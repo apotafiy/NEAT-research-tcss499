@@ -9,4 +9,10 @@ ASSET_MANAGER.downloadAll(() => {
 	gameEngine.init(ctx);
 
 	gameEngine.start();
+
+	gameEngine.addEntity(new Agent(gameEngine, 100, 100));
+	gameEngine.addEntity(new Agent(gameEngine, 200, 200));
+	gameEngine.addEntity(new Agent(gameEngine, 300, 300));
+	gameEngine.addEntity(new Agent(gameEngine, 400, 400));
+	gameEngine.addEntity(new Agent(gameEngine, 500, 500));
 });
