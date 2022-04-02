@@ -2,6 +2,7 @@ class Food {
     constructor(game, x, y, isPoison) {
         this.x = x;
         this.y = y;
+        this.isPoison = isPoison;
         this.game = game;
         this.states = {
             seed: 0,
@@ -27,7 +28,7 @@ class Food {
                 isSet: false,
             },
             {
-                lifeSpan: 10,
+                lifeSpan: 5,
                 radius: 3,
                 color: 'hsl(110, 100%, 30%)',
                 calories: 15,
@@ -42,6 +43,11 @@ class Food {
             },
         ]; // the properties of the entity at each state
         // would access as such: this.stateProps[this.state].lifeSpan
+        this.updateBoundingCircle();
+    }
+
+    updateBoundingCircle() {
+        this.BC = new BoundingCircle(this.x, this.y, this.properties[this.state].radius);
     }
 
     consume(){
@@ -53,12 +59,14 @@ class Food {
     update() {
         if (this.state == this.states.dead) {
             this.removeFromWorld = true;
+            return;
         } else if (!this.properties[this.state].isSet) {
             this.properties[this.state].isSet = true;
             setTimeout(() => {
                 this.state += 1;
             }, this.properties[this.state].lifeSpan * 1000);
         }
+        this.updateBoundingCircle();
     }
 
     draw(ctx) {
