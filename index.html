@@ -5,13 +5,23 @@
     <meta charset="utf-8">
     <title>Game Project Title Goes Here</title>
   
+    <script type="text/javascript" src="./entities/agent.js"></script>
+    <script type="text/javascript" src="./boundingcircle.js"></script>
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./timer.js"></script>
     <script type="text/javascript" src="./gameengine.js"></script>
     <script type="text/javascript" src="./util.js"></script>
     <script type="text/javascript" src="./main.js"></script>
+
+    <script type="text/javascript" src="./entities/Food.js"></script>
 </head>
 <body>
-    <canvas id="gameWorld" width="1024" height="768" style="background: white; border: 1px solid black" tabindex="0" autofocus></canvas>
+    <canvas id="gameWorld" width="1000" height="1000" style="background: white; border: 1px solid black" tabindex="0" autofocus></canvas>
+    <div>
+        <input type="range" id="leftwheel" min="-1" max="1" value="0" step="0.1"> Right Wheel
+    </div>
+    <div>
+        <input type="range" id="rightwheel" min="-1" max="1" value="0" step="0.1"> Left Wheel
+    </div>
 </body>
 </html>
