@@ -9,4 +9,5 @@ ASSET_MANAGER.downloadAll(() => {
 	gameEngine.init(ctx);
 
 	gameEngine.start();
+	gameEngine.addEntity(new Food(gameEngine, 50, 50, false));
 });
