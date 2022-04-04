@@ -11,9 +11,5 @@ ASSET_MANAGER.downloadAll(() => {
     gameEngine.start();
     gameEngine.addEntity(new Food(gameEngine, 50, 50, false));
 
-    gameEngine.addEntity(new Agent(gameEngine, 100, 100));
-    gameEngine.addEntity(new Agent(gameEngine, 200, 200));
-    gameEngine.addEntity(new Agent(gameEngine, 300, 300));
-    gameEngine.addEntity(new Agent(gameEngine, 400, 400));
     gameEngine.addEntity(new Agent(gameEngine, 500, 500));
 });

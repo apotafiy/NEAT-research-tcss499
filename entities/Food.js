@@ -15,28 +15,28 @@ class Food {
         this.properties = [
             {
                 lifeSpan: 5,
-                radius: 1,
+                radius: 5,
                 color: 'hsl(110, 100%, 50%)',
                 calories: 5,
                 isSet: false,
             },
             {
                 lifeSpan: 5,
-                radius: 2,
+                radius: 10,
                 color: 'hsl(110, 100%, 40%)',
                 calories: 10,
                 isSet: false,
             },
             {
                 lifeSpan: 5,
-                radius: 3,
+                radius: 15,
                 color: 'hsl(110, 100%, 30%)',
                 calories: 15,
                 isSet: false,
             },
             {
                 lifeSpan: 2,
-                radius: 2,
+                radius: 15,
                 color: 'hsl(110, 100%, 20%)',
                 calories: -10,
                 isSet: false,
@@ -74,8 +74,9 @@ class Food {
         ctx.arc(this.x, this.y, this.properties[this.state].radius, 0 , 2 * Math.PI, false);
         ctx.fillStyle = this.properties[this.state].color;
         ctx.fill();
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = this.properties[this.state].color;
+        ctx.lineWidth = 2;
+        // ctx.strokeStyle = this.properties[this.state].color;
+        ctx.strokeStyle = "Black";
         ctx.stroke();
     }
 }
