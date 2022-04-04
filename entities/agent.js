@@ -43,7 +43,7 @@ class Agent {
         ctx.fill();
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(this.BC.center.x, this.BC.center.y);
+        ctx.moveTo(this.BC.center.x + 15 * Math.cos(this.heading), this.BC.center.y + 15 * Math.sin(this.heading));
         ctx.lineTo(this.BC.center.x + 30 * Math.cos(this.heading), this.BC.center.y + 30 * Math.sin(this.heading));
         ctx.stroke();
     };
