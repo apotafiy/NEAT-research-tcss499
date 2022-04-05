@@ -1,5 +1,7 @@
 /** Global Parameters Object */
-const params = { };
+const params = {
+    CANVAS_SIZE: 1000
+ };
 
 /**
  * @param {Number} n

@@ -2,9 +2,9 @@ class Agent {
 
     constructor(game, x, y) {
         Object.assign(this, {game, x, y});
-        this.diameter = 30;
+        this.diameter = 20;
         this.wheelRadius = 5;
-        this.maxVelocity = 1;
+        this.maxVelocity = 10;
         this.strokeColor = "black";    
         this.fillColor = "blue";
         this.leftWheel = 0;
@@ -19,8 +19,12 @@ class Agent {
     };
 
     update() {
-        this.leftWheel = parseFloat(document.getElementById("leftwheel").value);
-        this.rightWheel = parseFloat(document.getElementById("rightwheel").value);
+        // this.leftWheel = parseFloat(document.getElementById("leftwheel").value);
+        // this.rightWheel = parseFloat(document.getElementById("rightwheel").value);
+
+        let wheels = this.neuralNet.processInput([randomInt(101) / 100]);
+        this.leftWheel = wheels[0];
+        this.rightWheel = wheels[1];
 
         let dh = this.wheelRadius / this.diameter * this.maxVelocity * (this.rightWheel - this.leftWheel);   
         let dx = (this.wheelRadius / 2) * this.maxVelocity * (this.rightWheel + this.leftWheel) * Math.cos(this.heading);
@@ -43,8 +47,8 @@ class Agent {
         ctx.fill();
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(this.BC.center.x + 15 * Math.cos(this.heading), this.BC.center.y + 15 * Math.sin(this.heading));
-        ctx.lineTo(this.BC.center.x + 30 * Math.cos(this.heading), this.BC.center.y + 30 * Math.sin(this.heading));
+        ctx.moveTo(this.BC.center.x + this.diameter / 2 * Math.cos(this.heading), this.BC.center.y + this.diameter / 2 * Math.sin(this.heading));
+        ctx.lineTo(this.BC.center.x + this.diameter * Math.cos(this.heading), this.BC.center.y + this.diameter * Math.sin(this.heading));
         ctx.stroke();
     };
 };
