@@ -3,19 +3,20 @@ class Agent {
     constructor(game, x, y) {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
-        this.wheelRadius = 5;
-        this.maxVelocity = 10;
+        this.wheelRadius = 2.5;
+        this.maxVelocity = 5;
         this.strokeColor = "black";    
         this.fillColor = "blue";
         this.leftWheel = 0;
         this.rightWheel = 0;
         this.heading = randomInt(361) * Math.PI / 180;
         this.neuralNet = new NeuralNet();
+        this.energy = 0;
         this.updateBoundingCircle();
     };
 
     updateBoundingCircle() {
-        this.BC = new BoundingCircle(this.x + this.diameter / 2, this.y + this.diameter / 2, this.diameter / 2);
+        this.BC = new BoundingCircle(this.x, this.y, this.diameter / 2);
     };
 
     update() {
@@ -33,14 +34,18 @@ class Agent {
         this.y += dy;
         this.heading += dh;
 
-        this.neuralNet.processInput([0.5]);
+        this.game.entities.forEach(entity => {
+            if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {
+                this.energy += entity.consume();
+            }
+        });
 
         this.updateBoundingCircle();
     };
 
     draw(ctx) {
         ctx.beginPath();
-        ctx.arc(this.x + this.diameter / 2, this.y + this.diameter / 2, this.diameter / 2, 0, 2 * Math.PI);
+        ctx.arc(this.x, this.y, this.diameter / 2, 0, 2 * Math.PI);
         ctx.strokeStyle = this.strokeColor;
         ctx.fillStyle = this.fillColor;
         ctx.lineWidth = 2;

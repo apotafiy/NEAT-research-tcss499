@@ -5,7 +5,6 @@ class NeuralNet {
         this.nodes = this.genome.nodeGenes;
         this.edges = this.genome.connectionGenes;
         this.sortedNodes = this.topoSort();
-        console.log(this.sortedNodes);
     };
 
     processInput(input) {
@@ -24,7 +23,7 @@ class NeuralNet {
                         value += edge.in.value * edge.weight;
                     }
                 });
-                this.nodes[nodeId].value = value;//this.sigmoid(value);
+                this.nodes[nodeId].value = this.sigmoid(value);
                 if (this.nodes[nodeId].type === NODE_TYPES.output) {
                     wheels.push(this.nodes[nodeId].value);
                 }

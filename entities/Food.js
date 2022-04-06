@@ -52,9 +52,11 @@ class Food {
     }
 
     consume(){
-        this.state = this.states.dead;
         // if isPoison then energy is depleted
-        return this.isPoison ? Math.abs(this.properties[this.state].calories) * -1: this.properties[this.state].calories;
+        let cals = this.isPoison ? Math.abs(this.properties[this.state].calories) * -1: this.properties[this.state].calories;
+        this.state = this.states.dead;
+        this.removeFromWorld = true;
+        return cals;
     }
 
     update() {
