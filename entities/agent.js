@@ -4,7 +4,7 @@ class Agent {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
         this.wheelRadius = 2.5;
-        this.maxVelocity = 5;
+        this.maxVelocity = 2;
         this.strokeColor = "black";    
         this.fillColor = "blue";
         this.leftWheel = 0;
@@ -23,7 +23,7 @@ class Agent {
         // this.leftWheel = parseFloat(document.getElementById("leftwheel").value);
         // this.rightWheel = parseFloat(document.getElementById("rightwheel").value);
 
-        let wheels = this.neuralNet.processInput([randomInt(101) / 100]);
+        let wheels = this.neuralNet.processInput([randomInt(101) / 100, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         this.leftWheel = wheels[0];
         this.rightWheel = wheels[1];
 
