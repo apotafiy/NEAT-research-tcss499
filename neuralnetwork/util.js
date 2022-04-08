@@ -1,10 +1,12 @@
-const NODE_TYPES = {
-    input: 0,
-    hidden: 1,
-    output: 2,
-};
 
-let INNOV_NUM = 0;
+
+// const NODE_TYPES = {
+//     input: 0,
+//     hidden: 1,
+//     output: 2,
+// };
+
+// let INNOV_NUM = 0;
 
 
 

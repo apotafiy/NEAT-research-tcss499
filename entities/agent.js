@@ -10,7 +10,8 @@ class Agent {
         this.leftWheel = 0;
         this.rightWheel = 0;
         this.heading = randomInt(361) * Math.PI / 180;
-        this.neuralNet = new NeuralNet();
+        this.genome = new Genome();
+        this.neuralNet = new NeuralNet(this.genome);
         this.energy = 0;
         this.updateBoundingCircle();
     };

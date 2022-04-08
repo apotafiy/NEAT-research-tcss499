@@ -14,8 +14,12 @@ ASSET_MANAGER.downloadAll(() => {
         gameEngine.addEntity(new Food(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), false));
     }
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1; i++) {
         gameEngine.addEntity(new Agent(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1)));
     }
-    
+
+    let agentA = new Agent(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1));
+    let agentB = new Agent(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1));
+
+    Genome.crossover(agentA.neuralNet.genome, agentB.neuralNet.genome);
 });

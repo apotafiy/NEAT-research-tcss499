@@ -1,7 +1,7 @@
 class NeuralNet {
 
-    constructor() {
-        this.genome = new Genome();
+    constructor(genome) {
+        this.genome = genome;
         this.nodes = this.genome.nodeGenes;
         this.edges = this.genome.connectionGenes;
         this.sortedNodes = this.topoSort();
@@ -13,7 +13,7 @@ class NeuralNet {
         let inputIndex = 0;
 
         this.sortedNodes.forEach(nodeId => {
-            if (this.nodes[nodeId].type === NODE_TYPES.input) { // assign values to input neurons
+            if (this.nodes[nodeId].type === Genome.NODE_TYPES.input) { // assign values to input neurons
                 this.nodes[nodeId].value = input[inputIndex];
                 inputIndex++;
             } else { // hidden or output neurons
@@ -24,7 +24,7 @@ class NeuralNet {
                     }
                 });
                 this.nodes[nodeId].value = this.sigmoid(value);
-                if (this.nodes[nodeId].type === NODE_TYPES.output) {
+                if (this.nodes[nodeId].type === Genome.NODE_TYPES.output) {
                     wheels.push(this.nodes[nodeId].value);
                 }
             }
