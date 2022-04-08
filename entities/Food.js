@@ -1,4 +1,5 @@
 class Food {
+    
     constructor(game, x, y, isPoison) {
         this.x = x;
         this.y = y;
@@ -15,28 +16,28 @@ class Food {
         this.properties = [
             {
                 lifeSpan: 5,
-                radius: 5,
+                radius: 3,
                 color: 'hsl(110, 100%, 50%)',
                 calories: 5,
                 isSet: false,
             },
             {
                 lifeSpan: 5,
-                radius: 10,
+                radius: 6,
                 color: 'hsl(110, 100%, 40%)',
                 calories: 10,
                 isSet: false,
             },
             {
                 lifeSpan: 5,
-                radius: 15,
+                radius: 9,
                 color: 'hsl(110, 100%, 30%)',
                 calories: 15,
                 isSet: false,
             },
             {
                 lifeSpan: 2,
-                radius: 15,
+                radius: 9,
                 color: 'hsl(110, 100%, 20%)',
                 calories: -10,
                 isSet: false,
@@ -51,9 +52,11 @@ class Food {
     }
 
     consume(){
-        this.state = this.states.dead;
         // if isPoison then energy is depleted
-        return this.isPoison ? Math.abs(this.properties[this.state].calories) * -1: this.properties[this.state].calories;
+        let cals = this.isPoison ? Math.abs(this.properties[this.state].calories) * -1: this.properties[this.state].calories;
+        this.state = this.states.dead;
+        this.removeFromWorld = true;
+        return cals;
     }
 
     update() {
