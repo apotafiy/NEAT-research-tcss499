@@ -16,28 +16,28 @@ class Food {
             {
                 lifeSpan: 3,
                 radius: 3,
-                color: 'hsl(110, 100%, 50%)',
+                color: 'hsl(50, 100%, 50%)',
                 calories: 5,
                 isSet: false,
             },
             {
                 lifeSpan: 3 + Math.random() * 2, // add a bit of variation in lifespan
                 radius: 6,
-                color: 'hsl(110, 100%, 40%)',
+                color: 'hsl(100, 100%, 50%)',
                 calories: 10,
                 isSet: false,
             },
             {
                 lifeSpan: 5,
                 radius: 9,
-                color: 'hsl(110, 100%, 30%)',
+                color: 'hsl(200, 100%, 50%)',
                 calories: 15,
                 isSet: false,
             },
             {
                 lifeSpan: 2,
                 radius: 9,
-                color: 'hsl(110, 100%, 20%)',
+                color: 'hsl(25, 100%, 50%)',
                 calories: -10,
                 isSet: false,
             },
@@ -101,6 +101,9 @@ class Food {
     }
 
     draw(ctx) {
+        if(this.state == this.states.dead){
+            return;
+        }
         ctx.beginPath();
         ctx.arc(
             this.x,
