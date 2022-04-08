@@ -14,14 +14,14 @@ class Food {
         this.state = this.states.seed;
         this.properties = [
             {
-                lifeSpan: 5,
+                lifeSpan: 3,
                 radius: 5,
                 color: 'hsl(110, 100%, 50%)',
                 calories: 5,
                 isSet: false,
             },
             {
-                lifeSpan: 5 + Math.random(), // add a bit of variation in lifespan 
+                lifeSpan: 3 + Math.random() * 2, // add a bit of variation in lifespan 
                 radius: 10,
                 color: 'hsl(110, 100%, 40%)',
                 calories: 10,
