@@ -8,10 +8,10 @@ class Genome {
         output: 2,
     };
 
-    static INNOV_MAP = {};
+    static INNOV_MAP = [];
 
     static resetInnovations = () => { // this function must be called whenever a new set of agents is created
-        Genome.INNOV_MAP = {};
+        Genome.INNOV_MAP = [];
     };
 
     static assignInnovNum = (inId, outId) => {
@@ -114,25 +114,32 @@ class Genome {
             if (innovationMap[connection.innovation] === undefined) {
                 innovationMap[connection.innovation] = [];
             }
-            innovationMap[connection.innovation].push({ ...connection });
+            innovationMap[connection.innovation][0] = { ...connection }; // genome A connections stored at index 0
         });
 
         genomeB.connectionGenes.forEach(connection => {
             if (innovationMap[connection.innovation] === undefined) {
                 innovationMap[connection.innovation] = [];
             }
-            innovationMap[connection.innovation].push({ ...connection });
+            innovationMap[connection.innovation][1] = { ...connection }; // genome B connections stored at index 1
         });
 
         let copiedConnections = [];
 
         innovationMap.forEach(connectionList => {
             if (connectionList !== undefined) {
-                let newConnection = { ...connectionList[0] };
-                if (connectionList.length === 2) {
-                    newConnection.isEnabled = newConnection.isEnabled && connectionList[1].isEnabled;
+                if (connectionList[0] !== undefined && connectionList[1] !== undefined) { // randomly choose between matching connection genes
+                    let newConnection = { ...connectionList[randomInt(2)] };
+                    newConnection.isEnabled = connectionList[0].isEnabled && connectionList[1].isEnabled;
+                    copiedConnections.push(newConnection);
+                } else { // disjoint/excess gene case -> result depends of fitness of genomeA and genomeB
+                    if (connectionList[0] !== undefined && genomeA.fitness >= genomeB.fitness) {
+                        copiedConnections.push(connectionList[0]);
+                    } 
+                    if (connectionList[1] !== undefined && genomeB.fitness >= genomeA.fitness) {
+                        copiedConnections.push(connectionList[1]);
+                    }
                 }
-                copiedConnections.push(newConnection);
             }
         });
 
@@ -141,7 +148,7 @@ class Genome {
 
     constructor(genome = undefined) {
         if (genome === undefined) {
-            let defaultGenome = Genome.getDefault(2, 0, 2, false);
+            let defaultGenome = Genome.getDefault(10, 0, 2, true);
             this.nodeGenes = defaultGenome.nodeGenes;
             this.connectionGenes = defaultGenome.connectionGenes;
         } else {

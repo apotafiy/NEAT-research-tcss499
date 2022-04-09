@@ -4,7 +4,7 @@ class Agent {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
         this.wheelRadius = 2.5;
-        this.maxVelocity = 2;
+        this.maxVelocity = 1;
         this.strokeColor = "black";    
         this.fillColor = "blue";
         this.leftWheel = 0;
@@ -13,7 +13,17 @@ class Agent {
         this.genome = new Genome();
         this.neuralNet = new NeuralNet(this.genome);
         this.energy = 0;
+        this.origin = { x: this.x, y: this.y };
         this.updateBoundingCircle();
+    };
+
+    assignFitness() {
+        const fitnessFunct = () => {
+            let currentPos = { x: this.x, y: this.y };
+            return distance(this.origin, currentPos) + distance(this.game.home.BC.center, currentPos);
+        };
+
+        this.genome.rawFitness = fitnessFunct();
     };
 
     updateBoundingCircle() {
@@ -24,7 +34,7 @@ class Agent {
         // this.leftWheel = parseFloat(document.getElementById("leftwheel").value);
         // this.rightWheel = parseFloat(document.getElementById("rightwheel").value);
 
-        let wheels = this.neuralNet.processInput([randomInt(101) / 100, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        let wheels = this.neuralNet.processInput([randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100, randomInt(101) / 100]);
         this.leftWheel = wheels[0];
         this.rightWheel = wheels[1];
 
