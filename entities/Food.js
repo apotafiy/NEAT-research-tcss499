@@ -1,5 +1,4 @@
 class Food {
-    
     constructor(game, x, y, isPoison) {
         this.x = x;
         this.y = y;
@@ -15,30 +14,30 @@ class Food {
         this.state = this.states.seed;
         this.properties = [
             {
-                lifeSpan: 5,
+                lifeSpan: 3,
                 radius: 3,
-                color: 'hsl(110, 100%, 50%)',
+                color: 'hsl(50, 100%, 50%)',
                 calories: 5,
                 isSet: false,
             },
             {
-                lifeSpan: 5,
+                lifeSpan: 3 + Math.random() * 2, // add a bit of variation in lifespan
                 radius: 6,
-                color: 'hsl(110, 100%, 40%)',
+                color: 'hsl(100, 100%, 50%)',
                 calories: 10,
                 isSet: false,
             },
             {
                 lifeSpan: 5,
                 radius: 9,
-                color: 'hsl(110, 100%, 30%)',
+                color: 'hsl(200, 100%, 50%)',
                 calories: 15,
                 isSet: false,
             },
             {
                 lifeSpan: 2,
                 radius: 9,
-                color: 'hsl(110, 100%, 20%)',
+                color: 'hsl(25, 100%, 50%)',
                 calories: -10,
                 isSet: false,
             },
@@ -48,18 +47,49 @@ class Food {
     }
 
     updateBoundingCircle() {
-        this.BC = new BoundingCircle(this.x, this.y, this.properties[this.state].radius);
+        this.BC = new BoundingCircle(
+            this.x,
+            this.y,
+            this.properties[this.state].radius
+        );
     }
 
-    consume(){
+    consume() {
         // if isPoison then energy is depleted
-        let cals = this.isPoison ? Math.abs(this.properties[this.state].calories) * -1: this.properties[this.state].calories;
+        let cals = this.isPoison
+            ? Math.abs(this.properties[this.state].calories) * -1
+            : this.properties[this.state].calories;
         this.state = this.states.dead;
         this.removeFromWorld = true;
         return cals;
     }
-
+    reproduce(numChildren) {
+        // determine a circle around food where it reproduce
+        // use the number of children to determine the angle to place the children
+        // if number of children is 2 then the angle increments should be 180deg
+        // if its 4 then it should be 90deg incrememnts
+        // once we know the angle we can choose a random distance from center to place the food
+        const increment = (2 * Math.PI) / numChildren;
+        let angle = Math.random() * Math.PI; // choose random starting angle to provide some variation in placements
+        const maxDist = 200;
+        for (let i = 0; i < numChildren; i++) {
+            // if i know angle and distance then i know coordinates
+            const distance = Math.random() * maxDist;
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+            this.game.entities.push(
+                new Food(this.game, this.x + x, this.y + y, false)
+            );
+            angle += increment;
+        }
+    }
     update() {
+        if(this.x < 0 || this.y < 0 || this.x > document.getElementById("gameWorld").width || this.y > document.getElementById("gameWorld").height){
+            // I include this in case the food spawns outside the bounds of the canvas
+            // that way it does not needlessly render these entities
+            this.removeFromWorld = true;
+            return;
+        }
         if (this.state == this.states.dead) {
             this.removeFromWorld = true;
             return;
@@ -68,18 +98,32 @@ class Food {
             setTimeout(() => {
                 this.state += 1;
             }, this.properties[this.state].lifeSpan * 1000);
+            if (this.state == this.states.adult) {
+                const maxChildCount = 3;
+                this.reproduce(Math.floor(Math.random() * maxChildCount) + 1);
+            }
         }
         this.updateBoundingCircle();
     }
 
     draw(ctx) {
+        if(this.state == this.states.dead){
+            return;
+        }
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.properties[this.state].radius, 0 , 2 * Math.PI, false);
+        ctx.arc(
+            this.x,
+            this.y,
+            this.properties[this.state].radius,
+            0,
+            2 * Math.PI,
+            false
+        );
         ctx.fillStyle = this.properties[this.state].color;
         ctx.fill();
         ctx.lineWidth = 2;
         // ctx.strokeStyle = this.properties[this.state].color;
-        ctx.strokeStyle = "Black";
+        ctx.strokeStyle = 'Black';
         ctx.stroke();
     }
 }
