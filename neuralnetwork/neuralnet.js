@@ -38,7 +38,7 @@ class NeuralNet {
     };
 
     topoSort() {
-        let inMap = {};
+        let inMap = [];
         let nodeQueue = [];
         let sortedNodes = [];
         
