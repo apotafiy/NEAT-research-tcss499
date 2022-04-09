@@ -43,14 +43,16 @@ class NeuralNet {
         let sortedNodes = [];
         
         for (let id = 0; id < this.nodes.length; id++) { // map neurons to number of incoming edges
-            inMap[id] = 0;
-            this.edges.forEach(edge => {
-                if (edge.out === id) {
-                    inMap[id]++;
+            if (this.nodes[id] !== undefined) {
+                inMap[id] = 0;
+                this.edges.forEach(edge => {
+                    if (edge.out === id) {
+                        inMap[id]++;
+                    }
+                });
+                if (inMap[id] === 0) {
+                    nodeQueue.push(id);
                 }
-            });
-            if (inMap[id] === 0) {
-                nodeQueue.push(id);
             }
         }
 

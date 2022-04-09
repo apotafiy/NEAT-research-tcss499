@@ -172,7 +172,7 @@ class Genome {
 
     constructor(genome = undefined) {
         if (genome === undefined) {
-            let defaultGenome = Genome.getDefault(true);
+            let defaultGenome = Genome.getDefault();
             this.nodeGenes = defaultGenome.nodeGenes;
             this.connectionGenes = defaultGenome.connectionGenes;
         } else {
