@@ -1,6 +1,14 @@
 class Genome {
 
+    static DEFAULT_INPUTS = 10;
+
+    static DEFAULT_HIDDENS = 0;
+
+    static DEFAULT_OUTPUTS = 2;
+
     static INNOV_NUM = 0;
+
+    static NODE_ID = Genome.DEFAULT_INPUTS + Genome.DEFAULT_HIDDENS + Genome.DEFAULT_OUTPUTS;
 
     static NODE_TYPES = {
         input: 0,
@@ -9,6 +17,8 @@ class Genome {
     };
 
     static INNOV_MAP = [];
+
+    static NODE_ID_MAP = [];
 
     static resetInnovations = () => { // this function must be called whenever a new set of agents is created
         Genome.INNOV_MAP = [];
@@ -25,8 +35,22 @@ class Genome {
         return innovNumber;
     };
 
-    static getDefault = (numInputs, numHiddens, numOutputs, randomWeights = false) => {
+    static assignNodeId = (innovNum) => {
+        let id;
+        if (Genome.NODE_ID_MAP[innovNum] !== undefined) {
+            id = Genome.NODE_ID_MAP[innovNum];
+        } else {
+            id = Genome.NODE_ID++;
+            Genome.NODE_ID_MAP = id;
+        }
+        return id;
+    };
 
+    static getDefault = (randomWeights = false) => {
+
+        let numInputs = Genome.DEFAULT_INPUTS;
+        let numHiddens = Genome.DEFAULT_HIDDENS;
+        let numOutputs = Genome.DEFAULT_OUTPUTS;
         let numNeurons = numInputs + numHiddens + numOutputs;
         let nodeGenes = [];
         let connectionGenes = [];
@@ -148,7 +172,7 @@ class Genome {
 
     constructor(genome = undefined) {
         if (genome === undefined) {
-            let defaultGenome = Genome.getDefault(10, 0, 2, true);
+            let defaultGenome = Genome.getDefault(true);
             this.nodeGenes = defaultGenome.nodeGenes;
             this.connectionGenes = defaultGenome.connectionGenes;
         } else {
@@ -158,10 +182,53 @@ class Genome {
     };
 
     mutate() {
+        this.connectionGenes.forEach(connection => { // weight mutations
+            if (randomInt(100) < 5) { // 5% chance of a weight mutation for every connection
+                connection.weight = randomInt(2) === 1 ? Math.min(1, connection.weight + Math.random() * 0.1) : Math.max(0, connection.weight - Math.random() * 0.1);
+            }
+        });
 
+        if (randomInt(100) < 5) { // new node mutation (5% chance)
+            let connection = this.connectionGenes[randomInt(this.connectionGenes.length)];
+            if (connection.isEnabled) {
+                let nodeId = Genome.assignNodeId(connection.innovation);
+                if (this.nodeGenes[nodeId] === undefined) { // check if we already have this node in our genome
+                    connection.isEnabled = false; // disable the old connection
+                    this.nodeGenes[nodeId] = { id: nodeId, type: Genome.NODE_TYPES.hidden }; // add the new node, then split the connection
+                    this.connectionGenes.push(
+                        {
+                            in: connection.in,
+                            out: nodeId,
+                            weight: 1,
+                            isEnabled: true,
+                            innovation: Genome.assignInnovNum(connection.in, nodeId)
+                        }
+                        );
+                    this.connectionGenes.push(
+                        {
+                            in: nodeId,
+                            out: connection.out,
+                            weight: connection.weight,
+                            isEnabled: true,
+                            innovation: Genome.assignInnovNum(nodeId, connection.out)
+                        }
+                    );
+                }
+            }
+        }
     };
 
-    length() {
+    numNodes() {
+        let count = 0;
+        this.nodeGenes.forEach(node => {
+            if (node !== undefined) {
+                count++;
+            }
+        });
+        return count;
+    };
+
+    numConnections() {
         return this.connectionGenes.length;
     };
 };
