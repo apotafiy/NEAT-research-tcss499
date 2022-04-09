@@ -19,8 +19,8 @@ class NeuralNet {
             } else { // hidden or output neurons
                 let value = 0;
                 this.edges.forEach(edge => {
-                    if (edge.out.id === nodeId && edge.isEnabled) {
-                        value += edge.in.value * edge.weight;
+                    if (edge.out === nodeId && edge.isEnabled) {
+                        value += this.nodes[edge.in].value * edge.weight;
                     }
                 });
                 this.nodes[nodeId].value = this.sigmoid(value);
@@ -45,7 +45,7 @@ class NeuralNet {
         for (let id = 0; id < this.nodes.length; id++) { // map neurons to number of incoming edges
             inMap[id] = 0;
             this.edges.forEach(edge => {
-                if (edge.out.id === id) {
+                if (edge.out === id) {
                     inMap[id]++;
                 }
             });
@@ -58,10 +58,10 @@ class NeuralNet {
             let id = nodeQueue.splice(0, 1)[0];
             sortedNodes.push(id);
             this.edges.forEach(edge => {
-                if (edge.in.id === id) {
-                    inMap[edge.out.id]--;
-                    if (inMap[edge.out.id] === 0) {
-                        nodeQueue.push(edge.out.id);
+                if (edge.in === id) {
+                    inMap[edge.out]--;
+                    if (inMap[edge.out] === 0) {
+                        nodeQueue.push(edge.out);
                     }
                 }
             });

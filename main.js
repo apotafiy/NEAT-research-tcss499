@@ -14,7 +14,7 @@ ASSET_MANAGER.downloadAll(() => {
         gameEngine.addEntity(new Food(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), false));
     }
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 100; i++) {
         gameEngine.addEntity(new Agent(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1)));
     }
 
