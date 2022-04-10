@@ -72,7 +72,7 @@ class Genome {
                         {
                             in: inputNeuron,
                             out: hiddenNeuron,
-                            weight: randomWeights ? randomInt(101) / 100 : 0.1,
+                            weight: randomWeights ? Math.random() : 0.1,
                             isEnabled: true,
                             innovation: Genome.assignInnovNum(inputNeuron, hiddenNeuron),
                         }
@@ -84,7 +84,7 @@ class Genome {
                         {
                             in: inputNeuron,
                             out: outputNeuron,
-                            weight: randomWeights ? randomInt(101) / 100 : 0.1,
+                            weight: randomWeights ? Math.random() : 0.1,
                             isEnabled: true,
                             innovation: Genome.assignInnovNum(inputNeuron, outputNeuron),
                         }
@@ -99,7 +99,7 @@ class Genome {
                     {
                         in: hiddenNeuron,
                         out: outputNeuron,
-                        weight: randomWeights ? randomInt(101) / 100 : 0.1,
+                        weight: randomWeights ? Math.random() : 0.1,
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(hiddenNeuron, outputNeuron),
                     }
