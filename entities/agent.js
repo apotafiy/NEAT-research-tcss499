@@ -52,6 +52,8 @@ class Agent {
         });
 
         this.updateBoundingCircle();
+        this.genome.mutate();
+        this.neuralNet = new NeuralNet(this.genome)
     };
 
     draw(ctx) {
