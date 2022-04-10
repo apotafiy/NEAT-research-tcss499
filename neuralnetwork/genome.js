@@ -114,24 +114,6 @@ class Genome {
     };
 
     static crossover = (genomeA, genomeB) => {
-
-        let addedIds = [];
-        let copiedNodes = [];
-
-        genomeA.nodeGenes.forEach(node => {
-            if (node !== undefined && !addedIds[node.id]) {
-                copiedNodes[node.id] = { ...node };
-                addedIds[node.id] = true;
-            }
-        });
-
-        genomeB.nodeGenes.forEach(node => {
-            if (node !== undefined && !addedIds[node.id]) {
-                copiedNodes[node.id] = { ...node };
-                addedIds[node.id] = true;
-            }
-        });
-
         let innovationMap = [];
 
         genomeA.connectionGenes.forEach(connection => {
@@ -148,22 +130,31 @@ class Genome {
             innovationMap[connection.innovation][1] = { ...connection }; // genome B connections stored at index 1
         });
 
+        let copiedNodes = [];
         let copiedConnections = [];
 
         innovationMap.forEach(connectionList => {
             if (connectionList !== undefined) {
+                let newConnection;
+                let selectedGenome;
                 if (connectionList[0] !== undefined && connectionList[1] !== undefined) { // randomly choose between matching connection genes
-                    let newConnection = { ...connectionList[randomInt(2)] };
+                    let randChoice = randomInt(2);
+                    selectedGenome = randChoice === 0 ? genomeA : genomeB;
+                    newConnection = connectionList[randChoice];
                     newConnection.isEnabled = connectionList[0].isEnabled && connectionList[1].isEnabled;
-                    copiedConnections.push(newConnection);
                 } else { // disjoint/excess gene case -> result depends of fitness of genomeA and genomeB
                     if (connectionList[0] !== undefined && genomeA.fitness >= genomeB.fitness) {
-                        copiedConnections.push(connectionList[0]);
+                        selectedGenome = genomeA;
+                        newConnection = connectionList[0];
                     } 
                     if (connectionList[1] !== undefined && genomeB.fitness >= genomeA.fitness) {
-                        copiedConnections.push(connectionList[1]);
+                        selectedGenome = genomeB;
+                        newConnection = connectionList[1];
                     }
                 }
+                copiedConnections.push(newConnection);
+                copiedNodes[newConnection.in] = { ...selectedGenome.nodeGenes[newConnection.in] };
+                copiedNodes[newConnection.out] = { ...selectedGenome.nodeGenes[newConnection.out] };
             }
         });
 
