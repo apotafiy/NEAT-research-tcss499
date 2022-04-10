@@ -77,7 +77,11 @@ class GameEngine {
     };
 
     addEntity(entity) {
-        this.entities.push(entity);
+        if (entity instanceof Agent || entity instanceof HomeBase) {
+            this.entities.push(entity);
+        } else {
+            this.entities.splice(1, 0, entity);
+        }  
     };
 
     draw() {

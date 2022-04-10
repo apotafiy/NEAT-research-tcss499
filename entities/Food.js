@@ -28,14 +28,14 @@ class Food {
                 isSet: false,
             },
             {
-                lifeSpan: 5,
+                lifeSpan: 3,
                 radius: 9,
                 color: 'hsl(200, 100%, 50%)',
                 calories: 15,
                 isSet: false,
             },
             {
-                lifeSpan: 2,
+                lifeSpan: 3,
                 radius: 9,
                 color: 'hsl(25, 100%, 50%)',
                 calories: -10,
@@ -97,6 +97,9 @@ class Food {
             this.properties[this.state].isSet = true;
             setTimeout(() => {
                 this.state += 1;
+                if (this.state == this.states.dead) {
+                    this.removeFromWorld = true;
+                }
             }, this.properties[this.state].lifeSpan * 1000);
             if (this.state == this.states.adult) {
                 const maxChildCount = 3;
