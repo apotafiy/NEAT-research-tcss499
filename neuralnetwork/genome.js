@@ -41,7 +41,7 @@ class Genome {
             id = Genome.NODE_ID_MAP[innovNum];
         } else {
             id = Genome.NODE_ID++;
-            Genome.NODE_ID_MAP = id;
+            Genome.NODE_ID_MAP[innovNum] = id;
         }
         return id;
     };
