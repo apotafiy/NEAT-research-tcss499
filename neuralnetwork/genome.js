@@ -152,7 +152,6 @@ class Genome {
                         newConnection = connectionList[1];
                     }
                 }
-                // console.log(newConnection)
                 if (newConnection !== undefined) {
                     copiedConnections.push(newConnection);
                     copiedNodes[newConnection.in] = { ...selectedGenome.nodeGenes[newConnection.in] };
