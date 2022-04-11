@@ -135,26 +135,29 @@ class Genome {
 
         innovationMap.forEach(connectionList => {
             if (connectionList !== undefined) {
-                let newConnection;
-                let selectedGenome;
+                let newConnection = undefined;
+                let selectedGenome = undefined;
                 if (connectionList[0] !== undefined && connectionList[1] !== undefined) { // randomly choose between matching connection genes
                     let randChoice = randomInt(2);
                     selectedGenome = randChoice === 0 ? genomeA : genomeB;
                     newConnection = connectionList[randChoice];
                     newConnection.isEnabled = connectionList[0].isEnabled && connectionList[1].isEnabled;
                 } else { // disjoint/excess gene case -> result depends of fitness of genomeA and genomeB
-                    if (connectionList[0] !== undefined && genomeA.fitness >= genomeB.fitness) {
+                    if (connectionList[0] !== undefined && genomeA.rawFitness >= genomeB.rawFitness) {
                         selectedGenome = genomeA;
                         newConnection = connectionList[0];
                     } 
-                    if (connectionList[1] !== undefined && genomeB.fitness >= genomeA.fitness) {
+                    if (connectionList[1] !== undefined && genomeB.rawFitness >= genomeA.rawFitness) {
                         selectedGenome = genomeB;
                         newConnection = connectionList[1];
                     }
                 }
-                copiedConnections.push(newConnection);
-                copiedNodes[newConnection.in] = { ...selectedGenome.nodeGenes[newConnection.in] };
-                copiedNodes[newConnection.out] = { ...selectedGenome.nodeGenes[newConnection.out] };
+                // console.log(newConnection)
+                if (newConnection !== undefined) {
+                    copiedConnections.push(newConnection);
+                    copiedNodes[newConnection.in] = { ...selectedGenome.nodeGenes[newConnection.in] };
+                    copiedNodes[newConnection.out] = { ...selectedGenome.nodeGenes[newConnection.out] };
+                }
             }
         });
 

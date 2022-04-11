@@ -1,6 +1,6 @@
 class Agent {
 
-    constructor(game, x, y) {
+    constructor(game, x, y, genome = undefined) {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
         this.wheelRadius = 2.5;
@@ -10,7 +10,7 @@ class Agent {
         this.leftWheel = 0;
         this.rightWheel = 0;
         this.heading = randomInt(361) * Math.PI / 180;
-        this.genome = new Genome();
+        this.genome = genome === undefined ? new Genome() : genome;
         this.neuralNet = new NeuralNet(this.genome);
         this.energy = 0;
         this.origin = { x: this.x, y: this.y };
@@ -52,8 +52,6 @@ class Agent {
         });
 
         this.updateBoundingCircle();
-        this.genome.mutate();
-        this.neuralNet = new NeuralNet(this.genome)
     };
 
     draw(ctx) {

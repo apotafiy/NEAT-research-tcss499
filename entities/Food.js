@@ -46,6 +46,10 @@ class Food {
         this.updateBoundingCircle();
     }
 
+    isAdult() {
+        return this.state === this.states.adult;
+    };
+
     updateBoundingCircle() {
         this.BC = new BoundingCircle(
             this.x,
@@ -63,7 +67,10 @@ class Food {
         this.removeFromWorld = true;
         return cals;
     }
-    reproduce(numChildren) {
+
+    reproduce() {
+        const maxChildCount = 3;
+        let numChildren = Math.floor(Math.random() * maxChildCount) + 1;
         // determine a circle around food where it reproduce
         // use the number of children to determine the angle to place the children
         // if number of children is 2 then the angle increments should be 180deg
@@ -72,17 +79,19 @@ class Food {
         const increment = (2 * Math.PI) / numChildren;
         let angle = Math.random() * Math.PI; // choose random starting angle to provide some variation in placements
         const maxDist = 200;
+        let children = [];
         for (let i = 0; i < numChildren; i++) {
             // if i know angle and distance then i know coordinates
             const distance = Math.random() * maxDist;
             const x = Math.cos(angle) * distance;
             const y = Math.sin(angle) * distance;
-            this.game.entities.push(
-                new Food(this.game, this.x + x, this.y + y, false)
-            );
+            let seedling = new Food(this.game, this.x + x, this.y + y, false);
+            children.push(seedling);
             angle += increment;
         }
+        return children;
     }
+
     update() {
         if(this.x < 0 || this.y < 0 || this.x > document.getElementById("gameWorld").width || this.y > document.getElementById("gameWorld").height){
             // I include this in case the food spawns outside the bounds of the canvas
@@ -101,10 +110,6 @@ class Food {
                     this.removeFromWorld = true;
                 }
             }, this.properties[this.state].lifeSpan * 1000);
-            if (this.state == this.states.adult) {
-                const maxChildCount = 3;
-                this.reproduce(Math.floor(Math.random() * maxChildCount) + 1);
-            }
         }
         this.updateBoundingCircle();
     }
@@ -125,7 +130,6 @@ class Food {
         ctx.fillStyle = this.properties[this.state].color;
         ctx.fill();
         ctx.lineWidth = 2;
-        // ctx.strokeStyle = this.properties[this.state].color;
         ctx.strokeStyle = 'Black';
         ctx.stroke();
     }
