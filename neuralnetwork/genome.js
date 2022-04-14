@@ -213,6 +213,7 @@ class Genome {
                     this.connectionGenes.push(inConnection);
                     this.nodeGenes[inConnection.in].edges.push(inConnection);
                     this.nodeGenes[inConnection.out].edges.push(inConnection);
+                    this.nodeGenes[nodeId].edges.push(inConnection);
 
                     let outConnection = {
                         in: nodeId,
@@ -224,6 +225,7 @@ class Genome {
                     this.connectionGenes.push(outConnection);
                     this.nodeGenes[outConnection.in].edges.push(outConnection);
                     this.nodeGenes[outConnection.out].edges.push(outConnection);
+                    this.nodeGenes[nodeId].edges.push(outConnection);
                 }
             }
         }
