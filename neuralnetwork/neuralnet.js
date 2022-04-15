@@ -18,10 +18,15 @@ class NeuralNet {
                 inputIndex++;
             } else { // hidden or output neurons
                 let value = 0;
-                this.edges.forEach(edge => {
-                    if (edge.out === nodeId && edge.isEnabled) {
-                        value += this.nodes[edge.in].value * edge.weight;
-                    }
+                this.nodes[nodeId].inIds.forEach(inId => {
+                    this.edges[[inId, nodeId]].forEach(connection => {
+                        if (connection.isEnabled) {
+                            value += this.nodes[inId].value * connection.weight;
+                        }
+                    });
+                    // if (edge.out === nodeId && edge.isEnabled) {
+                    //     value += this.nodes[edge.in].value * edge.weight;
+                    // }
                 });
                 this.nodes[nodeId].value = this.sigmoid(value);
                 if (this.nodes[nodeId].type === Genome.NODE_TYPES.output) {
@@ -42,29 +47,22 @@ class NeuralNet {
         let nodeQueue = [];
         let sortedNodes = [];
         
-        for (let id = 0; id < this.nodes.length; id++) { // map neurons to number of incoming edges
-            if (this.nodes[id] !== undefined) {
-                inMap[id] = 0;
-                this.edges.forEach(edge => {
-                    if (edge.out === id) {
-                        inMap[id]++;
-                    }
-                });
-                if (inMap[id] === 0) {
-                    nodeQueue.push(id);
+        this.nodes.forEach(node => { // map neurons to number of incoming edges
+            if (node !== undefined) {
+                inMap[node.id] = node.inIds.size;
+                if (inMap[node.id] === 0) {
+                    nodeQueue.push(node.id);
                 }
             }
-        }
+        });
 
         while (nodeQueue.length !== 0) {
             let id = nodeQueue.splice(0, 1)[0];
             sortedNodes.push(id);
-            this.edges.forEach(edge => {
-                if (edge.in === id) {
-                    inMap[edge.out]--;
-                    if (inMap[edge.out] === 0) {
-                        nodeQueue.push(edge.out);
-                    }
+            this.nodes[id].outIds.forEach(outId => {
+                inMap[outId]--;
+                if (inMap[outId] === 0) {
+                    nodeQueue.push(outId);
                 }
             });
         }

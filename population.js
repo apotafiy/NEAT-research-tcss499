@@ -39,7 +39,7 @@ class PopulationManager {
             }
 
             this.reproduceFood();
-        }, 4000);
+        }, 10000);
     };
 
     spawnAgents() {

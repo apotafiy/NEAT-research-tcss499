@@ -57,11 +57,11 @@ class Genome {
 
         for (let i = 0; i < numNeurons; i++) {
             if (i < numInputs) {
-                nodeGenes[i] = { id: i, type: Genome.NODE_TYPES.input, edges: [] };
+                nodeGenes[i] = { id: i, type: Genome.NODE_TYPES.input, inIds: new Set(), outIds: new Set() };
             } else if (i < numInputs + numHiddens) {
-                nodeGenes[i] = { id: i, type: Genome.NODE_TYPES.hidden, edges: [] };
+                nodeGenes[i] = { id: i, type: Genome.NODE_TYPES.hidden, inIds: new Set(), outIds: new Set() };
             } else {
-                nodeGenes[i] = { id: i, type: Genome.NODE_TYPES.output, edges: [] };
+                nodeGenes[i] = { id: i, type: Genome.NODE_TYPES.output, inIds: new Set(), outIds: new Set() };
             } 
         }
 
@@ -75,9 +75,10 @@ class Genome {
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(inputNeuron, hiddenNeuron),
                     };
-                    connectionGenes.push(connection);
-                    nodeGenes[inputNeuron].edges.push(connection);
-                    nodeGenes[hiddenNeuron].edges.push(connection);
+                    // connectionGenes[[connection.in, connection.out]] = connection;
+                    // nodeGenes[connection.in].outIds.push(connection.out);
+                    // nodeGenes[connection.out].inIds.push(connection.in);
+                    Genome.addParentConnection(connectionGenes, nodeGenes, connection);
                 }
             } else { // no hidden neurons, connect straight to output neurons
                 for (let outputNeuron = numInputs + numHiddens; outputNeuron < numNeurons; outputNeuron++) {
@@ -88,9 +89,10 @@ class Genome {
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(inputNeuron, outputNeuron),
                     };
-                    connectionGenes.push(connection);
-                    nodeGenes[inputNeuron].edges.push(connection);
-                    nodeGenes[outputNeuron].edges.push(connection);
+                    // connectionGenes[[connection.in, connection.out]] = connection;
+                    // nodeGenes[connection.in].outIds.push(connection.out);
+                    // nodeGenes[connection.out].inIds.push(connection.in);
+                    Genome.addParentConnection(connectionGenes, nodeGenes, connection);
                 }
             }
         }
@@ -104,9 +106,10 @@ class Genome {
                     isEnabled: true,
                     innovation: Genome.assignInnovNum(hiddenNeuron, outputNeuron),
                 };
-                connectionGenes.push(connection);
-                nodeGenes[hiddenNeuron].edges.push(connection);
-                nodeGenes[outputNeuron].edges.push(connection);
+                // connectionGenes[[connection.in, connection.out]] = connection;
+                // nodeGenes[connection.in].outIds.push(connection.out);
+                // nodeGenes[connection.out].inIds.push(connection.in);
+                Genome.addParentConnection(connectionGenes, nodeGenes, connection);
             }
         }
     
@@ -116,21 +119,39 @@ class Genome {
         };
     };
 
+    static addParentConnection = (connectionGenes, nodeGenes, newConnection) => { // NOTE: this function assumes a parent genome (nodes are set up appropriately).
+        if (connectionGenes[[newConnection.in, newConnection.out]] === undefined) {
+            connectionGenes[[newConnection.in, newConnection.out]] = [];
+        }
+
+        connectionGenes[[newConnection.in, newConnection.out]].push(newConnection);
+        nodeGenes[newConnection.in].outIds.add(newConnection.out);
+        nodeGenes[newConnection.out].inIds.add(newConnection.in);
+    };
+
     static crossover = (genomeA, genomeB) => {
         let innovationMap = [];
 
-        genomeA.connectionGenes.forEach(connection => {
-            if (innovationMap[connection.innovation] === undefined) {
-                innovationMap[connection.innovation] = [];
+        genomeA.connectionGenes.forEach(connections => {
+            if (connections !== undefined) {
+                connections.forEach(connection => {
+                    if (innovationMap[connection.innovation] === undefined) {
+                        innovationMap[connection.innovation] = [];
+                    }
+                    innovationMap[connection.innovation][0] = { ...connection }; // genome A connections stored at index 0
+                }); 
             }
-            innovationMap[connection.innovation][0] = { ...connection }; // genome A connections stored at index 0
         });
 
-        genomeB.connectionGenes.forEach(connection => {
-            if (innovationMap[connection.innovation] === undefined) {
-                innovationMap[connection.innovation] = [];
+        genomeB.connectionGenes.forEach(connections => {
+            if (connections !== undefined) {
+                connections.forEach(connection => {
+                    if (innovationMap[connection.innovation] === undefined) {
+                        innovationMap[connection.innovation] = [];
+                    }
+                    innovationMap[connection.innovation][1] = { ...connection }; // genome B connections stored at index 1
+                });
             }
-            innovationMap[connection.innovation][1] = { ...connection }; // genome B connections stored at index 1
         });
 
         let copiedNodes = [];
@@ -156,22 +177,29 @@ class Genome {
                     }
                 }
                 if (newConnection !== undefined) {
-                    copiedConnections.push(newConnection);
+                    // Genome.addConnection(copiedConnections, copiedNodes, newConnection);
+                    if (copiedConnections[[newConnection.in, newConnection.out]] === undefined) {
+                        copiedConnections[[newConnection.in, newConnection.out]] = [];
+                    }
+                    copiedConnections[[newConnection.in, newConnection.out]].push(newConnection);
                     copiedNodes[newConnection.in] = { ...selectedGenome.nodeGenes[newConnection.in] };
                     copiedNodes[newConnection.out] = { ...selectedGenome.nodeGenes[newConnection.out] };
                 }
             }
         });
 
-        // update edge lists of copiedNodes
+        // update neighbor lists of copiedNodes
         copiedNodes.forEach(node => {
             if (node !== undefined) {
-                node.edges = []; // clear each node's edge list
+                node.inIds = new Set(); // clear each node's incoming/outgoing node ids
+                node.outIds = new Set();
             }
         });
-        copiedConnections.forEach(connection => { // populate each node's edge list
-            copiedNodes[connection.in].edges.push(connection);
-            copiedNodes[connection.out].edges.push(connection);
+        copiedConnections.forEach(connection => { // populate each node's incoming/outgoing node ids
+            if (connection !== undefined) {
+                copiedNodes[connection.in].outIds.add(connection.out);
+                copiedNodes[connection.out].inIds.add(connection.in);
+            }
         });
 
         return new Genome({ nodeGenes: copiedNodes, connectionGenes: copiedConnections });
@@ -189,19 +217,23 @@ class Genome {
     };
 
     mutate() {
-        this.connectionGenes.forEach(connection => { // weight mutations
-            if (randomInt(100) < 5) { // 5% chance of a weight mutation for every connection
-                connection.weight = randomInt(2) === 1 ? Math.min(1, connection.weight + Math.random() * 0.1) : Math.max(0, connection.weight - Math.random() * 0.1);
+        this.connectionGenes.forEach(connections => { // weight mutations
+            if (connections !== undefined) {
+                connections.forEach(connection => {
+                    if (connection !== undefined && randomInt(100) < 5) { // 5% chance of a weight mutation for every connection
+                        connection.weight = randomInt(2) === 1 ? Math.min(1, connection.weight + Math.random() * 0.1) : Math.max(0, connection.weight - Math.random() * 0.1);
+                    }
+                });
             }
         });
 
         if (randomInt(100) < 5) { // new node mutation (5% chance)
-            let connection = this.connectionGenes[randomInt(this.connectionGenes.length)];
+            let connection = this.connectionsAsList()[randomInt(this.numConnections())];
             if (connection.isEnabled) {
                 let nodeId = Genome.assignNodeId(connection.innovation);
                 if (this.nodeGenes[nodeId] === undefined) { // check if we already have this node in our genome
                     connection.isEnabled = false; // disable the old connection
-                    this.nodeGenes[nodeId] = { id: nodeId, type: Genome.NODE_TYPES.hidden, edges: [] }; // add the new node, then split the connection
+                    this.nodeGenes[nodeId] = { id: nodeId, type: Genome.NODE_TYPES.hidden, inIds: new Set(), outIds: new Set() }; // add the new node, then split the connection
                     
                     let inConnection = {
                         in: connection.in,
@@ -210,10 +242,13 @@ class Genome {
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(connection.in, nodeId)
                     };
-                    this.connectionGenes.push(inConnection);
-                    this.nodeGenes[inConnection.in].edges.push(inConnection);
-                    this.nodeGenes[inConnection.out].edges.push(inConnection);
-                    this.nodeGenes[nodeId].edges.push(inConnection);
+                    // this.connectionGenes.push(inConnection);
+                    // this.nodeGenes[inConnection.out].edges.push(inConnection);
+
+                    // this.connectionGenes[[inConnection.in, inConnection.out]] = inConnection;
+                    // this.nodeGenes[inConnection.in].outIds.push(inConnection.out);
+                    // this.nodeGenes[inConnection.out].inIds.push(inConnection.in);
+                    Genome.addParentConnection(this.connectionGenes, this.nodeGenes, inConnection);
 
                     let outConnection = {
                         in: nodeId,
@@ -222,13 +257,24 @@ class Genome {
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(nodeId, connection.out)
                     };
-                    this.connectionGenes.push(outConnection);
-                    this.nodeGenes[outConnection.in].edges.push(outConnection);
-                    this.nodeGenes[outConnection.out].edges.push(outConnection);
-                    this.nodeGenes[nodeId].edges.push(outConnection);
+                    // this.connectionGenes.push(outConnection);
+                    // this.nodeGenes[outConnection.out].edges.push(outConnection);
+                    Genome.addParentConnection(this.connectionGenes, this.nodeGenes, outConnection);
                 }
             }
         }
+    };
+
+    connectionsAsList() {
+        let connectionList = [];
+        this.connectionGenes.forEach(connections => {
+            if (connections !== undefined) {
+                connections.forEach(connection => {
+                    connectionList.push(connection);
+                });
+            }
+        });
+        return connectionList;
     };
 
     numNodes() {
@@ -242,6 +288,6 @@ class Genome {
     };
 
     numConnections() {
-        return this.connectionGenes.length;
+        return this.connectionsAsList().length;
     };
 };
