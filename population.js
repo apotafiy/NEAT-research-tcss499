@@ -85,7 +85,6 @@ class PopulationManager {
 
         this.agents.forEach(agent => agent.resetOrigin());
 
-        console.log("number of agents in world: ", this.agents.length);
         this.startGeneration();
     };
 };

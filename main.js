@@ -15,6 +15,4 @@ ASSET_MANAGER.downloadAll(() => {
     gameEngine.home = home;
 
     let population = new PopulationManager(gameEngine);
-
-    console.log(Genome.getDefault())
 });
