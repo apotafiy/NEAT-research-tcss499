@@ -4,8 +4,8 @@ class Agent {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
         this.wheelRadius = 2.5;
-        this.maxVelocity = 1;
-        this.visionRadius = 250;
+        this.maxVelocity = 2;
+        this.visionRadius = 500;
         this.strokeColor = "black";    
         this.fillColor = "hsl(240, 100%, 50%)";
         this.leftWheel = 0;
@@ -21,7 +21,8 @@ class Agent {
     assignFitness() {
         const fitnessFunct = () => {
             let currentPos = { x: this.x, y: this.y };
-            return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
+            // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
+            return 20 * this.energy - 10 * distance(currentPos, this.game.home.BC.center);
         };
 
         this.genome.rawFitness = fitnessFunct();
@@ -38,6 +39,10 @@ class Agent {
 
     resetOrigin() {
         this.origin = { x: this.x, y: this.y };
+    };
+
+    resetEnergy() {
+        this.energy = 0;
     };
 
     update() {

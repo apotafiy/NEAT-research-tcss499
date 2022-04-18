@@ -152,7 +152,7 @@ class Genome {
                 selectedGenome = randChoice === 0 ? genomeA : genomeB;
                 newConnection = connectionMap.get(randChoice);
                 newConnection.isEnabled = connectionMap.get(0).isEnabled && connectionMap.get(1).isEnabled;
-            } else { // disjoint/excess gene case -> result depends of fitness of genomeA and genomeB
+            } else { // disjoint/excess gene case -> result depends of fitness of genomeA and genomeB (select more fit parent)
                 if (connectionMap.get(0) !== undefined && genomeA.rawFitness >= genomeB.rawFitness) {
                     selectedGenome = genomeA;
                     newConnection = connectionMap.get(0);
@@ -235,6 +235,30 @@ class Genome {
                 }
             }
         }
+
+        if (randomInt(100) < 5) { // new connection mutation (5% chance)
+            let allNodes = this.nodesAsList();
+            let inNode = allNodes[randomInt(this.numNodes())];
+            let outNode = allNodes[randomInt(this.numNodes())];
+
+            // cannot create incoming edge to an input node, or a connection that already exists!
+            if (outNode.type !== Genome.NODE_TYPES.input && this.connectionGenes.get([inNode.id, outNode.id]) === undefined) {
+                let newConnection = {
+                    in: inNode.id,
+                    out: outNode.id,
+                    weight: Math.random(),
+                    isEnabled: true,
+                    innovation: Genome.assignInnovNum(inNode.id, outNode.id)
+                };
+                Genome.addParentConnection(this.connectionGenes, this.nodeGenes, newConnection);
+
+                newConnection.isCyclic = topoSort(this.nodeGenes, this.connectionGenes) === false; // check if connection creates a cycle
+            
+                if (newConnection.isCyclic) {
+                    console.log("created a cyclic edge!")
+                }
+            }
+        }
     };
 
     connectionsAsList() {
@@ -245,6 +269,14 @@ class Genome {
             });
         });
         return connectionList;
+    };
+
+    nodesAsList() {
+        let nodeList = [];
+        this.nodeGenes.forEach(node => {
+            nodeList.push(node);
+        });
+        return nodeList;
     };
 
     numNodes() {

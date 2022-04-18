@@ -1,6 +1,7 @@
 class PopulationManager {
 
-    static MAX_FOOD = 500;
+    static MIN_FOOD = 100;
+    static MAX_FOOD = 200;
 
     constructor(game) {
         this.game = game;
@@ -13,7 +14,7 @@ class PopulationManager {
     };
 
     startGeneration() {
-        setTimeout(() => this.processGeneration(), 15000);
+        setTimeout(() => this.processGeneration(), 10000);
     };
 
     reproduceFood() {
@@ -25,8 +26,8 @@ class PopulationManager {
             }
 
             if (this.food.length < PopulationManager.MAX_FOOD) {
-                if (this.food.length === 0) {
-                    this.spawnFood();
+                if (this.food.length < PopulationManager.MIN_FOOD) {
+                    this.spawnFood(PopulationManager.MAX_FOOD - this.food.length);
                 }
                 this.food.forEach(food => {
                     if (food.isAdult()) {
@@ -39,7 +40,7 @@ class PopulationManager {
             }
 
             this.reproduceFood();
-        }, 10000);
+        }, 1000);
     };
 
     spawnAgents() {
@@ -50,8 +51,8 @@ class PopulationManager {
         }
     };
 
-    spawnFood() {
-        for (let i = 0; i < 200; i++) { // add food sources
+    spawnFood(count = PopulationManager.MAX_FOOD) {
+        for (let i = 0; i < count; i++) { // add food sources
             let food = new Food(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), false);
             this.game.addEntity(food);
             this.food.push(food);
@@ -83,7 +84,10 @@ class PopulationManager {
             this.agents.push(child);
         }
 
-        this.agents.forEach(agent => agent.resetOrigin());
+        this.agents.forEach(agent => {
+            agent.resetOrigin();
+            agent.resetEnergy();
+        });
 
         this.startGeneration();
     };
