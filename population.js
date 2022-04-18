@@ -13,7 +13,7 @@ class PopulationManager {
     };
 
     startGeneration() {
-        setTimeout(() => this.processGeneration(), 5000);
+        setTimeout(() => this.processGeneration(), 15000);
     };
 
     reproduceFood() {
@@ -25,6 +25,9 @@ class PopulationManager {
             }
 
             if (this.food.length < PopulationManager.MAX_FOOD) {
+                if (this.food.length === 0) {
+                    this.spawnFood();
+                }
                 this.food.forEach(food => {
                     if (food.isAdult()) {
                         food.reproduce().forEach(seedling => {
@@ -36,12 +39,12 @@ class PopulationManager {
             }
 
             this.reproduceFood();
-        }, 3000);
+        }, 10000);
     };
 
     spawnAgents() {
         for (let i = 0; i < 100; i++) { // add agents
-            let agent = new Agent(this.game, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1));
+            let agent = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2);
             this.game.addEntity(agent);
             this.agents.push(agent);
         }
@@ -56,14 +59,13 @@ class PopulationManager {
     };
 
     processGeneration() {
-        console.log("processing")
         this.agents.forEach(agent => {
             agent.assignFitness();
         });
 
         this.agents.sort((a1, a2) => a1.genome.rawFitness - a2.genome.rawFitness);
 
-        for (let i = Math.floor(this.agents.length / 2); i >= 0; --i) { // remove unfit bottom half of agents
+        for (let i = Math.floor(this.agents.length / 2) - 1; i >= 0; --i) { // remove unfit bottom half of agents
             this.agents[i].removeFromWorld = true;
             this.agents.splice(i, 1);
         }
@@ -71,16 +73,17 @@ class PopulationManager {
         Genome.resetInnovations(); // reset the innovation number mapping for newly created connections
 
         let length = this.agents.length;
-
         for (let i = 0; i < length; i++) { // randomly produce offspring between n pairs of remaining agents
             let parent1 = this.agents[randomInt(this.agents.length)];
             let parent2 = this.agents[randomInt(this.agents.length)];
             let childGenome = Genome.crossover(parent1.genome, parent2.genome);
             childGenome.mutate();
-            let child = new Agent(this.game, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), childGenome);
+            let child = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2, childGenome);
             this.game.addEntity(child);
             this.agents.push(child);
         }
+
+        this.agents.forEach(agent => agent.resetOrigin());
 
         this.startGeneration();
     };

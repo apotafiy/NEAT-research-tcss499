@@ -3,12 +3,17 @@ class HomeBase {
         Object.assign(this, {game, x, y});
         this.diameter = 30;
         this.strokeColor = "black";    
-        this.fillColor = "black";
+        this.fillColor = "hsl(0, 0%, 0%)";
         this.updateBoundingCircle();
     };
 
     updateBoundingCircle() {
         this.BC = new BoundingCircle(this.x, this.y, this.diameter / 2);
+    };
+
+    getHue() {
+        let commaIndex = this.fillColor.indexOf(",");
+        return parseFloat(this.fillColor.substring(4, commaIndex));
     };
 
     update() {};

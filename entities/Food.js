@@ -50,6 +50,11 @@ class Food {
         return this.state === this.states.adult;
     };
 
+    getHue() {
+        let commaIndex = this.properties[this.state].color.indexOf(",");
+        return parseFloat(this.properties[this.state].color.substring(4, commaIndex));
+    };
+
     updateBoundingCircle() {
         this.BC = new BoundingCircle(
             this.x,
