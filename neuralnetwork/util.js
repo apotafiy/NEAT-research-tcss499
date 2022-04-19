@@ -38,12 +38,8 @@ const topoSort = (nodes, edges) => {
         });
     }
 
-    if (sortedNodes.length !== nodes.size) { // cycle detected
+    if (sortedNodes.length !== nodes.size) { // cycle detected (this should never happen!)
         console.log("something went wrong");
-        console.log(nodes)
-        console.log(edges)
-        console.log(sortedNodes);
-        // return false;
     }
 
     return sortedNodes;
@@ -51,16 +47,9 @@ const topoSort = (nodes, edges) => {
 
 const detectCycle = (nodes, edges, newEdge) => {
 
-    // if (edges.get([newEdge.in, newEdge.out]) && edges.get([newEdge.out, newEdge.in])) {
-    //     console.log("look here!")
-    // }
-
-    // console.log(newEdge)
-
     const dfs = (nodes, edges, visited, currNodeId, originID) => {
         let hasCycle = false;
         visited.add(currNodeId);
-        // console.log(visited)
         nodes.get(currNodeId).outIds.forEach(outId => {
             let edge = edges.get([currNodeId, outId])[0]; // we take the first index because all other duplicate edges produce the same result
             if (!edge.isCyclic) {
