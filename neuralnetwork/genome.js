@@ -163,25 +163,22 @@ class Genome {
                 }
             }
             if (newConnection !== undefined) {
-                if (copiedConnections.get([newConnection.in, newConnection.out]) === undefined) {
-                    copiedConnections.set([newConnection.in, newConnection.out], []);
+                if (copiedNodes.get(newConnection.in) === undefined) {
+                    copiedNodes.set(newConnection.in, { ...selectedGenome.nodeGenes.get(newConnection.in) });
+                    copiedNodes.get(newConnection.in).inIds = new Set();
+                    copiedNodes.get(newConnection.in).outIds = new Set();
                 }
-                copiedConnections.get([newConnection.in, newConnection.out]).push(newConnection);
-                copiedNodes.set(newConnection.in, { ...selectedGenome.nodeGenes.get(newConnection.in) });
-                copiedNodes.set(newConnection.out, { ...selectedGenome.nodeGenes.get(newConnection.out) });
-            }
-        });
+                if (copiedNodes.get(newConnection.out) === undefined) {
+                    copiedNodes.set(newConnection.out, { ...selectedGenome.nodeGenes.get(newConnection.out) });
+                    copiedNodes.get(newConnection.out).inIds = new Set();
+                    copiedNodes.get(newConnection.out).outIds = new Set();
+                }
+                Genome.addParentConnection(copiedConnections, copiedNodes, newConnection);
 
-        // update neighbor lists of copiedNodes
-        copiedNodes.forEach(node => {
-            node.inIds = new Set(); // clear each node's incoming/outgoing node ids
-            node.outIds = new Set();
-        });
-        copiedConnections.forEach(connections => { // populate each node's incoming/outgoing node ids
-            connections.forEach(connection => {
-                copiedNodes.get(connection.in).outIds.add(connection.out);
-                copiedNodes.get(connection.out).inIds.add(connection.in);
-            });
+                // detect if this newly added edge creates a cycle in existing child genome
+                newConnection.isCyclic = false;
+                newConnection.isCyclic = detectCycle(copiedNodes, copiedConnections, newConnection);
+            }
         });
 
         return new Genome({ nodeGenes: copiedNodes, connectionGenes: copiedConnections });
@@ -220,6 +217,7 @@ class Genome {
                         out: nodeId,
                         weight: 1,
                         isEnabled: true,
+                        isCyclic: connection.isCyclic,
                         innovation: Genome.assignInnovNum(connection.in, nodeId)
                     };
                     Genome.addParentConnection(this.connectionGenes, this.nodeGenes, inConnection);
@@ -229,6 +227,7 @@ class Genome {
                         out: connection.out,
                         weight: connection.weight,
                         isEnabled: true,
+                        isCyclic: false,
                         innovation: Genome.assignInnovNum(nodeId, connection.out)
                     };
                     Genome.addParentConnection(this.connectionGenes, this.nodeGenes, outConnection);
@@ -248,15 +247,12 @@ class Genome {
                     out: outNode.id,
                     weight: Math.random(),
                     isEnabled: true,
+                    mutated: true,
                     innovation: Genome.assignInnovNum(inNode.id, outNode.id)
                 };
                 Genome.addParentConnection(this.connectionGenes, this.nodeGenes, newConnection);
 
-                newConnection.isCyclic = topoSort(this.nodeGenes, this.connectionGenes) === false; // check if connection creates a cycle
-            
-                if (newConnection.isCyclic) {
-                    console.log("created a cyclic edge!")
-                }
+                newConnection.isCyclic = detectCycle(this.nodeGenes, this.connectionGenes, newConnection);
             }
         }
     };

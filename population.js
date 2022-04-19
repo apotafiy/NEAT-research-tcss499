@@ -8,13 +8,13 @@ class PopulationManager {
         this.agents = [];
         this.food = [];
         this.spawnAgents();
-        this.spawnFood();
+        // this.spawnFood();
         this.startGeneration();
-        this.reproduceFood();
+        // this.reproduceFood();
     };
 
     startGeneration() {
-        setTimeout(() => this.processGeneration(), 10000);
+        setTimeout(() => this.processGeneration(), 20000);
     };
 
     reproduceFood() {

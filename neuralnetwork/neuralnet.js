@@ -5,12 +5,23 @@ class NeuralNet {
         this.nodes = this.genome.nodeGenes;
         this.edges = this.genome.connectionGenes;
         this.sortedNodes = topoSort(this.nodes, this.edges);
+        // if (this.sortedNodes === false) {
+        //     console.log("this should not be printing...")
+        //     console.log(this.nodes)
+        //     console.log(this.edges)
+        // }
     };
 
     processInput(input) {
 
         let wheels = [];
         let inputIndex = 0;
+
+        if (this.sortedNodes === false) {
+            console.log("we have a problem")
+            console.log(this.nodes)
+            console.log(this.edges)
+        }
 
         this.sortedNodes.forEach(nodeId => {
             let currNode = this.nodes.get(nodeId);

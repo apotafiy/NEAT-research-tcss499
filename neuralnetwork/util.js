@@ -32,35 +32,51 @@ const topoSort = (nodes, edges) => {
                 }
             });
 
-            if (inMap.get(outId) === 0 && id !== outId) {
+            if (inMap.get(outId) === 0 && !(sortedNodes.includes(outId))) {
                 nodeQueue.push(outId);
             }
         });
     }
 
     if (sortedNodes.length !== nodes.size) { // cycle detected
-        return false;
+        console.log("something went wrong");
+        console.log(nodes)
+        console.log(edges)
+        console.log(sortedNodes);
+        // return false;
     }
 
     return sortedNodes;
 };
 
-// const detectCycle = (nodes, edges, newEdge) => {
+const detectCycle = (nodes, edges, newEdge) => {
 
-//     console.log(newEdge)
+    // if (edges.get([newEdge.in, newEdge.out]) && edges.get([newEdge.out, newEdge.in])) {
+    //     console.log("look here!")
+    // }
 
-//     const dfs = (nodes, edges, visited, currNodeId) => {
-//         visited.add(currNodeId);
-//         console.log(visited)
-//         nodes.get(currNodeId).outIds.forEach(outId => {
-//             let edge = edges.get([currNodeId, outId])[0]; // we take the first index because all other duplicate edges produce the same result
-//             if (!edge.isCyclic && !(visited.has(outId))) {
-//                 return false || dfs(nodes, edges, visited, outId);
-//             } else {
-//                 return true;
-//             }
-//         });
-//     };
+    // console.log(newEdge)
 
-//     return dfs(nodes, edges, new Set(), newEdge.in);
-// };
+    const dfs = (nodes, edges, visited, currNodeId, originID) => {
+        let hasCycle = false;
+        visited.add(currNodeId);
+        // console.log(visited)
+        nodes.get(currNodeId).outIds.forEach(outId => {
+            let edge = edges.get([currNodeId, outId])[0]; // we take the first index because all other duplicate edges produce the same result
+            if (!edge.isCyclic) {
+                if (!(visited.has(outId))) {
+                    hasCycle = hasCycle || dfs(nodes, edges, visited, outId, originID);
+                } else if (outId === originID) {
+                    hasCycle = true;
+                }
+            }
+        });
+
+        if (hasCycle) {
+            console.log("cycle detected")
+        }
+        return hasCycle;
+    };
+
+    return dfs(nodes, edges, new Set(), newEdge.in, newEdge.in);
+};
