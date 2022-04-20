@@ -22,7 +22,7 @@ class Agent {
         const fitnessFunct = () => {
             let currentPos = { x: this.x, y: this.y };
             // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
-            return -10 * distance(currentPos, this.game.home.BC.center);
+            return this.energy - 10 * distance(currentPos, this.game.home.BC.center);
         };
 
         this.genome.rawFitness = fitnessFunct();
@@ -42,6 +42,11 @@ class Agent {
         this.origin = { x: this.x, y: this.y };
     };
 
+    resetPos() {
+        this.x = params.CANVAS_SIZE / 2;
+        this.y = params.CANVAS_SIZE / 2;
+    };
+
     resetEnergy() {
         this.energy = 0;
     };
@@ -52,7 +57,7 @@ class Agent {
 
         let spottedNeighbors = [];
         this.game.entities.forEach(entity => {
-            if (entity !== this && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
+            if (entity !== this && !(entity instanceof Agent) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
                 spottedNeighbors.push(entity);
             }
         });
