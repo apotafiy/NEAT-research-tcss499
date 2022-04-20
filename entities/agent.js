@@ -6,8 +6,8 @@ class Agent {
         this.wheelRadius = 2.5;
         this.maxVelocity = 2;
         this.visionRadius = 500;
-        this.strokeColor = "black";    
-        this.fillColor = "hsl(240, 100%, 50%)";
+        this.strokeColor = "black";
+        // this.fillColor = "hsl(240, 100%, 50%)";
         this.leftWheel = 0;
         this.rightWheel = 0;
         this.heading = randomInt(361) * Math.PI / 180;
@@ -33,8 +33,9 @@ class Agent {
     };
 
     getHue() {
-        let commaIndex = this.fillColor.indexOf(",");
-        return parseFloat(this.fillColor.substring(4, commaIndex));
+        // let commaIndex = this.fillColor.indexOf(",");
+        // return parseFloat(this.fillColor.substring(4, commaIndex));
+        return PopulationManager.SPECIES_COLORS.get(this.speciesId);
     };
 
     resetOrigin() {
@@ -97,7 +98,7 @@ class Agent {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.diameter / 2, 0, 2 * Math.PI);
         ctx.strokeStyle = this.strokeColor;
-        ctx.fillStyle = this.fillColor;
+        ctx.fillStyle = `hsl(${this.getHue()}, 100%, 50%)`;
         ctx.lineWidth = 2;
         ctx.fill();
         ctx.stroke();

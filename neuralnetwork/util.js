@@ -51,7 +51,7 @@ const detectCycle = (nodes, edges, newEdge) => {
         let hasCycle = false;
         visited.add(currNodeId);
         nodes.get(currNodeId).outIds.forEach(outId => {
-            let edge = edges.get([currNodeId, outId])[0]; // we take the first index because all other duplicate edges produce the same result
+            let edge = edges.get([currNodeId, outId])[edges.get([currNodeId, outId]).length - 1]; // we take the last edge because it is the most recent
             if (!edge.isCyclic) {
                 if (!(visited.has(outId))) {
                     hasCycle = hasCycle || dfs(nodes, edges, visited, outId, originID);
@@ -61,9 +61,6 @@ const detectCycle = (nodes, edges, newEdge) => {
             }
         });
 
-        if (hasCycle) {
-            console.log("cycle detected")
-        }
         return hasCycle;
     };
 

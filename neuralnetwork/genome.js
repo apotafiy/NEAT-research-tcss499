@@ -184,6 +184,53 @@ class Genome {
         return new Genome({ nodeGenes: copiedNodes, connectionGenes: copiedConnections });
     };
 
+    static numExcess = (genomeA, genomeB) => Math.abs(genomeA.innovationSet().maxInnovation - genomeB.innovationSet().maxInnovation);
+
+    static numDisjoint = (genomeA, genomeB) => {
+        let innovSetA = genomeA.innovationSet();
+        let innovSetB = genomeB.innovationSet();
+        let innovCutoff = Math.min(innovSetA.maxInnovation, innovSetB.maxInnovation);
+        let count = 0;
+        count += [...innovSetA.innovations].filter(x => x <= innovCutoff && !(innovSetB.innovations.has(x))).length;
+        count += [...innovSetB.innovations].filter(x => x <= innovCutoff && !(innovSetA.innovations.has(x))).length;
+        return count;
+    };
+
+    static avgWeightDiff = (genomeA, genomeB) => {
+        let innovationMap = new Map();
+        let connectionListA = genomeA.connectionsAsList();
+        let connectionlistB = genomeB.connectionsAsList();
+
+        connectionListA.forEach(connection => {
+            if (innovationMap.get(connection.innovation) === undefined) {
+                innovationMap.set(connection.innovation, new Map());
+            }
+            innovationMap.get(connection.innovation).set(0, connection.weight);
+        });
+
+        connectionlistB.forEach(connection => {
+            if (innovationMap.get(connection.innovation) !== undefined) {
+                innovationMap.get(connection.innovation).set(1, connection.weight);
+            }
+        });
+
+        let average = 0;
+        let matchCount = 0;
+        innovationMap.forEach(weightPair => {
+            if (weightPair.size === 2) {
+                average += Math.abs(weightPair.get(0) - weightPair.get(1));
+                matchCount++;
+            }
+        });
+        return average / matchCount;
+    };
+
+    static similarity = (genomeA, genomeB) => {
+        let N = Math.max(genomeA.numConnections(), genomeB.numConnections());
+        // console.log((1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB)))
+        return 1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB); 
+    };
+
     constructor(genome = undefined) {
         if (genome === undefined) {
             let defaultGenome = Genome.getDefault();
@@ -210,7 +257,7 @@ class Genome {
                 let nodeId = Genome.assignNodeId(connection.innovation);
                 if (this.nodeGenes.get(nodeId) === undefined) { // check if we already have this node in our genome
                     connection.isEnabled = false; // disable the old connection
-                    this.nodeGenes.set(nodeId, { id: nodeId, type: Genome.NODE_TYPES.hidden, inIds: new Set(), outIds: new Set() }); // add the new node, then split the connection
+                    this.nodeGenes.set(nodeId, { id: nodeId, type: Genome.NODE_TYPES.hidden, value: 0, inIds: new Set(), outIds: new Set() }); // add the new node, then split the connection
                     
                     let inConnection = {
                         in: connection.in,
@@ -255,6 +302,18 @@ class Genome {
                 newConnection.isCyclic = detectCycle(this.nodeGenes, this.connectionGenes, newConnection);
             }
         }
+    };
+
+    innovationSet() {
+        let innovations = new Set();
+        let maxInnovation = 0;
+        this.connectionGenes.forEach(connections => {
+            connections.forEach(connection => {
+                innovations.add(connection.innovation);
+                maxInnovation = Math.max(maxInnovation, connection.innovation);
+            });
+        });
+        return { innovations: innovations, maxInnovation: maxInnovation };
     };
 
     connectionsAsList() {

@@ -2,11 +2,16 @@ class PopulationManager {
 
     static MIN_FOOD = 100;
     static MAX_FOOD = 200;
+    static COMPAT_THRESHOLD = 1;
+    static SPECIES_ID = 0;
+    static SPECIES_COLORS = new Map();
+    static SPECIES_MEMBERS = new Map();
 
     constructor(game) {
         this.game = game;
         this.agents = [];
         this.food = [];
+        PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
         this.spawnAgents();
         // this.spawnFood();
         this.startGeneration();
@@ -14,7 +19,7 @@ class PopulationManager {
     };
 
     startGeneration() {
-        setTimeout(() => this.processGeneration(), 20000);
+        setTimeout(() => this.processGeneration(), 15000);
     };
 
     reproduceFood() {
@@ -44,8 +49,11 @@ class PopulationManager {
     };
 
     spawnAgents() {
+        PopulationManager.SPECIES_MEMBERS.set(PopulationManager.SPECIES_ID, []);
         for (let i = 0; i < 100; i++) { // add agents
             let agent = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2);
+            agent.speciesId = PopulationManager.SPECIES_ID;
+            PopulationManager.SPECIES_MEMBERS.get(PopulationManager.SPECIES_ID).push(agent);
             this.game.addEntity(agent);
             this.agents.push(agent);
         }
@@ -73,16 +81,59 @@ class PopulationManager {
 
         Genome.resetInnovations(); // reset the innovation number mapping for newly created connections
 
+        PopulationManager.SPECIES_MEMBERS = new Map();
+        this.agents.forEach(agent => { // fill species members map with surviving best-fit parent agents
+            if (PopulationManager.SPECIES_MEMBERS.get(agent.speciesId) === undefined) {
+                PopulationManager.SPECIES_MEMBERS.set(agent.speciesId, []);
+            }
+            PopulationManager.SPECIES_MEMBERS.get(agent.speciesId).push(agent);
+        });
+
+        let parentSpecies = [];
+        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
+
         let length = this.agents.length;
+        let speciesIndex = 0;
+        let children = [];
         for (let i = 0; i < length; i++) { // randomly produce offspring between n pairs of remaining agents
-            let parent1 = this.agents[randomInt(this.agents.length)];
-            let parent2 = this.agents[randomInt(this.agents.length)];
+            // let parent1 = this.agents[randomInt(this.agents.length)];
+            // let parent2 = this.agents[randomInt(this.agents.length)];
+            let parent1 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
+            let parent2 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
             let childGenome = Genome.crossover(parent1.genome, parent2.genome);
             childGenome.mutate();
             let child = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2, childGenome);
+            children.push(child);
+            speciesIndex = (speciesIndex + 1) % parentSpecies.length;
+        }
+
+        let repMap = new Map();
+        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => {
+            // choose a random rep from each species
+            repMap.set(speciesId, speciesList[randomInt(speciesList.length)]);
+        });
+
+        children.forEach(child => { // fit child into a species
+            let matchFound = false;
+            repMap.forEach((rep, speciesId) => {
+                if (!matchFound && Genome.similarity(rep.genome, child.genome) <= PopulationManager.COMPAT_THRESHOLD) { // species matched
+                    matchFound = true;
+                    child.speciesId = speciesId;
+                    PopulationManager.SPECIES_MEMBERS.get(speciesId).push(child);
+                }
+            });
+
+            if (!matchFound) { // no compatible, create a new species
+                console.log("created a new species!");
+                child.speciesId = ++PopulationManager.SPECIES_ID;
+                PopulationManager.SPECIES_MEMBERS.set(child.speciesId, []);
+                PopulationManager.SPECIES_COLORS.set(child.speciesId, randomInt(361));
+                PopulationManager.SPECIES_MEMBERS.get(child.speciesId).push(child);
+            }
+
             this.game.addEntity(child);
             this.agents.push(child);
-        }
+        });
 
         this.agents.forEach(agent => {
             agent.resetOrigin();
