@@ -4,6 +4,8 @@ class PopulationManager {
     static MAX_FOOD = 200;
     static COMPAT_THRESHOLD = 1;
     static SPECIES_ID = 0;
+    static GEN_NUM = 0;
+    static SPECIES_CREATED = 0;
     static SPECIES_COLORS = new Map();
     static SPECIES_MEMBERS = new Map();
 
@@ -19,7 +21,12 @@ class PopulationManager {
     };
 
     startGeneration() {
+        this.timer = 15.0;
         setTimeout(() => this.processGeneration(), 15000);
+    };
+
+    update() {
+        this.timer = Math.max(0, this.timer - this.game.clockTick);
     };
 
     reproduceFood() {
@@ -50,6 +57,7 @@ class PopulationManager {
 
     spawnAgents() {
         PopulationManager.SPECIES_MEMBERS.set(PopulationManager.SPECIES_ID, []);
+        PopulationManager.SPECIES_CREATED++;
         for (let i = 0; i < 100; i++) { // add agents
             let agent = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2);
             agent.speciesId = PopulationManager.SPECIES_ID;
@@ -125,6 +133,7 @@ class PopulationManager {
 
             if (!matchFound) { // no compatible, create a new species
                 console.log("created a new species!");
+                PopulationManager.SPECIES_CREATED++;
                 child.speciesId = ++PopulationManager.SPECIES_ID;
                 PopulationManager.SPECIES_MEMBERS.set(child.speciesId, []);
                 PopulationManager.SPECIES_COLORS.set(child.speciesId, randomInt(361));
@@ -140,6 +149,7 @@ class PopulationManager {
             agent.resetEnergy();
         });
 
+        PopulationManager.GEN_NUM++;
         this.startGeneration();
     };
 };

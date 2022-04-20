@@ -91,6 +91,7 @@ class GameEngine {
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].draw(this.ctx, this);
         }
+        this.display.draw(this.ctx, this);
     };
 
     update() {
@@ -103,6 +104,7 @@ class GameEngine {
                 entity.update();
             }
         }
+        this.population.update();
 
         for (let i = entitiesCount - 1; i >= 0; --i) {
             if (this.entities[i].removeFromWorld) {
