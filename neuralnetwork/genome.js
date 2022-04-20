@@ -184,7 +184,15 @@ class Genome {
         return new Genome({ nodeGenes: copiedNodes, connectionGenes: copiedConnections });
     };
 
-    static numExcess = (genomeA, genomeB) => Math.abs(genomeA.innovationSet().maxInnovation - genomeB.innovationSet().maxInnovation);
+    static numExcess = (genomeA, genomeB) =>  {
+        let innovSetA = genomeA.innovationSet();
+        let innovSetB = genomeB.innovationSet();
+        let innovCutoff = Math.min(innovSetA.maxInnovation, innovSetB.maxInnovation);
+        let count = 0;
+        count += [...innovSetA.innovations].filter(x => x > innovCutoff).length;
+        count += [...innovSetB.innovations].filter(x => x > innovCutoff).length;
+        return count;
+    };
 
     static numDisjoint = (genomeA, genomeB) => {
         let innovSetA = genomeA.innovationSet();

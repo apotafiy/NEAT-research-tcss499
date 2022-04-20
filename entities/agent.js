@@ -57,7 +57,7 @@ class Agent {
 
         let spottedNeighbors = [];
         this.game.entities.forEach(entity => {
-            if (entity !== this && !(entity instanceof Agent) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
+            if (entity !== this && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
                 spottedNeighbors.push(entity);
             }
         });

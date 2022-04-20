@@ -2,7 +2,7 @@ class PopulationManager {
 
     static MIN_FOOD = 100;
     static MAX_FOOD = 200;
-    static COMPAT_THRESHOLD = 1;
+    static COMPAT_THRESHOLD = 0.1;
     static SPECIES_ID = 0;
     static GEN_NUM = 0;
     static SPECIES_CREATED = 0;
@@ -15,9 +15,9 @@ class PopulationManager {
         this.food = [];
         PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
         this.spawnAgents();
-        this.spawnFood();
+        // this.spawnFood();
         this.startGeneration();
-        this.reproduceFood();
+        // this.reproduceFood();
     };
 
     startGeneration() {
@@ -132,7 +132,6 @@ class PopulationManager {
             });
 
             if (!matchFound) { // no compatible, create a new species
-                console.log("created a new species!");
                 PopulationManager.SPECIES_CREATED++;
                 child.speciesId = ++PopulationManager.SPECIES_ID;
                 PopulationManager.SPECIES_MEMBERS.set(child.speciesId, []);
