@@ -99,6 +99,7 @@ class PopulationManager {
 
         let parentSpecies = [];
         PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
+        parentSpecies.sort();
 
         let length = this.agents.length;
         let speciesIndex = 0;
