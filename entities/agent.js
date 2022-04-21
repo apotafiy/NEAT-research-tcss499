@@ -4,10 +4,10 @@ class Agent {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
         this.wheelRadius = 2.5;
-        this.maxVelocity = 1;
-        this.visionRadius = 250;
-        this.strokeColor = "black";    
-        this.fillColor = "hsl(240, 100%, 50%)";
+        this.maxVelocity = 2;
+        this.visionRadius = 500;
+        this.strokeColor = "black";
+        // this.fillColor = "hsl(240, 100%, 50%)";
         this.leftWheel = 0;
         this.rightWheel = 0;
         this.heading = randomInt(361) * Math.PI / 180;
@@ -21,7 +21,8 @@ class Agent {
     assignFitness() {
         const fitnessFunct = () => {
             let currentPos = { x: this.x, y: this.y };
-            return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
+            // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
+            return this.energy - 10 * distance(currentPos, this.game.home.BC.center);
         };
 
         this.genome.rawFitness = fitnessFunct();
@@ -32,12 +33,22 @@ class Agent {
     };
 
     getHue() {
-        let commaIndex = this.fillColor.indexOf(",");
-        return parseFloat(this.fillColor.substring(4, commaIndex));
+        // let commaIndex = this.fillColor.indexOf(",");
+        // return parseFloat(this.fillColor.substring(4, commaIndex));
+        return PopulationManager.SPECIES_COLORS.get(this.speciesId);
     };
 
     resetOrigin() {
         this.origin = { x: this.x, y: this.y };
+    };
+
+    resetPos() {
+        this.x = params.CANVAS_SIZE / 2;
+        this.y = params.CANVAS_SIZE / 2;
+    };
+
+    resetEnergy() {
+        this.energy = 0;
     };
 
     update() {
@@ -92,7 +103,7 @@ class Agent {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.diameter / 2, 0, 2 * Math.PI);
         ctx.strokeStyle = this.strokeColor;
-        ctx.fillStyle = this.fillColor;
+        ctx.fillStyle = `hsl(${this.getHue()}, 100%, 50%)`;
         ctx.lineWidth = 2;
         ctx.fill();
         ctx.stroke();

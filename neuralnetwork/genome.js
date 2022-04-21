@@ -152,7 +152,7 @@ class Genome {
                 selectedGenome = randChoice === 0 ? genomeA : genomeB;
                 newConnection = connectionMap.get(randChoice);
                 newConnection.isEnabled = connectionMap.get(0).isEnabled && connectionMap.get(1).isEnabled;
-            } else { // disjoint/excess gene case -> result depends of fitness of genomeA and genomeB
+            } else { // disjoint/excess gene case -> result depends of fitness of genomeA and genomeB (select more fit parent)
                 if (connectionMap.get(0) !== undefined && genomeA.rawFitness >= genomeB.rawFitness) {
                     selectedGenome = genomeA;
                     newConnection = connectionMap.get(0);
@@ -163,28 +163,80 @@ class Genome {
                 }
             }
             if (newConnection !== undefined) {
-                if (copiedConnections.get([newConnection.in, newConnection.out]) === undefined) {
-                    copiedConnections.set([newConnection.in, newConnection.out], []);
+                if (copiedNodes.get(newConnection.in) === undefined) {
+                    copiedNodes.set(newConnection.in, { ...selectedGenome.nodeGenes.get(newConnection.in) });
+                    copiedNodes.get(newConnection.in).inIds = new Set();
+                    copiedNodes.get(newConnection.in).outIds = new Set();
                 }
-                copiedConnections.get([newConnection.in, newConnection.out]).push(newConnection);
-                copiedNodes.set(newConnection.in, { ...selectedGenome.nodeGenes.get(newConnection.in) });
-                copiedNodes.set(newConnection.out, { ...selectedGenome.nodeGenes.get(newConnection.out) });
+                if (copiedNodes.get(newConnection.out) === undefined) {
+                    copiedNodes.set(newConnection.out, { ...selectedGenome.nodeGenes.get(newConnection.out) });
+                    copiedNodes.get(newConnection.out).inIds = new Set();
+                    copiedNodes.get(newConnection.out).outIds = new Set();
+                }
+                Genome.addParentConnection(copiedConnections, copiedNodes, newConnection);
+
+                // detect if this newly added edge creates a cycle in existing child genome
+                newConnection.isCyclic = false;
+                newConnection.isCyclic = detectCycle(copiedNodes, copiedConnections, newConnection);
             }
         });
 
-        // update neighbor lists of copiedNodes
-        copiedNodes.forEach(node => {
-            node.inIds = new Set(); // clear each node's incoming/outgoing node ids
-            node.outIds = new Set();
-        });
-        copiedConnections.forEach(connections => { // populate each node's incoming/outgoing node ids
-            connections.forEach(connection => {
-                copiedNodes.get(connection.in).outIds.add(connection.out);
-                copiedNodes.get(connection.out).inIds.add(connection.in);
-            });
+        return new Genome({ nodeGenes: copiedNodes, connectionGenes: copiedConnections });
+    };
+
+    static numExcess = (genomeA, genomeB) =>  {
+        let innovSetA = genomeA.innovationSet();
+        let innovSetB = genomeB.innovationSet();
+        let innovCutoff = Math.min(innovSetA.maxInnovation, innovSetB.maxInnovation);
+        let count = 0;
+        count += [...innovSetA.innovations].filter(x => x > innovCutoff).length;
+        count += [...innovSetB.innovations].filter(x => x > innovCutoff).length;
+        return count;
+    };
+
+    static numDisjoint = (genomeA, genomeB) => {
+        let innovSetA = genomeA.innovationSet();
+        let innovSetB = genomeB.innovationSet();
+        let innovCutoff = Math.min(innovSetA.maxInnovation, innovSetB.maxInnovation);
+        let count = 0;
+        count += [...innovSetA.innovations].filter(x => x <= innovCutoff && !(innovSetB.innovations.has(x))).length;
+        count += [...innovSetB.innovations].filter(x => x <= innovCutoff && !(innovSetA.innovations.has(x))).length;
+        return count;
+    };
+
+    static avgWeightDiff = (genomeA, genomeB) => {
+        let innovationMap = new Map();
+        let connectionListA = genomeA.connectionsAsList();
+        let connectionlistB = genomeB.connectionsAsList();
+
+        connectionListA.forEach(connection => {
+            if (innovationMap.get(connection.innovation) === undefined) {
+                innovationMap.set(connection.innovation, new Map());
+            }
+            innovationMap.get(connection.innovation).set(0, connection.weight);
         });
 
-        return new Genome({ nodeGenes: copiedNodes, connectionGenes: copiedConnections });
+        connectionlistB.forEach(connection => {
+            if (innovationMap.get(connection.innovation) !== undefined) {
+                innovationMap.get(connection.innovation).set(1, connection.weight);
+            }
+        });
+
+        let average = 0;
+        let matchCount = 0;
+        innovationMap.forEach(weightPair => {
+            if (weightPair.size === 2) {
+                average += Math.abs(weightPair.get(0) - weightPair.get(1));
+                matchCount++;
+            }
+        });
+        return average / matchCount;
+    };
+
+    static similarity = (genomeA, genomeB) => {
+        let N = Math.max(genomeA.numConnections(), genomeB.numConnections());
+        // console.log((1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB)))
+        return 1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB); 
     };
 
     constructor(genome = undefined) {
@@ -213,13 +265,14 @@ class Genome {
                 let nodeId = Genome.assignNodeId(connection.innovation);
                 if (this.nodeGenes.get(nodeId) === undefined) { // check if we already have this node in our genome
                     connection.isEnabled = false; // disable the old connection
-                    this.nodeGenes.set(nodeId, { id: nodeId, type: Genome.NODE_TYPES.hidden, inIds: new Set(), outIds: new Set() }); // add the new node, then split the connection
+                    this.nodeGenes.set(nodeId, { id: nodeId, type: Genome.NODE_TYPES.hidden, value: 0, inIds: new Set(), outIds: new Set() }); // add the new node, then split the connection
                     
                     let inConnection = {
                         in: connection.in,
                         out: nodeId,
                         weight: 1,
                         isEnabled: true,
+                        isCyclic: connection.isCyclic,
                         innovation: Genome.assignInnovNum(connection.in, nodeId)
                     };
                     Genome.addParentConnection(this.connectionGenes, this.nodeGenes, inConnection);
@@ -229,12 +282,46 @@ class Genome {
                         out: connection.out,
                         weight: connection.weight,
                         isEnabled: true,
+                        isCyclic: false,
                         innovation: Genome.assignInnovNum(nodeId, connection.out)
                     };
                     Genome.addParentConnection(this.connectionGenes, this.nodeGenes, outConnection);
                 }
             }
         }
+
+        if (randomInt(100) < 5) { // new connection mutation (5% chance)
+            let allNodes = this.nodesAsList();
+            let inNode = allNodes[randomInt(this.numNodes())];
+            let outNode = allNodes[randomInt(this.numNodes())];
+
+            // cannot create incoming edge to an input node, or a connection that already exists!
+            if (outNode.type !== Genome.NODE_TYPES.input && this.connectionGenes.get([inNode.id, outNode.id]) === undefined) {
+                let newConnection = {
+                    in: inNode.id,
+                    out: outNode.id,
+                    weight: Math.random(),
+                    isEnabled: true,
+                    mutated: true,
+                    innovation: Genome.assignInnovNum(inNode.id, outNode.id)
+                };
+                Genome.addParentConnection(this.connectionGenes, this.nodeGenes, newConnection);
+
+                newConnection.isCyclic = detectCycle(this.nodeGenes, this.connectionGenes, newConnection);
+            }
+        }
+    };
+
+    innovationSet() {
+        let innovations = new Set();
+        let maxInnovation = 0;
+        this.connectionGenes.forEach(connections => {
+            connections.forEach(connection => {
+                innovations.add(connection.innovation);
+                maxInnovation = Math.max(maxInnovation, connection.innovation);
+            });
+        });
+        return { innovations: innovations, maxInnovation: maxInnovation };
     };
 
     connectionsAsList() {
@@ -245,6 +332,14 @@ class Genome {
             });
         });
         return connectionList;
+    };
+
+    nodesAsList() {
+        let nodeList = [];
+        this.nodeGenes.forEach(node => {
+            nodeList.push(node);
+        });
+        return nodeList;
     };
 
     numNodes() {

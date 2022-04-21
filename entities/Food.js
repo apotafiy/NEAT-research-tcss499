@@ -47,7 +47,7 @@ class Food {
     }
 
     isAdult() {
-        return this.state === this.states.adult;
+        return this.state === this.states.decaying;
     };
 
     getHue() {

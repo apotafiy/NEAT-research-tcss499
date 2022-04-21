@@ -4,13 +4,24 @@ class NeuralNet {
         this.genome = genome;
         this.nodes = this.genome.nodeGenes;
         this.edges = this.genome.connectionGenes;
-        this.sortedNodes = this.topoSort();
+        this.sortedNodes = topoSort(this.nodes, this.edges);
+        // if (this.sortedNodes === false) {
+        //     console.log("this should not be printing...")
+        //     console.log(this.nodes)
+        //     console.log(this.edges)
+        // }
     };
 
     processInput(input) {
 
         let wheels = [];
         let inputIndex = 0;
+
+        if (this.sortedNodes === false) {
+            console.log("we have a problem")
+            console.log(this.nodes)
+            console.log(this.edges)
+        }
 
         this.sortedNodes.forEach(nodeId => {
             let currNode = this.nodes.get(nodeId);
@@ -38,35 +49,5 @@ class NeuralNet {
 
     sigmoid(x) {
         return 1 / (1 + Math.E ** -x);
-    };
-
-    topoSort() {
-        let inMap = new Map();
-        let nodeQueue = [];
-        let sortedNodes = [];
-        
-        this.nodes.forEach(node => { // map neurons to number of incoming edges
-            inMap.set(node.id, 0);
-            node.inIds.forEach(inId => {
-                inMap.set(node.id, inMap.get(node.id) + this.edges.get([inId, node.id]).length);
-            });
-
-            if (inMap.get(node.id) === 0) {
-                nodeQueue.push(node.id);
-            }
-        });
-
-        while (nodeQueue.length !== 0) {
-            let id = nodeQueue.splice(0, 1)[0];
-            sortedNodes.push(id);
-            this.nodes.get(id).outIds.forEach(outId => {
-                inMap.set(outId, inMap.get(outId) - 1);
-                if (inMap.get(outId) === 0) {
-                    nodeQueue.push(outId);
-                }
-            });
-        }
-
-        return sortedNodes;
     };
 };
