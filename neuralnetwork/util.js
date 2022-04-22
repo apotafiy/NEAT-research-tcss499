@@ -1,8 +1,12 @@
 const normalizeHue = (hue) => Math.min(1, hue / 360);
 
-const normalizeDistance = (distance) => Math.min(1, distance / params.CANVAS_SIZE);
+const normalizeAngle = (a) => a < 0 ? -1 - a / 360 : 1 - a / 360;
 
+const normalizeDistance = (distance) => 1 - Math.min(1, distance / Math.sqrt(2 * params.CANVAS_SIZE ** 2));
 
+const normalizeX = (x) => x < 0 ? -1 - Math.max(-1, x / params.CANVAS_SIZE) : 1 - Math.min(1, x / params.CANVAS_SIZE);
+
+const normalizeY = (y) => y < 0 ? -1 - Math.max(-1, y / params.CANVAS_SIZE) : 1 - Math.min(1, y / params.CANVAS_SIZE);
 
 const topoSort = (nodes, edges) => {
     let inMap = new Map();

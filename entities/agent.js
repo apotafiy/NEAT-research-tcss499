@@ -22,7 +22,8 @@ class Agent {
         const fitnessFunct = () => {
             let currentPos = { x: this.x, y: this.y };
             // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
-            return this.energy - 10 * distance(currentPos, this.game.home.BC.center);
+            // return this.energy - 10 * distance(currentPos, this.game.home.BC.center);
+            return this.energy;
         };
 
         this.genome.rawFitness = fitnessFunct();
@@ -57,7 +58,7 @@ class Agent {
 
         let spottedNeighbors = [];
         this.game.entities.forEach(entity => {
-            if (entity !== this && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
+            if (entity !== this && !(entity instanceof Agent) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
                 spottedNeighbors.push(entity);
             }
         });
@@ -67,9 +68,15 @@ class Agent {
         for (let i = 0; i < Math.min(spottedNeighbors.length, 5); i++) {
             let neighbor = spottedNeighbors[i];
             input.push(normalizeHue(neighbor.getHue()));
+            let vector = { x: neighbor.x - this.x, y: neighbor.y - this.y };
+            let vectAngle = Math.atan2(-vector.y, -vector.x);
+            if (vectAngle < 0) {
+                vectAngle += 2 * Math.PI;
+            }
+            input.push(normalizeAngle((this.heading - vectAngle) * 180 / Math.PI));
             input.push(normalizeDistance(distance(neighbor.BC.center, this.BC.center)));
         }
-        for (let i = input.length; i < 10; i++) {
+        for (let i = input.length; i < Genome.DEFAULT_INPUTS; i++) {
             input.push(0);
         }
 
@@ -86,6 +93,16 @@ class Agent {
         this.x += dx;
         this.y += dy;
         this.heading += dh;
+
+        if (this.heading < 0) {
+            this.heading += 2 * Math.PI;
+        } else if (this.heading > 2 * Math.PI) {
+            this.heading -= 2 * Math.PI;
+        }
+
+        if (this.heading < 0) {
+            console.log("uh oh")
+        }
 
         let displacement = distance(oldPos, { x: this.x, y: this.y });
         this.energy -= displacement;
