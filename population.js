@@ -15,9 +15,9 @@ class PopulationManager {
         this.food = [];
         PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
         this.spawnAgents();
-        // this.spawnFood();
+        this.spawnFood();
         this.startGeneration();
-        // this.reproduceFood();
+        this.reproduceFood();
     };
 
     startGeneration() {
