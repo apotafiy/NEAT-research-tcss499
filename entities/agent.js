@@ -69,12 +69,15 @@ class Agent {
             let neighbor = spottedNeighbors[i];
             input.push(normalizeHue(neighbor.getHue()));
             let vector = { x: neighbor.x - this.x, y: neighbor.y - this.y };
-            let vectAngle = Math.atan2(-vector.y, -vector.x);
+            let vectAngle = Math.atan2(vector.y, vector.x);
             if (vectAngle < 0) {
                 vectAngle += 2 * Math.PI;
             }
             input.push(normalizeAngle((this.heading - vectAngle) * 180 / Math.PI));
             input.push(normalizeDistance(distance(neighbor.BC.center, this.BC.center)));
+            // input.push(normalizeAngle(this.heading * 180 / Math.PI));
+            // input.push(normalizeX(neighbor.x - this.x));
+            // input.push(normalizeY(neighbor.y - this.y));
         }
         for (let i = input.length; i < Genome.DEFAULT_INPUTS; i++) {
             input.push(0);
@@ -96,16 +99,21 @@ class Agent {
 
         if (this.heading < 0) {
             this.heading += 2 * Math.PI;
-        } else if (this.heading > 2 * Math.PI) {
+        } else if (this.heading >= 2 * Math.PI) {
             this.heading -= 2 * Math.PI;
         }
 
         if (this.heading < 0) {
-            console.log("uh oh")
+            console.log("uh oh!")
         }
 
-        let displacement = distance(oldPos, { x: this.x, y: this.y });
-        this.energy -= displacement;
+        if (Math.abs(wheels[0]) > 1 || Math.abs(wheels[1]) > 1) {
+            console.log("invalid output for a wheel!")
+        }
+
+        // uncomment this code to implement agent metabolism
+        // let displacement = distance(oldPos, { x: this.x, y: this.y });
+        // this.energy -= displacement;
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {

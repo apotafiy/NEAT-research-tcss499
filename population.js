@@ -1,7 +1,7 @@
 class PopulationManager {
 
-    static MIN_FOOD = 100;
-    static MAX_FOOD = 200;
+    static MIN_FOOD = 250;
+    static MAX_FOOD = 300;
     static COMPAT_THRESHOLD = 0.1;
     static SPECIES_ID = 0;
     static GEN_NUM = 0;
