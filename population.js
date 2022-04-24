@@ -13,11 +13,12 @@ class PopulationManager {
         this.game = game;
         this.agents = [];
         this.food = [];
+        this.foodTracker = new FoodTracker();
         PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
         this.spawnAgents();
-        // this.spawnFood();
+        this.spawnFood();
         this.startGeneration();
-        // this.reproduceFood();
+        this.reproduceFood();
     };
 
     startGeneration() {
@@ -69,13 +70,18 @@ class PopulationManager {
 
     spawnFood(count = PopulationManager.MAX_FOOD) {
         for (let i = 0; i < count; i++) { // add food sources
-            let food = new Food(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), false);
+            let food = new Food(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), false, this.foodTracker);
             this.game.addEntity(food);
             this.food.push(food);
         }
     };
 
     processGeneration() {
+        console.log("Generation: " + this.foodTracker.currentGeneration);
+        console.log(this.foodTracker.generations[this.foodTracker.currentGeneration]);
+        if(PopulationManager.GEN_NUM % 5 == 0){
+            console.log(this.foodTracker);
+        }
         this.agents.forEach(agent => {
             agent.assignFitness();
         });
@@ -151,6 +157,7 @@ class PopulationManager {
         });
 
         PopulationManager.GEN_NUM++;
+        this.foodTracker.addNewGeneration();
         this.startGeneration();
     };
 };
