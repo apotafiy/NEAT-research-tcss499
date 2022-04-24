@@ -33,11 +33,14 @@ class FoodTracker {
         this.generations[this.currentGeneration].caloriesConsumed += num;
     }
 
-    /**
-     * Returns data necessary for graphing
-     */
-    parse(){
+    getConsumptionData(){
+        return this.generations.map((obj)=>obj.generations.caloriesConsumed);
+    }
 
-
+    getLifeStageData(){
+        return [this.generations.map((obj)=>obj.lifeStageCounts[0]),
+            this.generations.map((obj)=>obj.lifeStageCounts[1]),
+            this.generations.map((obj)=>obj.lifeStageCounts[2]),
+            this.generations.map((obj)=>obj.lifeStageCounts[3])] 
     }
 }
