@@ -22,7 +22,7 @@ class Agent {
         const fitnessFunct = () => {
             let currentPos = { x: this.x, y: this.y };
             // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
-            return this.energy - 2 * distance(currentPos, this.game.home.BC.center);
+            return this.energy - 0.3 * distance(currentPos, this.game.home.BC.center);
         };
 
         this.genome.rawFitness = fitnessFunct();

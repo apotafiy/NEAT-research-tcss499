@@ -38,7 +38,6 @@ class FoodTracker {
      * @returns calories data for graphing
      */
     getConsumptionData(){
-        console.log(this.generations.map((obj)=>obj.caloriesConsumed));
         return this.generations.map((obj)=>obj.caloriesConsumed);
     }
 
@@ -47,9 +46,22 @@ class FoodTracker {
      * @returns life stage data for graphing
      */
     getLifeStageData(){
-        return [this.generations.map((obj)=>obj.lifeStageCounts[0]),
-            this.generations.map((obj)=>obj.lifeStageCounts[1]),
-            this.generations.map((obj)=>obj.lifeStageCounts[2]),
-            this.generations.map((obj)=>obj.lifeStageCounts[3])] 
+        const seedMap = {};
+        this.generations.forEach((obj, i)=>{
+            seedMap[i] = obj.lifeStageCounts[0];
+        });
+        const adMap = {};
+        this.generations.forEach((obj, i)=>{
+            adMap[i] = obj.lifeStageCounts[1];
+        });
+        const adultMap = {};
+        this.generations.forEach((obj, i)=>{
+            adultMap[i] = obj.lifeStageCounts[2];
+        });
+        const decMap = {};
+        this.generations.forEach((obj, i)=>{
+            decMap[i] = obj.lifeStageCounts[3];
+        });
+        return [seedMap, adMap, adultMap, decMap];
     }
 }

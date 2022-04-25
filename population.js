@@ -77,11 +77,6 @@ class PopulationManager {
     };
 
     processGeneration() {
-        console.log("Generation: " + this.foodTracker.currentGeneration);
-        console.log(this.foodTracker.generations[this.foodTracker.currentGeneration]);
-        if(PopulationManager.GEN_NUM % 5 == 0){
-            console.log(this.foodTracker);
-        }
         this.agents.forEach(agent => {
             agent.assignFitness();
         });
@@ -158,6 +153,7 @@ class PopulationManager {
 
         PopulationManager.GEN_NUM++;
         generateFoodConsumptionChart(this.foodTracker.getConsumptionData());
+        generateFoodStageChart(this.foodTracker.getLifeStageData());
         this.foodTracker.addNewGeneration();
         this.startGeneration();
     };
