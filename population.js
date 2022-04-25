@@ -78,6 +78,7 @@ class PopulationManager {
 
     processGeneration() {
         this.agents.forEach(agent => {
+            agent.age++;
             agent.assignFitness();
         });
 
