@@ -157,6 +157,7 @@ class PopulationManager {
         });
 
         PopulationManager.GEN_NUM++;
+        generateFoodConsumptionChart(this.foodTracker.getConsumptionData());
         this.foodTracker.addNewGeneration();
         this.startGeneration();
     };

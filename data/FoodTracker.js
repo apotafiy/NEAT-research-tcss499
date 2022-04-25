@@ -33,10 +33,19 @@ class FoodTracker {
         this.generations[this.currentGeneration].caloriesConsumed += num;
     }
 
+    /**
+     * 
+     * @returns calories data for graphing
+     */
     getConsumptionData(){
-        return this.generations.map((obj)=>obj.generations.caloriesConsumed);
+        console.log(this.generations.map((obj)=>obj.caloriesConsumed));
+        return this.generations.map((obj)=>obj.caloriesConsumed);
     }
 
+    /**
+     * 
+     * @returns life stage data for graphing
+     */
     getLifeStageData(){
         return [this.generations.map((obj)=>obj.lifeStageCounts[0]),
             this.generations.map((obj)=>obj.lifeStageCounts[1]),
