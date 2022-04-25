@@ -14,6 +14,7 @@ class PopulationManager {
         this.agents = [];
         this.food = [];
         this.foodTracker = new FoodTracker();
+        this.agentTracker = new AgentTracker();
         PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
         this.spawnAgents();
         this.spawnFood();
@@ -78,6 +79,7 @@ class PopulationManager {
 
     processGeneration() {
         this.agents.forEach(agent => {
+            this.agentTracker.processAgent(agent);
             agent.age++;
             agent.assignFitness();
         });
