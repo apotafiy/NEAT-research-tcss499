@@ -25,12 +25,10 @@ class AgentTracker {
      */
     addAge(agent) {
         this.generations[this.currentGeneration].oldest = Math.max(
-            agent.NUMGENERATIONS,
+            agent.age,
             this.generations[this.currentGeneration].oldest
         );
-        this.generations[this.currentGeneration].ages.push(
-            agent.NUMGENERATIONS
-        );
+        this.generations[this.currentGeneration].ages.push(agent.age);
     }
 
     /**
