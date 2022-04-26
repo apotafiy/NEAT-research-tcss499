@@ -84,6 +84,8 @@ class PopulationManager {
             agent.assignFitness();
         });
 
+        console.log(this.agentTracker.generations[this.agentTracker.currentGeneration]);
+
         this.agents.sort((a1, a2) => a1.genome.rawFitness - a2.genome.rawFitness);
 
         for (let i = Math.floor(this.agents.length / 2) - 1; i >= 0; --i) { // remove unfit bottom half of agents
@@ -155,9 +157,11 @@ class PopulationManager {
         });
 
         PopulationManager.GEN_NUM++;
+        generateAgeChart(this.agentTracker.getAgeData());
         generateFoodConsumptionChart(this.foodTracker.getConsumptionData());
         generateFoodStageChart(this.foodTracker.getLifeStageData());
         this.foodTracker.addNewGeneration();
+        this.agentTracker.addNewGeneration();
         this.startGeneration();
     };
 };

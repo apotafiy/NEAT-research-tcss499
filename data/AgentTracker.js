@@ -28,7 +28,9 @@ class AgentTracker {
             agent.age,
             this.generations[this.currentGeneration].oldest
         );
-        this.generations[this.currentGeneration].ages.push(agent.age);
+        this.generations[this.currentGeneration].ages.push(
+            agent.age
+        );
     }
 
     /**
@@ -64,7 +66,7 @@ class AgentTracker {
     getAgeData() {
         const maxAges = this.generations.map((obj) => obj.oldest);
         const medianAges = this.generations.map((obj) =>
-            this.getMedian(obj.age)
+            this.getMedian(obj.ages)
         );
         return {
             oldest: maxAges,

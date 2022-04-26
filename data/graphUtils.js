@@ -10,7 +10,8 @@ const generateEnergyChart = (data) => {};
  */
 const generateAgeChart = (data) => {
     const labels = [];
-    data.forEach((elem, i) => {
+    console.log(data);
+    data.medians.forEach((elem, i) => {
         labels.push(i);
     });
     if (document.getElementById('ageChart') != undefined) {
@@ -20,7 +21,7 @@ const generateAgeChart = (data) => {
     ctx.setAttribute('id', 'ageChart');
     document.getElementById('ageChartContainer').appendChild(ctx);
     const myChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [
@@ -36,8 +37,8 @@ const generateAgeChart = (data) => {
                     label: 'Median Age',
                     data: data.medians,
                     fill: true,
-                    backgroundColor: ['rgba(100,0,255,0.2)'],
-                    borderColor: ['rgba(100,0,255,1)'],
+                    backgroundColor: ['rgba(100,0,0,0.5)'],
+                    borderColor: ['rgba(100,0,0,1)'],
                     borderWidth: 3,
                 },
             ],
