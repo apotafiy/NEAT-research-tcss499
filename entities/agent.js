@@ -104,16 +104,16 @@ class Agent {
         }
 
         if (this.heading < 0) {
-            console.log("uh oh!")
+            console.log("uh oh!");
         }
 
         if (Math.abs(wheels[0]) > 1 || Math.abs(wheels[1]) > 1) {
-            console.log("invalid output for a wheel!")
+            console.log("invalid output for a wheel!");
         }
 
         // uncomment this code to implement agent metabolism
         // let displacement = distance(oldPos, { x: this.x, y: this.y });
-        // this.energy -= displacement;
+        // this.energy = Math.max(0, this.energy - displacement / 2);
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {

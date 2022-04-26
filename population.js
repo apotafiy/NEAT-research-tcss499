@@ -101,36 +101,41 @@ class PopulationManager {
             PopulationManager.SPECIES_MEMBERS.get(agent.speciesId).push(agent);
         });
 
-        // let parentSpecies = [];
-        // PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
-        // parentSpecies.sort();
-
         let sharedFitnessMap = new Map();
         let sumShared = 0;
         PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => {
             let sumRaws = 0;
             speciesList.forEach(member => {
-                sumRaws += member.rawFitness;
+                sumRaws += member.genome.rawFitness;
             });
             sumShared += sumRaws / speciesList.length;
             sharedFitnessMap.set(speciesId, sumRaws / speciesList.length);
         });
+        let rouletteOrder = [...sharedFitnessMap.keys()].sort();
 
         let length = this.agents.length;
-        // let speciesIndex = 0;
         let children = [];
         for (let i = 0; i < length; i++) { // randomly produce offspring between n pairs of remaining agents
-            // let parent1 = this.agents[randomInt(this.agents.length)];
-            // let parent2 = this.agents[randomInt(this.agents.length)];
-            // let parent1 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
-            // let parent2 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
             let rouletteResult = randomFloat(sumShared);
-            
+            let rouletteIndex = 0;
+            let accumulator = 0;
+            let flag = false;
+            let parent1, parent2;
+            while (!flag) {
+                let nextSpecies = rouletteOrder[rouletteIndex];
+                accumulator += sharedFitnessMap.get(nextSpecies);
+                if (accumulator >= rouletteResult) {
+                    flag = true;
+                    let possibleParents = PopulationManager.SPECIES_MEMBERS.get(nextSpecies);
+                    parent1 = possibleParents[randomInt(possibleParents.length)];
+                    parent2 = possibleParents[randomInt(possibleParents.length)];
+                }
+                rouletteIndex++;
+            }
             let childGenome = Genome.crossover(parent1.genome, parent2.genome);
             childGenome.mutate();
             let child = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2, childGenome);
             children.push(child);
-            // speciesIndex = (speciesIndex + 1) % parentSpecies.length;
         }
 
         let repMap = new Map();
@@ -139,13 +144,10 @@ class PopulationManager {
             repMap.set(speciesId, speciesList[randomInt(speciesList.length)]);
         });
 
-        let parentSpecies = [];
-        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
-        parentSpecies.sort();
-
+        let compatOrder = [...PopulationManager.SPECIES_MEMBERS.keys()].sort(); // sort by speciesId such that compatibility is always considered in the same order
         children.forEach(child => { // fit child into a species
             let matchFound = false;
-            parentSpecies.forEach(speciesId => {
+            compatOrder.forEach(speciesId => {
                 let rep = repMap.get(speciesId);
                 if (!matchFound && Genome.similarity(rep.genome, child.genome) <= PopulationManager.COMPAT_THRESHOLD) { // species matched
                     matchFound = true;
