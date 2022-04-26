@@ -103,14 +103,23 @@ class PopulationManager {
 
         let sharedFitnessMap = new Map();
         let sumShared = 0;
+        let minShared = 0;
         PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => {
             let sumRaws = 0;
             speciesList.forEach(member => {
                 sumRaws += member.genome.rawFitness;
             });
+            minShared = Math.min(minShared, sumRaws);
             sumShared += sumRaws / speciesList.length;
             sharedFitnessMap.set(speciesId, sumRaws / speciesList.length);
         });
+        if (minShared < 0) {
+            sumShared = 0;
+            sharedFitnessMap.forEach((fitness, speciesId) => {
+                sharedFitnessMap.set(speciesId, fitness + minShared * -1);
+                sumShared += sharedFitnessMap.get(speciesId);
+            });
+        }
         let rouletteOrder = [...sharedFitnessMap.keys()].sort();
 
         let length = this.agents.length;
