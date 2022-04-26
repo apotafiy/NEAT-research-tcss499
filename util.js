@@ -1,6 +1,7 @@
 /** Global Parameters Object */
 const params = {
-    CANVAS_SIZE: 1000
+    CANVAS_SIZE: 1000,
+    ENFORCE_CIRCULAR_FOOD: false
  };
 
 /**
@@ -8,6 +9,12 @@ const params = {
  * @returns Random Integer Between 0 and n-1
  */
 const randomInt = n => Math.floor(Math.random() * n);
+
+/**
+ * @param {Number} n
+ * @returns Random Float Between 0 and n-1
+ */
+ const randomFloat = n => Math.random() * n;
 
 /**
  * @param {Number} r Red Value

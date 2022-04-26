@@ -69,7 +69,11 @@ class PopulationManager {
 
     spawnFood(count = PopulationManager.MAX_FOOD) {
         for (let i = 0; i < count; i++) { // add food sources
-            let food = new Food(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), false);
+            let randomDist = randomInt(params.CANVAS_SIZE / 2);
+            let randomAngle = randomInt(360) * Math.PI / 180;
+            let x = params.CANVAS_SIZE / 2 + randomDist * Math.cos(randomAngle);
+            let y = params.CANVAS_SIZE / 2 + randomDist * Math.sin(randomAngle);
+            let food = new Food(gameEngine, x, y, false);
             this.game.addEntity(food);
             this.food.push(food);
         }
@@ -97,23 +101,36 @@ class PopulationManager {
             PopulationManager.SPECIES_MEMBERS.get(agent.speciesId).push(agent);
         });
 
-        let parentSpecies = [];
-        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
-        parentSpecies.sort();
+        // let parentSpecies = [];
+        // PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
+        // parentSpecies.sort();
+
+        let sharedFitnessMap = new Map();
+        let sumShared = 0;
+        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => {
+            let sumRaws = 0;
+            speciesList.forEach(member => {
+                sumRaws += member.rawFitness;
+            });
+            sumShared += sumRaws / speciesList.length;
+            sharedFitnessMap.set(speciesId, sumRaws / speciesList.length);
+        });
 
         let length = this.agents.length;
-        let speciesIndex = 0;
+        // let speciesIndex = 0;
         let children = [];
         for (let i = 0; i < length; i++) { // randomly produce offspring between n pairs of remaining agents
             // let parent1 = this.agents[randomInt(this.agents.length)];
             // let parent2 = this.agents[randomInt(this.agents.length)];
-            let parent1 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
-            let parent2 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
+            // let parent1 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
+            // let parent2 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
+            let rouletteResult = randomFloat(sumShared);
+            
             let childGenome = Genome.crossover(parent1.genome, parent2.genome);
             childGenome.mutate();
             let child = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2, childGenome);
             children.push(child);
-            speciesIndex = (speciesIndex + 1) % parentSpecies.length;
+            // speciesIndex = (speciesIndex + 1) % parentSpecies.length;
         }
 
         let repMap = new Map();
@@ -122,9 +139,14 @@ class PopulationManager {
             repMap.set(speciesId, speciesList[randomInt(speciesList.length)]);
         });
 
+        let parentSpecies = [];
+        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
+        parentSpecies.sort();
+
         children.forEach(child => { // fit child into a species
             let matchFound = false;
-            repMap.forEach((rep, speciesId) => {
+            parentSpecies.forEach(speciesId => {
+                let rep = repMap.get(speciesId);
                 if (!matchFound && Genome.similarity(rep.genome, child.genome) <= PopulationManager.COMPAT_THRESHOLD) { // species matched
                     matchFound = true;
                     child.speciesId = speciesId;
