@@ -10,7 +10,7 @@ const generateEnergyChart = (data) => {};
  */
 const generateAgeChart = (data) => {
     const labels = [];
-    console.log(data);
+    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });

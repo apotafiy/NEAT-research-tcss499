@@ -84,7 +84,7 @@ class PopulationManager {
             agent.assignFitness();
         });
 
-        console.log(this.agentTracker.generations[this.agentTracker.currentGeneration]);
+        // console.log(this.agentTracker.generations[this.agentTracker.currentGeneration]);
 
         this.agents.sort((a1, a2) => a1.genome.rawFitness - a2.genome.rawFitness);
 
