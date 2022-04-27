@@ -48,7 +48,7 @@ const generateNodeChart = (data) => {
         options: {
             scales: {
                 y: {
-                    beginAtZero: true,
+                    min: 10,
                 },
             },
             elements: {
