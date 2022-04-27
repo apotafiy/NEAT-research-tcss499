@@ -15,6 +15,7 @@ class PopulationManager {
         this.food = [];
         this.foodTracker = new FoodTracker();
         this.agentTracker = new AgentTracker();
+        this.genomeTracker = new GenomeTracker();
         PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
         this.spawnAgents();
         this.spawnFood();
@@ -80,6 +81,7 @@ class PopulationManager {
     processGeneration() {
         this.agents.forEach(agent => {
             this.agentTracker.processAgent(agent);
+            this.genomeTracker.processGenome(agent.genome);
             agent.age++;
             agent.assignFitness();
         });
@@ -162,6 +164,7 @@ class PopulationManager {
         generateFoodStageChart(this.foodTracker.getLifeStageData());
         this.foodTracker.addNewGeneration();
         this.agentTracker.addNewGeneration();
+        this.genomeTracker.addNewGeneration();
         this.startGeneration();
     };
 };
