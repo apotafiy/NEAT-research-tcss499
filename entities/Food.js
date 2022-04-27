@@ -1,9 +1,10 @@
 class Food {
-    constructor(game, x, y, isPoison) {
+    constructor(game, x, y, isPoison, foodTracker) {
         this.x = x;
         this.y = y;
         this.isPoison = isPoison;
         this.game = game;
+        this.foodTracker = foodTracker;
         this.states = {
             seed: 0,
             adolescent: 1,
@@ -68,6 +69,7 @@ class Food {
         let cals = this.isPoison
             ? Math.abs(this.properties[this.state].calories) * -1
             : this.properties[this.state].calories;
+        this.foodTracker.addCalories(this.properties[this.state].calories);
         this.state = this.states.dead;
         this.removeFromWorld = true;
         return cals;
@@ -90,7 +92,7 @@ class Food {
             const distance = Math.random() * maxDist;
             const x = Math.cos(angle) * distance;
             const y = Math.sin(angle) * distance;
-            let seedling = new Food(this.game, this.x + x, this.y + y, false);
+            let seedling = new Food(this.game, this.x + x, this.y + y, false, this.foodTracker);
             children.push(seedling);
             angle += increment;
         }
@@ -110,6 +112,7 @@ class Food {
             return;
         } else if (!this.properties[this.state].isSet) {
             this.properties[this.state].isSet = true;
+            this.foodTracker.addLifeStage(this.state);
             setTimeout(() => {
                 this.state += 1;
                 if (this.state == this.states.dead) {

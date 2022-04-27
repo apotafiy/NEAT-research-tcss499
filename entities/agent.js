@@ -14,6 +14,7 @@ class Agent {
         this.genome = genome === undefined ? new Genome() : genome;
         this.neuralNet = new NeuralNet(this.genome);
         this.energy = 0;
+        this.age = 0;
         this.resetOrigin();
         this.updateBoundingCircle();
     };
