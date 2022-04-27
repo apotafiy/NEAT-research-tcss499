@@ -1,7 +1,12 @@
 /** Global Parameters Object */
 const params = {
     CANVAS_SIZE: 1000,
-    ENFORCE_CIRCULAR_FOOD: false
+    FOOD_OUTSIDE: false,
+    GEN_TIME: 15,
+    AGENT_NEIGHBORS: false,
+    MIN_FOOD: 250,
+    MAX_FOOD: 300,
+    COMPAT_THRESH: 0.1
  };
 
 /**

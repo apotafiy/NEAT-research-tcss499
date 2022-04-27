@@ -24,10 +24,22 @@
 <body>
     <canvas id="gameWorld" width="1000" height="1000" style="background: white; border: 1px solid black" tabindex="0" autofocus></canvas>
     <div>
-        <input type="range" id="leftwheel" min="-1" max="1" value="0" step="0.1"> Right Wheel
+        <input type="checkbox" id="agent_neighbors"> Agent Neighbors
     </div>
     <div>
-        <input type="range" id="rightwheel" min="-1" max="1" value="0" step="0.1"> Left Wheel
+        <input type="checkbox" id="food_outside_circle" checked="checked"> Food Outside Circle
+    </div>
+    <div>
+        <input type="text" id="generation_time" value="15"> Generation Time (sec)
+    </div>
+    <div>
+        <input type="text" id="compat_threshold" value="0.1"> Species Compatibility Threshold
+    </div>
+    <div>
+        <input type="text" id="min_food" value="250"> Minimum Food
+    </div>
+    <div>
+        <input type="text" id="max_food" value="300"> Maximum Food
     </div>
 </body>
 </html>

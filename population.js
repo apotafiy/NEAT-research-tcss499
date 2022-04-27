@@ -1,8 +1,8 @@
 class PopulationManager {
 
-    static MIN_FOOD = 250;
-    static MAX_FOOD = 300;
-    static COMPAT_THRESHOLD = 0.1;
+    // static MIN_FOOD = 250;
+    // static MAX_FOOD = 300;
+    // static COMPAT_THRESHOLD = 0.1;
     static SPECIES_ID = 0;
     static GEN_NUM = 0;
     static SPECIES_CREATED = 0;
@@ -21,8 +21,8 @@ class PopulationManager {
     };
 
     startGeneration() {
-        this.timer = 15.0;
-        setTimeout(() => this.processGeneration(), 15000);
+        this.timer = params.GEN_TIME;
+        setTimeout(() => this.processGeneration(), params.GEN_TIME * 1000);
     };
 
     update() {
@@ -37,9 +37,9 @@ class PopulationManager {
                 }
             }
 
-            if (this.food.length < PopulationManager.MAX_FOOD) {
-                if (this.food.length < PopulationManager.MIN_FOOD) {
-                    this.spawnFood(PopulationManager.MAX_FOOD - this.food.length);
+            if (this.food.length < params.MAX_FOOD) {
+                if (this.food.length < params.MIN_FOOD) {
+                    this.spawnFood(params.MAX_FOOD - this.food.length);
                 }
                 this.food.forEach(food => {
                     if (food.isAdult()) {
@@ -67,7 +67,7 @@ class PopulationManager {
         }
     };
 
-    spawnFood(count = PopulationManager.MAX_FOOD) {
+    spawnFood(count = params.MAX_FOOD) {
         for (let i = 0; i < count; i++) { // add food sources
             let randomDist = randomInt(params.CANVAS_SIZE / 2);
             let randomAngle = randomInt(360) * Math.PI / 180;
@@ -158,7 +158,7 @@ class PopulationManager {
             let matchFound = false;
             compatOrder.forEach(speciesId => {
                 let rep = repMap.get(speciesId);
-                if (!matchFound && Genome.similarity(rep.genome, child.genome) <= PopulationManager.COMPAT_THRESHOLD) { // species matched
+                if (!matchFound && Genome.similarity(rep.genome, child.genome) <= params.COMPAT_THRESH) { // species matched
                     matchFound = true;
                     child.speciesId = speciesId;
                     PopulationManager.SPECIES_MEMBERS.get(speciesId).push(child);
