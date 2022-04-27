@@ -2,6 +2,69 @@
  *
  * @param {array} data array of arrays of data
  */
+const generateCycleChart = (data) => {
+    const labels = [];
+    // console.log(data.means);
+    data.medians.forEach((elem, i) => {
+        labels.push(i);
+    });
+    if (document.getElementById('cycleChart') != undefined) {
+        document.getElementById('cycleChart').remove();
+    }
+    const ctx = document.createElement('canvas');
+    ctx.setAttribute('id', 'cycleChart');
+    document.getElementById('cycleChartContainer').appendChild(ctx);
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Max Cycles',
+                    data: data.maxes,
+                    fill: true,
+                    backgroundColor: ['rgba(0,50,255,0.2)'],
+                    borderColor: ['rgba(0,50,255,1)'],
+                    borderWidth: 3,
+                },
+                {
+                    label: 'Median Cycles',
+                    data: data.medians,
+                    fill: true,
+                    backgroundColor: ['rgba(200,0,200,0.5)'],
+                    borderColor: ['rgba(200,0,200,1)'],
+                    borderWidth: 3,
+                },
+                {
+                    label: 'Min Cycles',
+                    data: data.mins,
+                    fill: true,
+                    backgroundColor: ['rgba(200,0,0,0.5)'],
+                    borderColor: ['rgba(200,0,0,1)'],
+                    borderWidth: 3,
+                },
+            ],
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+            },
+            elements: {
+                line: {
+                    tension: 0.2,
+                },
+            },
+        },
+    });
+};
+
+
+/**
+ *
+ * @param {array} data array of arrays of data
+ */
 const generateConnectionChart = (data) => {
     const labels = [];
     // console.log(data.means);

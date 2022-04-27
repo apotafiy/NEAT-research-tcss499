@@ -47,6 +47,7 @@ class GenomeTracker {
         );
         const numCycles = connections.reduce((acc, curr) => {
             if (curr.isCyclic) {
+                console.log('cycle');
                 return 1 + acc;
             } else {
                 return acc;
@@ -74,6 +75,26 @@ class GenomeTracker {
             maxes: maxConnections,
             mins: minConnections,
             medians: medianConnections,
+        };
+    }
+
+    getCycleData() {
+        const maxCycles = this.generations.map((obj) =>
+            obj.cycles.reduce((acc, curr) => Math.max(acc, curr), 0)
+        );
+        const minCycles = this.generations.map((obj) =>
+            obj.cycles.reduce(
+                (acc, curr) => Math.min(acc, curr),
+                Number.MAX_VALUE
+            )
+        );
+        const medianCycles = this.generations.map((obj) =>
+            getMedian(obj.cycles)
+        );
+        return {
+            maxes: maxCycles,
+            mins: minCycles,
+            medians: medianCycles,
         };
     }
 }
