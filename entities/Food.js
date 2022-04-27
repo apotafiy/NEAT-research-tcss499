@@ -100,7 +100,8 @@ class Food {
     }
 
     update() {
-        if(this.x < 0 || this.y < 0 || this.x > document.getElementById("gameWorld").width || this.y > document.getElementById("gameWorld").height){
+        if ((this.x < 0 || this.y < 0 || this.x > params.CANVAS_SIZE || this.y > params.CANVAS_SIZE) ||
+            (!(params.FOOD_OUTSIDE) && distance(this.BC.center, this.game.home.BC.center) > params.CANVAS_SIZE / 2)){
             // I include this in case the food spawns outside the bounds of the canvas
             // that way it does not needlessly render these entities
             this.removeFromWorld = true;

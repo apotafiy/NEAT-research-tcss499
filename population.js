@@ -1,13 +1,11 @@
 class PopulationManager {
 
-    static MIN_FOOD = 250;
-    static MAX_FOOD = 300;
-    static COMPAT_THRESHOLD = 0.1;
     static SPECIES_ID = 0;
     static GEN_NUM = 0;
     static SPECIES_CREATED = 0;
     static SPECIES_COLORS = new Map();
     static SPECIES_MEMBERS = new Map();
+    static COLORS_USED = new Set();
 
     constructor(game) {
         this.game = game;
@@ -16,7 +14,9 @@ class PopulationManager {
         this.foodTracker = new FoodTracker();
         this.agentTracker = new AgentTracker();
         this.genomeTracker = new GenomeTracker();
-        PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
+        let defaultColor = randomInt(361);
+        PopulationManager.COLORS_USED.add(defaultColor);
+        PopulationManager.SPECIES_COLORS.set(0, defaultColor);
         this.spawnAgents();
         this.spawnFood();
         this.startGeneration();
@@ -24,8 +24,8 @@ class PopulationManager {
     };
 
     startGeneration() {
-        this.timer = 15.0;
-        setTimeout(() => this.processGeneration(), 15000);
+        this.timer = params.GEN_TIME;
+        setTimeout(() => this.processGeneration(), params.GEN_TIME * 1000);
     };
 
     update() {
@@ -40,9 +40,9 @@ class PopulationManager {
                 }
             }
 
-            if (this.food.length < PopulationManager.MAX_FOOD) {
-                if (this.food.length < PopulationManager.MIN_FOOD) {
-                    this.spawnFood(PopulationManager.MAX_FOOD - this.food.length);
+            if (this.food.length < params.MAX_FOOD) {
+                if (this.food.length < params.MIN_FOOD) {
+                    this.spawnFood(params.MAX_FOOD - this.food.length);
                 }
                 this.food.forEach(food => {
                     if (food.isAdult()) {
@@ -70,9 +70,13 @@ class PopulationManager {
         }
     };
 
-    spawnFood(count = PopulationManager.MAX_FOOD) {
+    spawnFood(count = params.MAX_FOOD) {
         for (let i = 0; i < count; i++) { // add food sources
-            let food = new Food(gameEngine, randomInt(params.CANVAS_SIZE + 1), randomInt(params.CANVAS_SIZE + 1), false, this.foodTracker);
+            let randomDist = randomInt(params.CANVAS_SIZE / 2);
+            let randomAngle = randomInt(360) * Math.PI / 180;
+            let x = params.CANVAS_SIZE / 2 + randomDist * Math.cos(randomAngle);
+            let y = params.CANVAS_SIZE / 2 + randomDist * Math.sin(randomAngle);
+            let food = new Food(gameEngine, x, y, false, this.foodTracker);
             this.game.addEntity(food);
             this.food.push(food);
         }
@@ -96,31 +100,61 @@ class PopulationManager {
 
         Genome.resetInnovations(); // reset the innovation number mapping for newly created connections
 
+        let remainingColors = new Set(); // we need to filter out the colors of species that have died out for reuse
         PopulationManager.SPECIES_MEMBERS = new Map();
         this.agents.forEach(agent => { // fill species members map with surviving best-fit parent agents
             if (PopulationManager.SPECIES_MEMBERS.get(agent.speciesId) === undefined) {
                 PopulationManager.SPECIES_MEMBERS.set(agent.speciesId, []);
             }
             PopulationManager.SPECIES_MEMBERS.get(agent.speciesId).push(agent);
+            remainingColors.add(PopulationManager.SPECIES_COLORS.get(agent.speciesId));
         });
+        PopulationManager.COLORS_USED = new Set([...PopulationManager.COLORS_USED].filter(color => remainingColors.has(color)));
 
-        let parentSpecies = [];
-        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => parentSpecies.push(speciesId));
-        parentSpecies.sort();
+        let sharedFitnessMap = new Map();
+        let sumShared = 0;
+        let minShared = 0;
+        PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => {
+            let sumRaws = 0;
+            speciesList.forEach(member => {
+                sumRaws += member.genome.rawFitness;
+            });
+            minShared = Math.min(minShared, sumRaws);
+            sumShared += sumRaws / speciesList.length;
+            sharedFitnessMap.set(speciesId, sumRaws / speciesList.length);
+        });
+        if (minShared < 0) {
+            sumShared = 0;
+            sharedFitnessMap.forEach((fitness, speciesId) => {
+                sharedFitnessMap.set(speciesId, fitness + minShared * -1);
+                sumShared += sharedFitnessMap.get(speciesId);
+            });
+        }
+        let rouletteOrder = [...sharedFitnessMap.keys()].sort();
 
         let length = this.agents.length;
-        let speciesIndex = 0;
         let children = [];
         for (let i = 0; i < length; i++) { // randomly produce offspring between n pairs of remaining agents
-            // let parent1 = this.agents[randomInt(this.agents.length)];
-            // let parent2 = this.agents[randomInt(this.agents.length)];
-            let parent1 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
-            let parent2 = PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex])[randomInt(PopulationManager.SPECIES_MEMBERS.get(parentSpecies[speciesIndex]).length)];
+            let rouletteResult = randomFloat(sumShared);
+            let rouletteIndex = 0;
+            let accumulator = 0;
+            let flag = false;
+            let parent1, parent2;
+            while (!flag) {
+                let nextSpecies = rouletteOrder[rouletteIndex];
+                accumulator += sharedFitnessMap.get(nextSpecies);
+                if (accumulator >= rouletteResult) {
+                    flag = true;
+                    let possibleParents = PopulationManager.SPECIES_MEMBERS.get(nextSpecies);
+                    parent1 = possibleParents[randomInt(possibleParents.length)];
+                    parent2 = possibleParents[randomInt(possibleParents.length)];
+                }
+                rouletteIndex++;
+            }
             let childGenome = Genome.crossover(parent1.genome, parent2.genome);
             childGenome.mutate();
             let child = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2, childGenome);
             children.push(child);
-            speciesIndex = (speciesIndex + 1) % parentSpecies.length;
         }
 
         let repMap = new Map();
@@ -129,10 +163,12 @@ class PopulationManager {
             repMap.set(speciesId, speciesList[randomInt(speciesList.length)]);
         });
 
+        let compatOrder = [...PopulationManager.SPECIES_MEMBERS.keys()].sort(); // sort by speciesId such that compatibility is always considered in the same order
         children.forEach(child => { // fit child into a species
             let matchFound = false;
-            repMap.forEach((rep, speciesId) => {
-                if (!matchFound && Genome.similarity(rep.genome, child.genome) <= PopulationManager.COMPAT_THRESHOLD) { // species matched
+            compatOrder.forEach(speciesId => {
+                let rep = repMap.get(speciesId);
+                if (!matchFound && Genome.similarity(rep.genome, child.genome) <= params.COMPAT_THRESH) { // species matched
                     matchFound = true;
                     child.speciesId = speciesId;
                     PopulationManager.SPECIES_MEMBERS.get(speciesId).push(child);
@@ -143,7 +179,12 @@ class PopulationManager {
                 PopulationManager.SPECIES_CREATED++;
                 child.speciesId = ++PopulationManager.SPECIES_ID;
                 PopulationManager.SPECIES_MEMBERS.set(child.speciesId, []);
-                PopulationManager.SPECIES_COLORS.set(child.speciesId, randomInt(361));
+                let newColor = randomInt(361);
+                while (PopulationManager.COLORS_USED.has(newColor)) {
+                    newColor = randomInt(361);
+                }
+                PopulationManager.COLORS_USED.add(newColor);
+                PopulationManager.SPECIES_COLORS.set(child.speciesId, newColor);
                 PopulationManager.SPECIES_MEMBERS.get(child.speciesId).push(child);
             }
 

@@ -95,6 +95,13 @@ class GameEngine {
     };
 
     update() {
+        params.AGENT_NEIGHBORS = document.getElementById("agent_neighbors").checked;
+        params.FOOD_OUTSIDE = document.getElementById("food_outside_circle").checked;
+        params.GEN_TIME = parseFloat(document.getElementById("generation_time").value);
+        params.MIN_FOOD = parseInt(document.getElementById("min_food").value);
+        params.MAX_FOOD = parseInt(document.getElementById("max_food").value);
+        params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
+
         let entitiesCount = this.entities.length;
 
         for (let i = 0; i < entitiesCount; i++) {

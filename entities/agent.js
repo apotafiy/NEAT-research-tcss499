@@ -59,7 +59,7 @@ class Agent {
 
         let spottedNeighbors = [];
         this.game.entities.forEach(entity => {
-            if (entity !== this && !(entity instanceof Agent) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
+            if (entity !== this && (params.AGENT_NEIGHBORS || !(entity instanceof Agent)) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
                 spottedNeighbors.push(entity);
             }
         });
@@ -84,9 +84,6 @@ class Agent {
             input.push(0);
         }
 
-        // this.leftWheel = parseFloat(document.getElementById("leftwheel").value);
-        // this.rightWheel = parseFloat(document.getElementById("rightwheel").value);
-
         let wheels = this.neuralNet.processInput(input);
         this.leftWheel = wheels[0];
         this.rightWheel = wheels[1];
@@ -105,16 +102,16 @@ class Agent {
         }
 
         if (this.heading < 0) {
-            console.log("uh oh!")
+            console.log("uh oh!");
         }
 
         if (Math.abs(wheels[0]) > 1 || Math.abs(wheels[1]) > 1) {
-            console.log("invalid output for a wheel!")
+            console.log("invalid output for a wheel!");
         }
 
         // uncomment this code to implement agent metabolism
-        // let displacement = distance(oldPos, { x: this.x, y: this.y });
-        // this.energy -= displacement;
+        let displacement = distance(oldPos, { x: this.x, y: this.y });
+        this.energy = Math.max(0, this.energy - displacement / 2);
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {
