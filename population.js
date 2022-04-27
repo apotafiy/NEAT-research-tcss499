@@ -1,8 +1,5 @@
 class PopulationManager {
 
-    // static MIN_FOOD = 250;
-    // static MAX_FOOD = 300;
-    // static COMPAT_THRESHOLD = 0.1;
     static SPECIES_ID = 0;
     static GEN_NUM = 0;
     static SPECIES_CREATED = 0;
@@ -13,6 +10,8 @@ class PopulationManager {
         this.game = game;
         this.agents = [];
         this.food = [];
+        this.foodTracker = new FoodTracker();
+        this.agentTracker = new AgentTracker();
         PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
         this.spawnAgents();
         this.spawnFood();
@@ -73,7 +72,7 @@ class PopulationManager {
             let randomAngle = randomInt(360) * Math.PI / 180;
             let x = params.CANVAS_SIZE / 2 + randomDist * Math.cos(randomAngle);
             let y = params.CANVAS_SIZE / 2 + randomDist * Math.sin(randomAngle);
-            let food = new Food(gameEngine, x, y, false);
+            let food = new Food(gameEngine, x, y, false, this.foodTracker);
             this.game.addEntity(food);
             this.food.push(food);
         }
@@ -81,8 +80,12 @@ class PopulationManager {
 
     processGeneration() {
         this.agents.forEach(agent => {
+            this.agentTracker.processAgent(agent);
+            agent.age++;
             agent.assignFitness();
         });
+
+        // console.log(this.agentTracker.generations[this.agentTracker.currentGeneration]);
 
         this.agents.sort((a1, a2) => a1.genome.rawFitness - a2.genome.rawFitness);
 
@@ -184,6 +187,11 @@ class PopulationManager {
         });
 
         PopulationManager.GEN_NUM++;
+        generateAgeChart(this.agentTracker.getAgeData());
+        generateFoodConsumptionChart(this.foodTracker.getConsumptionData());
+        generateFoodStageChart(this.foodTracker.getLifeStageData());
+        this.foodTracker.addNewGeneration();
+        this.agentTracker.addNewGeneration();
         this.startGeneration();
     };
 };

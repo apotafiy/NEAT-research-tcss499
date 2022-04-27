@@ -4,9 +4,13 @@
 <head>
     <meta charset="utf-8">
     <title>Game Project Title Goes Here</title>
-  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="./data/GenomeTracker.js"></script>
+    <script type="text/javascript" src="./data/AgentTracker.js"></script>
     <script type="text/javascript" src="./entities/agent.js"></script>
-    <script type="text/javascript" src="./entities/food.js"></script>
+    <script type="text/javascript" src="./data/FoodTracker.js"></script>
+    <script type="text/javascript" src="./data/graphUtils.js"></script>
+    <script type="text/javascript" src="./entities/Food.js"></script>
     <script type="text/javascript" src="./entities/home.js"></script>
     <script type="text/javascript" src="./neuralnetwork/mapping.js"></script>
     <script type="text/javascript" src="./neuralnetwork/neuralnet.js"></script>
@@ -41,5 +45,15 @@
     <div>
         <input type="text" id="max_food" value="300"> Maximum Food
     </div>
+    <div id="ageChartContainer">
+        <canvas id="ageChart"></canvas>
+    </div>
+    <div id="foodConsumptionChartContainer">
+        <canvas id="foodConsumptionChart"></canvas>
+    </div>
+    <div id="foodLifeStageChartContainer">
+        <canvas id="foodLifeStageChart"></canvas>
+    </div>
+
 </body>
 </html>
