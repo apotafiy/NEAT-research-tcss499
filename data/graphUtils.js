@@ -2,6 +2,69 @@
  *
  * @param {array} data array of arrays of data
  */
+const generateNodeChart = (data) => {
+    const labels = [];
+    // console.log(data.means);
+    data.medians.forEach((elem, i) => {
+        labels.push(i);
+    });
+    if (document.getElementById('nodeChart') != undefined) {
+        document.getElementById('nodeChart').remove();
+    }
+    const ctx = document.createElement('canvas');
+    ctx.setAttribute('id', 'nodeChart');
+    document.getElementById('nodeChartContainer').appendChild(ctx);
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Max Nodes',
+                    data: data.maxes,
+                    fill: true,
+                    backgroundColor: ['rgba(0,50,255,0.2)'],
+                    borderColor: ['rgba(0,50,255,1)'],
+                    borderWidth: 3,
+                },
+                {
+                    label: 'Median Nodes',
+                    data: data.medians,
+                    fill: true,
+                    backgroundColor: ['rgba(200,0,200,0.5)'],
+                    borderColor: ['rgba(200,0,200,1)'],
+                    borderWidth: 3,
+                },
+                {
+                    label: 'Min Nodes',
+                    data: data.mins,
+                    fill: true,
+                    backgroundColor: ['rgba(200,0,0,0.5)'],
+                    borderColor: ['rgba(200,0,0,1)'],
+                    borderWidth: 3,
+                },
+            ],
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+            },
+            elements: {
+                line: {
+                    tension: 0.2,
+                },
+            },
+        },
+    });
+};
+
+
+/**
+ *
+ * @param {array} data array of arrays of data
+ */
 const generateCycleChart = (data) => {
     const labels = [];
     // console.log(data.means);

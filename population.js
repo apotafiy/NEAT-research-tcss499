@@ -204,6 +204,7 @@ class PopulationManager {
         generateFoodStageChart(this.foodTracker.getLifeStageData());
         generateConnectionChart(this.genomeTracker.getConnectionData());
         generateCycleChart(this.genomeTracker.getCycleData());
+        generateNodeChart(this.genomeTracker.getNodeData());
         this.foodTracker.addNewGeneration();
         this.agentTracker.addNewGeneration();
         this.genomeTracker.addNewGeneration();

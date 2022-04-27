@@ -97,4 +97,15 @@ class GenomeTracker {
             medians: medianCycles,
         };
     }
+
+    getNodeData() {
+        const maxNodes = this.generations.map((obj) => obj.maxNodes);
+        const minNodes = this.generations.map((obj) => obj.minNodes);
+        const medianNodes = this.generations.map((obj) => getMedian(obj.nodes));
+        return {
+            maxes: maxNodes,
+            mins: minNodes,
+            medians: medianNodes,
+        };
+    }
 }
