@@ -86,7 +86,6 @@ class PopulationManager {
             agent.assignFitness();
         });
 
-        // console.log(this.agentTracker.generations[this.agentTracker.currentGeneration]);
 
         this.agents.sort((a1, a2) => a1.genome.rawFitness - a2.genome.rawFitness);
 
@@ -162,6 +161,7 @@ class PopulationManager {
         generateAgeChart(this.agentTracker.getAgeData());
         generateFoodConsumptionChart(this.foodTracker.getConsumptionData());
         generateFoodStageChart(this.foodTracker.getLifeStageData());
+        generateConnectionChart(this.genomeTracker.getConnectionData());
         this.foodTracker.addNewGeneration();
         this.agentTracker.addNewGeneration();
         this.genomeTracker.addNewGeneration();
