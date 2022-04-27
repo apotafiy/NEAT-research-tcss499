@@ -5,6 +5,7 @@ class PopulationManager {
     static SPECIES_CREATED = 0;
     static SPECIES_COLORS = new Map();
     static SPECIES_MEMBERS = new Map();
+    static COLORS_USED = new Set();
 
     constructor(game) {
         this.game = game;
@@ -12,7 +13,9 @@ class PopulationManager {
         this.food = [];
         this.foodTracker = new FoodTracker();
         this.agentTracker = new AgentTracker();
-        PopulationManager.SPECIES_COLORS.set(0, randomInt(361));
+        let defaultColor = randomInt(361);
+        PopulationManager.COLORS_USED.add(defaultColor);
+        PopulationManager.SPECIES_COLORS.set(0, defaultColor);
         this.spawnAgents();
         this.spawnFood();
         this.startGeneration();
@@ -96,13 +99,16 @@ class PopulationManager {
 
         Genome.resetInnovations(); // reset the innovation number mapping for newly created connections
 
+        let remainingColors = new Set(); // we need to filter out the colors of species that have died out for reuse
         PopulationManager.SPECIES_MEMBERS = new Map();
         this.agents.forEach(agent => { // fill species members map with surviving best-fit parent agents
             if (PopulationManager.SPECIES_MEMBERS.get(agent.speciesId) === undefined) {
                 PopulationManager.SPECIES_MEMBERS.set(agent.speciesId, []);
             }
             PopulationManager.SPECIES_MEMBERS.get(agent.speciesId).push(agent);
+            remainingColors.add(PopulationManager.SPECIES_COLORS.get(agent.speciesId));
         });
+        PopulationManager.COLORS_USED = new Set([...PopulationManager.COLORS_USED].filter(color => remainingColors.has(color)));
 
         let sharedFitnessMap = new Map();
         let sumShared = 0;
@@ -172,7 +178,12 @@ class PopulationManager {
                 PopulationManager.SPECIES_CREATED++;
                 child.speciesId = ++PopulationManager.SPECIES_ID;
                 PopulationManager.SPECIES_MEMBERS.set(child.speciesId, []);
-                PopulationManager.SPECIES_COLORS.set(child.speciesId, randomInt(361));
+                let newColor = randomInt(361);
+                while (PopulationManager.COLORS_USED.has(newColor)) {
+                    newColor = randomInt(361);
+                }
+                PopulationManager.COLORS_USED.add(newColor);
+                PopulationManager.SPECIES_COLORS.set(child.speciesId, newColor);
                 PopulationManager.SPECIES_MEMBERS.get(child.speciesId).push(child);
             }
 
