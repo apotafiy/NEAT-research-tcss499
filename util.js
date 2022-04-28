@@ -6,7 +6,8 @@ const params = {
     AGENT_NEIGHBORS: false,
     MIN_FOOD: 300,
     COMPAT_THRESH: 0.1,
-    ENFORCE_MIN_FOOD: false
+    ENFORCE_MIN_FOOD: false,
+    AGENT_VISION_RADIUS: 500
  };
 
 /**

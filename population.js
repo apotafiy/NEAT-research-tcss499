@@ -42,6 +42,7 @@ class PopulationManager {
             params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
             this.tickCounter = 0;
             this.processGeneration();
+            params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius"));
             params.GEN_TICKS = parseInt(document.getElementById("generation_time").value);
             if (this.food.length === 0) {
                 this.spawnFood();
