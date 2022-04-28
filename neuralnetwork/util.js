@@ -75,7 +75,11 @@ const detectCycle = (nodes, edges, newEdge) => {
 
 const getMedian = (arr) => {
     arr.sort((a, b) => a - b);
-    return arr[Math.floor(arr.length / 2)];
+    if(arr.length % 2 != 0) {
+        return arr[Math.floor(arr.length / 2)];
+    } else {
+        return getMean(arr.slice(Math.floor(arr.length/2), Math.floor(arr.length/2) + 2));
+    }
 }
 
 const getMean = (arr) => {
