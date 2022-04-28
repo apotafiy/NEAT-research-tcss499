@@ -96,6 +96,7 @@ class GameEngine {
 
     update() {
         let entitiesCount = this.entities.length;
+        this.flag = this.population.update();
 
         for (let i = 0; i < entitiesCount; i++) {
             let entity = this.entities[i];
@@ -111,7 +112,13 @@ class GameEngine {
             }
         }
 
-        this.population.update();
+        // if (!this.flag) {
+        //     this.population.food.forEach(food => {
+        //         if (!food.removeFromWorld) {
+        //             console.log(food.tickCounter)
+        //         }
+        //     })
+        // }
     };
 
     loop() {

@@ -6,6 +6,7 @@ class Food {
         this.game = game;
         this.foodTracker = foodTracker;
         this.tickCounter = 0;
+        this.lifetimeTicks = params.GEN_TICKS;
         this.states = {
             seed: 0,
             adolescent: 1,
@@ -49,7 +50,7 @@ class Food {
             },
         ]; // the properties of the entity at each state
         // would access as such: this.stateProps[this.state].lifeSpan
-        this.ticksToNext = params.GEN_TICKS * this.properties[this.states.seed].lifespanRatio;
+        this.ticksToNext = this.lifetimeTicks * this.properties[this.states.seed].lifespanRatio;
         this.updateBoundingCircle();
     }
 
@@ -108,7 +109,7 @@ class Food {
             // that way it does not needlessly render these entities
             this.removeFromWorld = true;
             return;
-        } 
+        }
 
         if (!this.properties[this.state].isSet) {
             this.properties[this.state].isSet = true;
@@ -121,9 +122,13 @@ class Food {
             this.state++;
             if (this.state === this.states.dead) {
                 this.removeFromWorld = true;
+                // console.log("reproducing");
+                if (!this.game.flag) {
+                    console.log("weird")
+                }
                 this.reproduce();
             } else {
-                this.ticksToNext = params.GEN_TICKS * this.properties[this.state].lifespanRatio;
+                this.ticksToNext = this.lifetimeTicks * this.properties[this.state].lifespanRatio;
             }
         }
 

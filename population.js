@@ -46,7 +46,10 @@ class PopulationManager {
             params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius"));
             params.GEN_TICKS = parseInt(document.getElementById("generation_time").value);
             this.spawnFood(params.MIN_FOOD - this.food.length);
+            console.log("generation done")
+            return false;
         }
+        return true;
     };
 
     spawnAgents() {
