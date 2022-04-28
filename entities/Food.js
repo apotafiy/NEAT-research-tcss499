@@ -5,6 +5,7 @@ class Food {
         this.isPoison = isPoison;
         this.game = game;
         this.foodTracker = foodTracker;
+        this.tickCounter = 0;
         this.states = {
             seed: 0,
             adolescent: 1,
@@ -15,28 +16,32 @@ class Food {
         this.state = this.states.seed;
         this.properties = [
             {
-                lifeSpan: 3,
+                // lifeSpan: 3,
+                lifespanRatio: 0.25,
                 radius: 3,
                 color: 'hsl(50, 100%, 50%)',
                 calories: 5,
                 isSet: false,
             },
             {
-                lifeSpan: 3 + Math.random() * 2, // add a bit of variation in lifespan
+                // lifeSpan: 3 + Math.random() * 2, // add a bit of variation in lifespan
+                lifespanRatio: 0.25,
                 radius: 6,
                 color: 'hsl(100, 100%, 50%)',
                 calories: 10,
                 isSet: false,
             },
             {
-                lifeSpan: 3,
+                // lifeSpan: 3,
+                lifespanRatio: 0.25,
                 radius: 9,
                 color: 'hsl(200, 100%, 50%)',
                 calories: 15,
                 isSet: false,
             },
             {
-                lifeSpan: 3,
+                // lifeSpan: 3,
+                lifespanRatio: 0.25,
                 radius: 9,
                 color: 'hsl(25, 100%, 50%)',
                 calories: -5,
@@ -44,12 +49,9 @@ class Food {
             },
         ]; // the properties of the entity at each state
         // would access as such: this.stateProps[this.state].lifeSpan
+        this.ticksToNext = params.GEN_TICKS * this.properties[this.states.seed].lifespanRatio;
         this.updateBoundingCircle();
     }
-
-    isAdult() {
-        return this.state === this.states.decaying;
-    };
 
     getHue() {
         let commaIndex = this.properties[this.state].color.indexOf(",");
@@ -85,7 +87,7 @@ class Food {
         // once we know the angle we can choose a random distance from center to place the food
         const increment = (2 * Math.PI) / numChildren;
         let angle = Math.random() * Math.PI; // choose random starting angle to provide some variation in placements
-        const maxDist = 200;
+        const maxDist = 250;
         let children = [];
         for (let i = 0; i < numChildren; i++) {
             // if i know angle and distance then i know coordinates
@@ -96,7 +98,7 @@ class Food {
             children.push(seedling);
             angle += increment;
         }
-        return children;
+        this.game.population.registerSeedlings(children);
     }
 
     update() {
@@ -106,21 +108,28 @@ class Food {
             // that way it does not needlessly render these entities
             this.removeFromWorld = true;
             return;
-        }
-        if (this.state == this.states.dead) {
-            this.removeFromWorld = true;
-            return;
-        } else if (!this.properties[this.state].isSet) {
+        } 
+
+        if (!this.properties[this.state].isSet) {
             this.properties[this.state].isSet = true;
             this.foodTracker.addLifeStage(this.state);
-            setTimeout(() => {
-                this.state += 1;
-                if (this.state == this.states.dead) {
-                    this.removeFromWorld = true;
-                }
-            }, this.properties[this.state].lifeSpan * 1000);
         }
-        this.updateBoundingCircle();
+
+        this.tickCounter++;
+        if (this.tickCounter === this.ticksToNext) {
+            this.tickCounter = 0;
+            this.state++;
+            if (this.state === this.states.dead) {
+                this.removeFromWorld = true;
+                this.reproduce();
+            } else {
+                this.ticksToNext = params.GEN_TICKS * this.properties[this.state].lifespanRatio;
+            }
+        }
+
+        if (!this.removeFromWorld) {
+            this.updateBoundingCircle();
+        }
     }
 
     draw(ctx) {

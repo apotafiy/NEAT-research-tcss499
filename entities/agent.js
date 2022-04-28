@@ -5,7 +5,6 @@ class Agent {
         this.diameter = 20;
         this.wheelRadius = 2.5;
         this.maxVelocity = 2;
-        this.visionRadius = 500;
         this.strokeColor = "black";
         // this.fillColor = "hsl(240, 100%, 50%)";
         this.leftWheel = 0;
@@ -59,7 +58,7 @@ class Agent {
 
         let spottedNeighbors = [];
         this.game.entities.forEach(entity => {
-            if (entity !== this && (params.AGENT_NEIGHBORS || !(entity instanceof Agent)) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= this.visionRadius) {
+            if (entity !== this && (params.AGENT_NEIGHBORS || !(entity instanceof Agent)) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
                 spottedNeighbors.push(entity);
             }
         });
@@ -111,7 +110,7 @@ class Agent {
 
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
-        this.energy = Math.max(0, this.energy - displacement / 2);
+        this.energy -= displacement / 2;
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {

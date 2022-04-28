@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Game Project Title Goes Here</title>
+    <title>TCSS 499 NEAT Simulation</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="text/javascript" src="./data/GenomeTracker.js"></script>
     <script type="text/javascript" src="./data/AgentTracker.js"></script>
@@ -31,19 +31,22 @@
         <input type="checkbox" id="agent_neighbors"> Agent Neighbors
     </div>
     <div>
-        <input type="checkbox" id="food_outside_circle" checked="checked"> Food Outside Circle
+        <input type="checkbox" id="food_outside_circle"> Food Outside Circle
     </div>
     <div>
-        <input type="text" id="generation_time" value="15"> Generation Time (sec)
+        <input type="checkbox" id="enforce_min_food"> Enforce Minimum Food
+    </div>
+    <div>
+        <input type="text" id="agent_vision_radius" value="500"> Agent Visual Radius (pixels)
+    </div>
+    <div>
+        <input type="text" id="generation_time" value="800"> Generation Time (ticks)
     </div>
     <div>
         <input type="text" id="compat_threshold" value="0.1"> Species Compatibility Threshold
     </div>
     <div>
-        <input type="text" id="min_food" value="250"> Minimum Food
-    </div>
-    <div>
-        <input type="text" id="max_food" value="300"> Maximum Food
+        <input type="text" id="min_food" value="300"> Minimum Food
     </div>
     <div id="connectionChartContainer">
         <canvas id="connectionChart"></canvas>

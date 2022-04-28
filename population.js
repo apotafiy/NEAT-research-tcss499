@@ -13,55 +13,46 @@ class PopulationManager {
         this.food = [];
         this.foodTracker = new FoodTracker();
         this.agentTracker = new AgentTracker();
+        this.tickCounter = 0;
         this.genomeTracker = new GenomeTracker();
         let defaultColor = randomInt(361);
         PopulationManager.COLORS_USED.add(defaultColor);
         PopulationManager.SPECIES_COLORS.set(0, defaultColor);
         this.spawnAgents();
         this.spawnFood();
-        this.startGeneration();
-        this.reproduceFood();
-    };
-
-    startGeneration() {
-        this.timer = params.GEN_TIME;
-        setTimeout(() => this.processGeneration(), params.GEN_TIME * 1000);
     };
 
     update() {
-        this.timer = Math.max(0, this.timer - this.game.clockTick);
-    };
+        params.AGENT_NEIGHBORS = document.getElementById("agent_neighbors").checked;
+        params.FOOD_OUTSIDE = document.getElementById("food_outside_circle").checked;
+        params.ENFORCE_MIN_FOOD = document.getElementById("enforce_min_food").checked;
+        params.MIN_FOOD = parseInt(document.getElementById("min_food").value);
 
-    reproduceFood() {
-        setTimeout(() => {
-            for (let i = this.food.length - 1; i >= 0; --i) {
-                if (this.food[i].removeFromWorld) {
-                    this.food.splice(i, 1);
-                }
+        for (let i = this.food.length - 1; i >= 0; --i) { // remove eaten or dead food
+            if (this.food[i].removeFromWorld) {
+                this.food.splice(i, 1);
             }
+        }
 
-            if (this.food.length < params.MAX_FOOD) {
-                if (this.food.length < params.MIN_FOOD) {
-                    this.spawnFood(params.MAX_FOOD - this.food.length);
-                }
-                this.food.forEach(food => {
-                    if (food.isAdult()) {
-                        food.reproduce().forEach(seedling => {
-                            this.food.push(seedling);
-                            this.game.addEntity(seedling);
-                        });
-                    }
-                });
-            }
+        if (params.ENFORCE_MIN_FOOD && this.food.length < params.MIN_FOOD) {
+            this.spawnFood(params.MIN_FOOD - this.food.length);
+        }
 
-            this.reproduceFood();
-        }, 1000);
+        this.tickCounter++;
+        if (this.tickCounter === params.GEN_TICKS) { // we've reached the end of the generation
+            params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
+            this.tickCounter = 0;
+            this.processGeneration();
+            params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius"));
+            params.GEN_TICKS = parseInt(document.getElementById("generation_time").value);
+            this.spawnFood(params.MIN_FOOD - this.food.length);
+        }
     };
 
     spawnAgents() {
         PopulationManager.SPECIES_MEMBERS.set(PopulationManager.SPECIES_ID, []);
         PopulationManager.SPECIES_CREATED++;
-        for (let i = 0; i < 100; i++) { // add agents
+        for (let i = 0; i < 50; i++) { // add agents
             let agent = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2);
             agent.speciesId = PopulationManager.SPECIES_ID;
             PopulationManager.SPECIES_MEMBERS.get(PopulationManager.SPECIES_ID).push(agent);
@@ -70,16 +61,24 @@ class PopulationManager {
         }
     };
 
-    spawnFood(count = params.MAX_FOOD) {
+    spawnFood(count = params.MIN_FOOD) {
+        let seedlings = [];
         for (let i = 0; i < count; i++) { // add food sources
             let randomDist = randomInt(params.CANVAS_SIZE / 2);
             let randomAngle = randomInt(360) * Math.PI / 180;
             let x = params.CANVAS_SIZE / 2 + randomDist * Math.cos(randomAngle);
             let y = params.CANVAS_SIZE / 2 + randomDist * Math.sin(randomAngle);
-            let food = new Food(gameEngine, x, y, false, this.foodTracker);
-            this.game.addEntity(food);
-            this.food.push(food);
+            let food = new Food(this.game, x, y, false, this.foodTracker);
+            seedlings.push(food);
         }
+        this.registerSeedlings(seedlings);
+    };
+
+    registerSeedlings(seedlings) {
+        seedlings.forEach(seedling => {
+            this.food.push(seedling);
+            this.game.addEntity(seedling);
+        });
     };
 
     processGeneration() {
@@ -89,7 +88,6 @@ class PopulationManager {
             agent.age++;
             agent.assignFitness();
         });
-
 
         this.agents.sort((a1, a2) => a1.genome.rawFitness - a2.genome.rawFitness);
 
@@ -208,6 +206,5 @@ class PopulationManager {
         this.foodTracker.addNewGeneration();
         this.agentTracker.addNewGeneration();
         this.genomeTracker.addNewGeneration();
-        this.startGeneration();
     };
 };
