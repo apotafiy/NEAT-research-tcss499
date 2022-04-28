@@ -110,7 +110,7 @@ class Agent {
 
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
-        this.energy -= displacement / 2;
+        this.energy -= displacement;
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {

@@ -40,6 +40,7 @@ class PopulationManager {
             this.processGeneration();
             params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius"));
             params.GEN_TICKS = parseInt(document.getElementById("generation_time").value);
+            params.RAND_FOOD_PHASES = document.getElementById("rand_food_phases").checked;
             return true;
         }
         return false;
@@ -61,7 +62,7 @@ class PopulationManager {
     spawnAgents() {
         PopulationManager.SPECIES_MEMBERS.set(PopulationManager.SPECIES_ID, []);
         PopulationManager.SPECIES_CREATED++;
-        for (let i = 0; i < 100; i++) { // add agents
+        for (let i = 0; i < 50; i++) { // add agents
             let agent = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2);
             agent.speciesId = PopulationManager.SPECIES_ID;
             PopulationManager.SPECIES_MEMBERS.get(PopulationManager.SPECIES_ID).push(agent);

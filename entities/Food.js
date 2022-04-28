@@ -15,34 +15,31 @@ class Food {
             dead: 4,
         };
         this.state = this.states.seed;
+        let lifespans = this.createLifetimes();
         this.properties = [
             {
-                // lifeSpan: 3,
-                lifespanRatio: 0.25,
+                lifeSpan: lifespans[0],
                 radius: 3,
                 color: 'hsl(50, 100%, 50%)',
                 calories: 5,
                 isSet: false,
             },
             {
-                // lifeSpan: 3 + Math.random() * 2, // add a bit of variation in lifespan
-                lifespanRatio: 0.25,
+                lifeSpan: lifespans[1],
                 radius: 6,
                 color: 'hsl(100, 100%, 50%)',
                 calories: 10,
                 isSet: false,
             },
             {
-                // lifeSpan: 3,
-                lifespanRatio: 0.25,
+                lifeSpan: lifespans[2],
                 radius: 9,
                 color: 'hsl(200, 100%, 50%)',
                 calories: 15,
                 isSet: false,
             },
             {
-                // lifeSpan: 3,
-                lifespanRatio: 0.25,
+                lifeSpan: lifespans[3],
                 radius: 9,
                 color: 'hsl(25, 100%, 50%)',
                 calories: -5,
@@ -50,9 +47,30 @@ class Food {
             },
         ]; // the properties of the entity at each state
         // would access as such: this.stateProps[this.state].lifeSpan
-        this.ticksToNext = this.lifetimeTicks * this.properties[this.states.seed].lifespanRatio;
+        this.ticksToNext = this.properties[this.states.seed].lifeSpan;
         this.updateBoundingCircle();
     }
+
+    createLifetimes() {
+        const minDistribution = 0.1;
+        let total = 0;
+        let lifetimes = [];
+        if (!params.RAND_FOOD_PHASES) { // not randomized
+            for (let i = 0; i < 3; i++) {
+                lifetimes.push(Math.floor(0.25 * this.lifetimeTicks));
+                total += Math.floor(0.25 * this.lifetimeTicks);
+            }
+        } else { // randomized
+            for (let i = 0; i < 3; i++) {
+                let minimum = Math.floor(minDistribution * this.lifetimeTicks);
+                let next = Math.floor(Math.max(minimum, Math.random() * (((this.lifetimeTicks - total) / this.lifetimeTicks) - minDistribution * (3 - i)) * this.lifetimeTicks));
+                lifetimes.push(next);
+                total += next;
+            }
+        }
+        lifetimes.push(this.lifetimeTicks - total);
+        return lifetimes;
+    };
 
     getHue() {
         let commaIndex = this.properties[this.state].color.indexOf(",");
@@ -124,7 +142,7 @@ class Food {
                 this.removeFromWorld = true;
                 this.reproduce();
             } else {
-                this.ticksToNext = this.lifetimeTicks * this.properties[this.state].lifespanRatio;
+                this.ticksToNext = this.properties[this.states.seed].lifeSpan;
             }
         }
 
