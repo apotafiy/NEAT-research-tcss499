@@ -2,11 +2,11 @@
 const params = {
     CANVAS_SIZE: 1000,
     FOOD_OUTSIDE: false,
-    GEN_TIME: 15,
+    GEN_TICKS: 800,
     AGENT_NEIGHBORS: false,
-    MIN_FOOD: 250,
-    MAX_FOOD: 300,
-    COMPAT_THRESH: 0.1
+    MIN_FOOD: 300,
+    COMPAT_THRESH: 0.1,
+    ENFORCE_MIN_FOOD: false
  };
 
 /**
