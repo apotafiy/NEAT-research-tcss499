@@ -49,21 +49,6 @@ class AgentTracker {
         this.generations[this.currentGeneration].energy;
     }
 
-    /**
-     * Median age for non-new agents
-     * @param {array} arr array of ages
-     * @returns median age for non-new agents
-     */
-    getMedian(arr) {
-        arr.sort((a, b) => a - b);
-        return arr[Math.floor(arr.length / 2)];
-    }
-
-    getMean(arr){
-        if(arr.length == 0) return 0;
-        const total = arr.reduce((curr, acc)=> acc + curr, 0);
-        return total / arr.length;
-    }
 
     /**
      * Public method
@@ -81,8 +66,8 @@ class AgentTracker {
         // this is because half of all agents ages will be 0, thus leading to boring data
         // by filtering out agents with age 0 we ignore all new agents
         const topHalfAges = this.generations.map((obj) => obj.ages.filter((age) => age != 0));
-        const medianAges = topHalfAges.map((ages) => this.getMedian(ages));
-        const meanAges = topHalfAges.map((ages) => this.getMean(ages));
+        const medianAges = topHalfAges.map((ages) => getMedian(ages));
+        const meanAges = topHalfAges.map((ages) => getMean(ages));
         return {
             oldest: maxAges,
             medians: medianAges,
@@ -94,7 +79,7 @@ class AgentTracker {
         const minEnergies = this.generations.map((obj) => obj.minEnergy);
         const maxEnergies = this.generations.map((obj) => obj.maxEnergy);
         const medianEnergies = this.generations.map((obj) =>
-            this.getMedian(obj.energy)
+            getMedian(obj.energy)
         );
         return {
             mins: minEnergies,

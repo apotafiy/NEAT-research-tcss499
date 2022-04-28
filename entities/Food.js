@@ -39,7 +39,7 @@ class Food {
                 lifeSpan: 3,
                 radius: 9,
                 color: 'hsl(25, 100%, 50%)',
-                calories: -10,
+                calories: -5,
                 isSet: false,
             },
         ]; // the properties of the entity at each state
