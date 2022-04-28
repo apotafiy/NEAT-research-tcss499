@@ -28,12 +28,7 @@ class PopulationManager {
         params.ENFORCE_MIN_FOOD = document.getElementById("enforce_min_food").checked;
         params.MIN_FOOD = parseInt(document.getElementById("min_food").value);
 
-        for (let i = this.food.length - 1; i >= 0; --i) { // remove eaten or dead food
-            if (this.food[i].removeFromWorld) {
-                this.food.splice(i, 1);
-            }
-        }
-
+        this.cleanupFood();
         if (params.ENFORCE_MIN_FOOD && this.food.length < params.MIN_FOOD) {
             this.spawnFood(params.MIN_FOOD - this.food.length);
         }
@@ -45,17 +40,28 @@ class PopulationManager {
             this.processGeneration();
             params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius"));
             params.GEN_TICKS = parseInt(document.getElementById("generation_time").value);
-            this.spawnFood(params.MIN_FOOD - this.food.length);
-            console.log("generation done")
-            return false;
+            return true;
         }
-        return true;
+        return false;
+    };
+
+    cleanupFood() {
+        for (let i = this.food.length - 1; i >= 0; --i) { // remove eaten or dead food
+            if (this.food[i].removeFromWorld) {
+                this.food.splice(i, 1);
+            }
+        }
+    };
+
+    checkFoodLevels() {
+        this.cleanupFood();
+        this.spawnFood(params.MIN_FOOD - this.food.length);
     };
 
     spawnAgents() {
         PopulationManager.SPECIES_MEMBERS.set(PopulationManager.SPECIES_ID, []);
         PopulationManager.SPECIES_CREATED++;
-        for (let i = 0; i < 50; i++) { // add agents
+        for (let i = 0; i < 100; i++) { // add agents
             let agent = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2);
             agent.speciesId = PopulationManager.SPECIES_ID;
             PopulationManager.SPECIES_MEMBERS.get(PopulationManager.SPECIES_ID).push(agent);

@@ -122,10 +122,6 @@ class Food {
             this.state++;
             if (this.state === this.states.dead) {
                 this.removeFromWorld = true;
-                // console.log("reproducing");
-                if (!this.game.flag) {
-                    console.log("weird")
-                }
                 this.reproduce();
             } else {
                 this.ticksToNext = this.lifetimeTicks * this.properties[this.state].lifespanRatio;

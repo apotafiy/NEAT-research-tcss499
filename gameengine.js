@@ -81,7 +81,8 @@ class GameEngine {
             this.entities.push(entity);
         } else {
             this.entities.splice(1, 0, entity);
-        }  
+            this.iShift++;
+        }
     };
 
     draw() {
@@ -95,30 +96,29 @@ class GameEngine {
     };
 
     update() {
+        this.iShift = 0;
         let entitiesCount = this.entities.length;
-        this.flag = this.population.update();
+        let flag = this.population.update();
 
-        for (let i = 0; i < entitiesCount; i++) {
+        for (let i = this.iShift; i < this.iShift + entitiesCount; i++) {
             let entity = this.entities[i];
-
+            
+            let prevShift = this.iShift;
             if (!entity.removeFromWorld) {
                 entity.update();
+                i += this.iShift - prevShift;
             }
         }
 
-        for (let i = entitiesCount - 1; i >= 0; --i) {
+        if (flag) {
+            this.population.checkFoodLevels();
+        }
+
+        for (let i = entitiesCount + this.iShift - 1; i >= this.iShift; --i) {
             if (this.entities[i].removeFromWorld) {
                 this.entities.splice(i, 1);
             }
         }
-
-        // if (!this.flag) {
-        //     this.population.food.forEach(food => {
-        //         if (!food.removeFromWorld) {
-        //             console.log(food.tickCounter)
-        //         }
-        //     })
-        // }
     };
 
     loop() {
