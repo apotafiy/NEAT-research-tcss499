@@ -67,6 +67,7 @@ class Agent {
         spottedNeighbors.sort((entity1, entity2) => distance(entity1.BC.center, this.BC.center) - distance(entity2.BC.center, this.BC.center));
         let input = [];
 
+        input.push(1); // bias node always = 1
         for (let i = 0; i < Math.min(spottedNeighbors.length, 5); i++) {
             let neighbor = spottedNeighbors[i];
             input.push(normalizeHue(neighbor.getHue()));

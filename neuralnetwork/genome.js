@@ -1,6 +1,6 @@
 class Genome {
 
-    static DEFAULT_INPUTS = 15;
+    static DEFAULT_INPUTS = 16;
 
     static DEFAULT_HIDDENS = 0;
 
