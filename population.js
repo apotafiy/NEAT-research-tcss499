@@ -38,7 +38,7 @@ class PopulationManager {
             params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
             this.tickCounter = 0;
             this.processGeneration();
-            params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius"));
+            params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius").value);
             params.GEN_TICKS = parseInt(document.getElementById("generation_time").value);
             params.RAND_FOOD_PHASES = document.getElementById("rand_food_phases").checked;
             return true;

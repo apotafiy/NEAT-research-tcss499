@@ -3,8 +3,8 @@ class Agent {
     constructor(game, x, y, genome = undefined) {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
-        this.wheelRadius = 2.5;
-        this.maxVelocity = 2;
+        this.wheelRadius = 1;
+        this.maxVelocity = 3;
         this.strokeColor = "black";
         // this.fillColor = "hsl(240, 100%, 50%)";
         this.leftWheel = 0;
@@ -23,6 +23,7 @@ class Agent {
             let currentPos = { x: this.x, y: this.y };
             // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
             // return this.energy - 10 * distance(currentPos, this.game.home.BC.center);
+            // return 50 * this.energy - 0.5 * distance(this.game.home.BC.center, currentPos);
             return this.energy;
         };
 
@@ -65,6 +66,7 @@ class Agent {
 
         spottedNeighbors.sort((entity1, entity2) => distance(entity1.BC.center, this.BC.center) - distance(entity2.BC.center, this.BC.center));
         let input = [];
+
         for (let i = 0; i < Math.min(spottedNeighbors.length, 5); i++) {
             let neighbor = spottedNeighbors[i];
             input.push(normalizeHue(neighbor.getHue()));
@@ -109,8 +111,8 @@ class Agent {
         }
 
         // uncomment this code to implement agent metabolism
-        let displacement = distance(oldPos, { x: this.x, y: this.y });
-        this.energy -= displacement;
+        // let displacement = distance(oldPos, { x: this.x, y: this.y });
+        // this.energy -= displacement;
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {

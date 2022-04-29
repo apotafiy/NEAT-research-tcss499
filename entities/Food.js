@@ -68,6 +68,7 @@ class Food {
                 total += next;
             }
         }
+
         lifetimes.push(this.lifetimeTicks - total);
         return lifetimes;
     };
@@ -142,7 +143,7 @@ class Food {
                 this.removeFromWorld = true;
                 this.reproduce();
             } else {
-                this.ticksToNext = this.properties[this.states.seed].lifeSpan;
+                this.ticksToNext = this.properties[this.state].lifeSpan;
             }
         }
 
