@@ -73,3 +73,10 @@ window.requestAnimFrame = (() => {
 const distance = (p1, p2) => {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 };
+
+/**
+ * Shuffles a provided array
+ * @param {Array} a the array to be shuffled
+ * @returns a shuffled copy of the array
+ */
+const shuffleArray = a => [...a].sort(() => Math.random() - 0.5);
