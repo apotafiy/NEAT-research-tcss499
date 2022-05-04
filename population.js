@@ -111,9 +111,12 @@ class PopulationManager {
         });
         let sumShared = 0;
         reprodFitMap.forEach((fitness, speciesId) => {
-            reprodFitMap.set(speciesId, fitness + minShared * -1 + 5);
+            const newFit = fitness + minShared * -1 + 5;
+            reprodFitMap.set(speciesId, newFit);
             sumShared += reprodFitMap.get(speciesId);
+            this.agentTracker.addSpeciesFitness({speciesId, fitness: newFit, hue: PopulationManager.SPECIES_COLORS.get(speciesId)});
         });
+        console.log(this.agentTracker.getFitnessData());
         let rouletteOrder = [...reprodFitMap.keys()].sort();
         let ascendingFitSpecies = [...reprodFitMap.keys()].sort((s1, s2) => reprodFitMap.get(s1) - reprodFitMap.get(s2));
         let deathFitMap = new Map();
