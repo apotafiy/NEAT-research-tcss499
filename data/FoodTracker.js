@@ -17,8 +17,8 @@ class FoodTracker {
     }
 
     /**
-     * Records how many lifecycle stages were reached in each generation
-     * E.g. counts how many seeds existed in a generation
+     * Records how many lifecycle stages were eaten each generation
+     * E.g. counts how many seeds were consumed in a generation
      * @param {int} stage number representing food stage in lifecycle
      */
     addLifeStage(stage) {
@@ -34,32 +34,32 @@ class FoodTracker {
     }
 
     /**
-     * 
+     *
      * @returns calories data for graphing
      */
-    getConsumptionData(){
-        return this.generations.map((obj)=>obj.caloriesConsumed);
+    getConsumptionData() {
+        return this.generations.map((obj) => obj.caloriesConsumed);
     }
 
     /**
-     * 
+     *
      * @returns life stage data for graphing
      */
-    getLifeStageData(){
+    getLifeStageData() {
         const seedMap = {};
-        this.generations.forEach((obj, i)=>{
+        this.generations.forEach((obj, i) => {
             seedMap[i] = obj.lifeStageCounts[0];
         });
         const adMap = {};
-        this.generations.forEach((obj, i)=>{
+        this.generations.forEach((obj, i) => {
             adMap[i] = obj.lifeStageCounts[1];
         });
         const adultMap = {};
-        this.generations.forEach((obj, i)=>{
+        this.generations.forEach((obj, i) => {
             adultMap[i] = obj.lifeStageCounts[2];
         });
         const decMap = {};
-        this.generations.forEach((obj, i)=>{
+        this.generations.forEach((obj, i) => {
             decMap[i] = obj.lifeStageCounts[3];
         });
         return [seedMap, adMap, adultMap, decMap];
