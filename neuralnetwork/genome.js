@@ -1,6 +1,6 @@
 class Genome {
 
-    static DEFAULT_INPUTS = 15;
+    static DEFAULT_INPUTS = 16;
 
     static DEFAULT_HIDDENS = 0;
 
@@ -254,7 +254,7 @@ class Genome {
         this.connectionGenes.forEach(connections => { // weight mutations
             connections.forEach(connection => {
                 if (randomInt(100) < 5) { // 5% chance of a weight mutation for every connection
-                    connection.weight = randomInt(2) === 1 ? Math.min(1, connection.weight + Math.random() * 0.1) : Math.max(0, connection.weight - Math.random() * 0.1);
+                    connection.weight = randomInt(2) === 1 ? Math.min(1, connection.weight + Math.random() * 0.1) : Math.max(-1, connection.weight - Math.random() * 0.1);
                 }
             });
         });

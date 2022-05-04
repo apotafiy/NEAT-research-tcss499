@@ -2,12 +2,13 @@
 const params = {
     CANVAS_SIZE: 1000,
     FOOD_OUTSIDE: false,
-    GEN_TICKS: 800,
+    GEN_TICKS: 1000,
     AGENT_NEIGHBORS: false,
-    MIN_FOOD: 300,
+    MIN_FOOD: 100,
     COMPAT_THRESH: 0.1,
     ENFORCE_MIN_FOOD: false,
-    AGENT_VISION_RADIUS: 500
+    AGENT_VISION_RADIUS: 500,
+    RAND_FOOD_PHASES: false
  };
 
 /**
@@ -72,3 +73,10 @@ window.requestAnimFrame = (() => {
 const distance = (p1, p2) => {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 };
+
+/**
+ * Shuffles a provided array
+ * @param {Array} a the array to be shuffled
+ * @returns a shuffled copy of the array
+ */
+const shuffleArray = a => [...a].sort(() => Math.random() - 0.5);
