@@ -43,7 +43,6 @@ const generateNodeChart = (data) => {
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -57,10 +56,15 @@ const generateNodeChart = (data) => {
                     tension: 0.1,
                 },
             },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Nodes in Neural Nets',
+                },
+            },
         },
     });
 };
-
 
 /**
  *
@@ -107,7 +111,6 @@ const generateCycleChart = (data) => {
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -121,10 +124,15 @@ const generateCycleChart = (data) => {
                     tension: 0.1,
                 },
             },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Cycles in Neural Nets',
+                },
+            },
         },
     });
 };
-
 
 /**
  *
@@ -171,7 +179,6 @@ const generateConnectionChart = (data) => {
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -184,6 +191,12 @@ const generateConnectionChart = (data) => {
             elements: {
                 line: {
                     tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Connections in Neural Nets',
                 },
             },
         },
@@ -241,7 +254,6 @@ const generateAgeChart = (data) => {
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -253,6 +265,12 @@ const generateAgeChart = (data) => {
             elements: {
                 line: {
                     tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Age of Agents',
                 },
             },
         },
@@ -298,6 +316,12 @@ const generateFoodConsumptionChart = (data) => {
             elements: {
                 line: {
                     tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Calories Consumed Per Generation',
                 },
             },
         },
@@ -366,6 +390,12 @@ const generateFoodStageChart = (data) => {
                     tension: 0.1,
                 },
             },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Food Stages',
+                },
+            },
         },
     });
 
@@ -373,7 +403,7 @@ const generateFoodStageChart = (data) => {
     //     type: 'line',
     //     data: {
     //         datasets: [
-    //             
+    //
     //         ],
     //     },
     //     options: {
