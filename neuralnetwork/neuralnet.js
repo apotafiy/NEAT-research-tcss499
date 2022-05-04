@@ -5,11 +5,6 @@ class NeuralNet {
         this.nodes = this.genome.nodeGenes;
         this.edges = this.genome.connectionGenes;
         this.sortedNodes = topoSort(this.nodes, this.edges);
-        // if (this.sortedNodes === false) {
-        //     console.log("this should not be printing...")
-        //     console.log(this.nodes)
-        //     console.log(this.edges)
-        // }
     };
 
     processInput(input) {
@@ -48,6 +43,6 @@ class NeuralNet {
     };
 
     sigmoid(x) {
-        return 1 / (1 + Math.E ** -x);
+        return 2 / (1 + Math.E ** -x) - 1;
     };
 };

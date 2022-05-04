@@ -28,12 +28,7 @@ class PopulationManager {
         params.ENFORCE_MIN_FOOD = document.getElementById("enforce_min_food").checked;
         params.MIN_FOOD = parseInt(document.getElementById("min_food").value);
 
-        for (let i = this.food.length - 1; i >= 0; --i) { // remove eaten or dead food
-            if (this.food[i].removeFromWorld) {
-                this.food.splice(i, 1);
-            }
-        }
-
+        this.cleanupFood();
         if (params.ENFORCE_MIN_FOOD && this.food.length < params.MIN_FOOD) {
             this.spawnFood(params.MIN_FOOD - this.food.length);
         }
@@ -43,10 +38,25 @@ class PopulationManager {
             params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
             this.tickCounter = 0;
             this.processGeneration();
-            params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius"));
+            params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius").value);
             params.GEN_TICKS = parseInt(document.getElementById("generation_time").value);
-            this.spawnFood(params.MIN_FOOD - this.food.length);
+            params.RAND_FOOD_PHASES = document.getElementById("rand_food_phases").checked;
+            return true;
         }
+        return false;
+    };
+
+    cleanupFood() {
+        for (let i = this.food.length - 1; i >= 0; --i) { // remove eaten or dead food
+            if (this.food[i].removeFromWorld) {
+                this.food.splice(i, 1);
+            }
+        }
+    };
+
+    checkFoodLevels() {
+        this.cleanupFood();
+        this.spawnFood(params.MIN_FOOD - this.food.length);
     };
 
     spawnAgents() {
@@ -89,28 +99,7 @@ class PopulationManager {
             agent.assignFitness();
         });
 
-        this.agents.sort((a1, a2) => a1.genome.rawFitness - a2.genome.rawFitness);
-
-        for (let i = Math.floor(this.agents.length / 2) - 1; i >= 0; --i) { // remove unfit bottom half of agents
-            this.agents[i].removeFromWorld = true;
-            this.agents.splice(i, 1);
-        }
-
-        Genome.resetInnovations(); // reset the innovation number mapping for newly created connections
-
-        let remainingColors = new Set(); // we need to filter out the colors of species that have died out for reuse
-        PopulationManager.SPECIES_MEMBERS = new Map();
-        this.agents.forEach(agent => { // fill species members map with surviving best-fit parent agents
-            if (PopulationManager.SPECIES_MEMBERS.get(agent.speciesId) === undefined) {
-                PopulationManager.SPECIES_MEMBERS.set(agent.speciesId, []);
-            }
-            PopulationManager.SPECIES_MEMBERS.get(agent.speciesId).push(agent);
-            remainingColors.add(PopulationManager.SPECIES_COLORS.get(agent.speciesId));
-        });
-        PopulationManager.COLORS_USED = new Set([...PopulationManager.COLORS_USED].filter(color => remainingColors.has(color)));
-
-        let sharedFitnessMap = new Map();
-        let sumShared = 0;
+        let reprodFitMap = new Map();
         let minShared = 0;
         PopulationManager.SPECIES_MEMBERS.forEach((speciesList, speciesId) => {
             let sumRaws = 0;
@@ -118,21 +107,51 @@ class PopulationManager {
                 sumRaws += member.genome.rawFitness;
             });
             minShared = Math.min(minShared, sumRaws);
-            sumShared += sumRaws / speciesList.length;
-            sharedFitnessMap.set(speciesId, sumRaws / speciesList.length);
+            reprodFitMap.set(speciesId, sumRaws / speciesList.length);
         });
-        if (minShared < 0) {
-            sumShared = 0;
-            sharedFitnessMap.forEach((fitness, speciesId) => {
-                sharedFitnessMap.set(speciesId, fitness + minShared * -1);
-                sumShared += sharedFitnessMap.get(speciesId);
-            });
+        let sumShared = 0;
+        reprodFitMap.forEach((fitness, speciesId) => {
+            reprodFitMap.set(speciesId, fitness + minShared * -1 + 5);
+            sumShared += reprodFitMap.get(speciesId);
+        });
+        let rouletteOrder = [...reprodFitMap.keys()].sort();
+        let ascendingFitSpecies = [...reprodFitMap.keys()].sort((s1, s2) => reprodFitMap.get(s1) - reprodFitMap.get(s2));
+        let deathFitMap = new Map();
+        for (let i = 0; i < ascendingFitSpecies.length; i++) {
+            deathFitMap.set(ascendingFitSpecies[i], reprodFitMap.get(ascendingFitSpecies[ascendingFitSpecies.length - i - 1]));
         }
-        let rouletteOrder = [...sharedFitnessMap.keys()].sort();
 
-        let length = this.agents.length;
+        for (let i = 0; i < this.agents.length / 2; i++) { // death roulette
+            let killed = false;
+            while (!killed) { // keep rolling the roulette wheel until someone dies
+                let rouletteResult = randomFloat(sumShared);
+                let rouletteIndex = 0;
+                let accumulator = 0;
+                let flag = false;
+                while (!flag) {
+                    let nextSpecies = rouletteOrder[rouletteIndex];
+                    accumulator += deathFitMap.get(nextSpecies);
+                    if (accumulator >= rouletteResult) { // we try to kill a parent... might not be successful
+                        flag = true;
+                        let killOptions = shuffleArray(PopulationManager.SPECIES_MEMBERS.get(nextSpecies));
+                        let j = 0;
+                        while (j < killOptions.length && !killed) {
+                            let toKill = killOptions[j];
+                            if (!toKill.removeFromWorld) {
+                                killed = true;
+                                toKill.removeFromWorld = true;
+                            }
+                            j++;
+                        }
+                    }
+                    rouletteIndex++;
+                }
+            } 
+        }
+
+        Genome.resetInnovations(); // reset the innovation number mapping for newly created connections
         let children = [];
-        for (let i = 0; i < length; i++) { // randomly produce offspring between n pairs of remaining agents
+        for (let i = 0; i < this.agents.length / 2; i++) { // randomly produce offspring between n pairs of remaining agents, reproduction roulette
             let rouletteResult = randomFloat(sumShared);
             let rouletteIndex = 0;
             let accumulator = 0;
@@ -140,7 +159,7 @@ class PopulationManager {
             let parent1, parent2;
             while (!flag) {
                 let nextSpecies = rouletteOrder[rouletteIndex];
-                accumulator += sharedFitnessMap.get(nextSpecies);
+                accumulator += reprodFitMap.get(nextSpecies);
                 if (accumulator >= rouletteResult) {
                     flag = true;
                     let possibleParents = PopulationManager.SPECIES_MEMBERS.get(nextSpecies);
@@ -189,6 +208,23 @@ class PopulationManager {
             this.game.addEntity(child);
             this.agents.push(child);
         });
+
+        for (let i = this.agents.length - 1; i >= 0; --i) { // unregister killed parents
+            if (this.agents[i].removeFromWorld) {
+                this.agents.splice(i, 1);
+            }
+        }
+
+        let remainingColors = new Set(); // we need to filter out the colors of species that have died out for reuse
+        PopulationManager.SPECIES_MEMBERS = new Map();
+        this.agents.forEach(agent => { // fill species members map with surviving parents and children
+            if (PopulationManager.SPECIES_MEMBERS.get(agent.speciesId) === undefined) {
+                PopulationManager.SPECIES_MEMBERS.set(agent.speciesId, []);
+            }
+            PopulationManager.SPECIES_MEMBERS.get(agent.speciesId).push(agent);
+            remainingColors.add(PopulationManager.SPECIES_COLORS.get(agent.speciesId));
+        });
+        PopulationManager.COLORS_USED = new Set([...PopulationManager.COLORS_USED].filter(color => remainingColors.has(color)));
 
         this.agents.forEach(agent => {
             agent.resetPos();
