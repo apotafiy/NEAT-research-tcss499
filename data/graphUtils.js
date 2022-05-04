@@ -352,8 +352,8 @@ const generateFoodStageChart = (data) => {
                 {
                     label: 'Seeds',
                     data: data[0],
-                    backgroundColor: ['Yellow'],
-                    borderColor: ['Yellow'],
+                    backgroundColor: ['rgb(255, 230, 0)'],
+                    borderColor: ['rgb(255, 230, 0)'],
                     borderWidth: 3,
                 },
                 {
@@ -393,7 +393,7 @@ const generateFoodStageChart = (data) => {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Food Stages',
+                    text: 'Food Stages Consumed',
                 },
             },
         },
