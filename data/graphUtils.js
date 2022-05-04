@@ -1,5 +1,70 @@
 /**
  *
+ * @param {2d array} data array of arrays of life stage counts per generation
+ */
+const generateCurrentFitnessChart = (data) => {
+    if (document.getElementById('currentFitnessChart') != undefined) {
+        document.getElementById('currentFitnessChart').remove();
+    }
+    const ctx = document.createElement('canvas');
+    ctx.setAttribute('id', 'currentFitnessChart');
+    document.getElementById('currentFitnessChartContainer').appendChild(ctx);
+
+    const current = data[data.length - 1];
+    current.sort((a, b) => a.speciesId - b.speciesId);
+    const min = current.reduce(
+        (acc, curr) => Math.min(curr.fitness, acc),
+        Number.MAX_VALUE
+    );
+    const datasets = [];
+    current.forEach((obj) => {
+        const temp = {
+            label: `ID: ${obj.speciesId}`,
+            data: [obj.fitness],
+            borderColor: [
+                `hsl(${PopulationManager.SPECIES_COLORS.get(
+                    obj.speciesId
+                )}, 100%, 50%)`,
+            ],
+            backgroundColor: [
+                `hsla(${PopulationManager.SPECIES_COLORS.get(
+                    obj.speciesId
+                )}, 100%, 50%, 0.7)`,
+            ],
+            borderWidth: 3,
+        };
+        datasets.push(temp);
+    });
+
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [''],
+            datasets,
+        },
+        options: {
+            scales: {
+                y: {
+                    min: min - 100,
+                },
+            },
+            elements: {
+                line: {
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Species Fitness',
+                },
+            },
+        },
+    });
+};
+
+/**
+ *
  * @param {array} data array of arrays of data
  */
 const generateNodeChart = (data) => {
@@ -393,7 +458,7 @@ const generateFoodStageChart = (data) => {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Food Stages Consumed',
+                    text: 'Food Consumed',
                 },
             },
         },

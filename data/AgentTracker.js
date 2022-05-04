@@ -92,8 +92,7 @@ class AgentTracker {
         };
     }
 
-    getFitnessData(){
-        const gens = this.generations.map((obj) => obj.speciesFitness);
-        return gens
+    getFitnessData() {
+        return this.generations.map((obj) => obj.speciesFitness);
     }
 }
