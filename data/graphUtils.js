@@ -1,5 +1,70 @@
 /**
  *
+ * @param {2d array} data array of arrays of life stage counts per generation
+ */
+const generateCurrentFitnessChart = (data) => {
+    if (document.getElementById('currentFitnessChart') != undefined) {
+        document.getElementById('currentFitnessChart').remove();
+    }
+    const ctx = document.createElement('canvas');
+    ctx.setAttribute('id', 'currentFitnessChart');
+    document.getElementById('currentFitnessChartContainer').appendChild(ctx);
+
+    const current = data[data.length - 1];
+    current.sort((a, b) => a.speciesId - b.speciesId);
+    const min = current.reduce(
+        (acc, curr) => Math.min(curr.fitness, acc),
+        Number.MAX_VALUE
+    );
+    const datasets = [];
+    current.forEach((obj) => {
+        const temp = {
+            label: `ID: ${obj.speciesId}`,
+            data: [obj.fitness],
+            borderColor: [
+                `hsl(${PopulationManager.SPECIES_COLORS.get(
+                    obj.speciesId
+                )}, 100%, 50%)`,
+            ],
+            backgroundColor: [
+                `hsla(${PopulationManager.SPECIES_COLORS.get(
+                    obj.speciesId
+                )}, 100%, 50%, 0.7)`,
+            ],
+            borderWidth: 3,
+        };
+        datasets.push(temp);
+    });
+
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [''],
+            datasets,
+        },
+        options: {
+            scales: {
+                y: {
+                    min: min - 100,
+                },
+            },
+            elements: {
+                line: {
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Species Fitness',
+                },
+            },
+        },
+    });
+};
+
+/**
+ *
  * @param {array} data array of arrays of data
  */
 const generateNodeChart = (data) => {
@@ -22,28 +87,27 @@ const generateNodeChart = (data) => {
                 {
                     label: 'Min Nodes',
                     data: data.mins,
-                    fill: true,
-                    backgroundColor: ['rgba(150,0,0,0.2)'],
-                    borderColor: ['rgba(200,0,0,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(255,0,0,0.1)'],
+                    borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Median Nodes',
                     data: data.medians,
-                    fill: true,
-                    backgroundColor: ['rgba(200,0,200,0.2)'],
-                    borderColor: ['rgba(200,0,200,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(150,0,255,0.1)'],
+                    borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Max Nodes',
                     data: data.maxes,
-                    fill: true,
-                    backgroundColor: ['rgba(0,50,255,0.2)'],
-                    borderColor: ['rgba(0,50,255,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(0,0,255,0.1)'],
+                    borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -54,13 +118,18 @@ const generateNodeChart = (data) => {
             },
             elements: {
                 line: {
-                    tension: 0.2,
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Nodes in Neural Nets',
                 },
             },
         },
     });
 };
-
 
 /**
  *
@@ -86,28 +155,27 @@ const generateCycleChart = (data) => {
                 {
                     label: 'Min Cycles',
                     data: data.mins,
-                    fill: true,
-                    backgroundColor: ['rgba(200,0,0,0.2)'],
-                    borderColor: ['rgba(150,0,0,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(255,0,0,0.1)'],
+                    borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Median Cycles',
                     data: data.medians,
-                    fill: true,
-                    backgroundColor: ['rgba(200,0,200,0.2)'],
-                    borderColor: ['rgba(200,0,200,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(150,0,255,0.1)'],
+                    borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Max Cycles',
                     data: data.maxes,
-                    fill: true,
-                    backgroundColor: ['rgba(0,50,255,0.2)'],
-                    borderColor: ['rgba(0,50,255,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(0,0,255,0.1)'],
+                    borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -118,13 +186,18 @@ const generateCycleChart = (data) => {
             },
             elements: {
                 line: {
-                    tension: 0.2,
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Cycles in Neural Nets',
                 },
             },
         },
     });
 };
-
 
 /**
  *
@@ -150,28 +223,27 @@ const generateConnectionChart = (data) => {
                 {
                     label: 'Min Connections',
                     data: data.mins,
-                    fill: true,
-                    backgroundColor: ['rgba(150,0,0,0.2)'],
-                    borderColor: ['rgba(200,0,0,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(255,0,0,0.1)'],
+                    borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Median Connections',
                     data: data.medians,
-                    fill: true,
-                    backgroundColor: ['rgba(200,0,200,0.2)'],
-                    borderColor: ['rgba(200,0,200,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(150,0,255,0.1)'],
+                    borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Max Connections',
                     data: data.maxes,
-                    fill: true,
-                    backgroundColor: ['rgba(0,50,255,0.2)'],
-                    borderColor: ['rgba(0,50,255,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(0,0,255,0.1)'],
+                    borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -183,7 +255,13 @@ const generateConnectionChart = (data) => {
             },
             elements: {
                 line: {
-                    tension: 0.2,
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Connections in Neural Nets',
                 },
             },
         },
@@ -220,28 +298,27 @@ const generateAgeChart = (data) => {
                 {
                     label: 'Median Age',
                     data: data.medians,
-                    fill: true,
-                    backgroundColor: ['rgba(150,0,0,0.2)'],
-                    borderColor: ['rgba(200,0,0,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(255,0,0,0.1)'],
+                    borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Mean Age',
                     data: data.means,
-                    fill: true,
-                    backgroundColor: ['rgba(200,0,200,0.2)'],
-                    borderColor: ['rgba(200,0,200,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(150,0,255,0.1)'],
+                    borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
                 },
                 {
                     label: 'Oldest Agent',
                     data: data.oldest,
-                    fill: true,
-                    backgroundColor: ['rgba(0,50,255,0.2)'],
-                    borderColor: ['rgba(0,50,255,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(0,0,255,0.1)'],
+                    borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
                 },
-                
             ],
         },
         options: {
@@ -252,7 +329,13 @@ const generateAgeChart = (data) => {
             },
             elements: {
                 line: {
-                    tension: 0.2,
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Age of Agents',
                 },
             },
         },
@@ -282,9 +365,9 @@ const generateFoodConsumptionChart = (data) => {
                 {
                     label: 'Calories Consumed Per Generation',
                     data: data,
-                    fill: true,
-                    backgroundColor: ['rgba(100,0,255,0.2)'],
-                    borderColor: ['rgba(100,0,255,1)'],
+                    fill: false,
+                    backgroundColor: ['rgba(150,0,255,0.1)'],
+                    borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
                 },
             ],
@@ -297,7 +380,13 @@ const generateFoodConsumptionChart = (data) => {
             },
             elements: {
                 line: {
-                    tension: 0.2,
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Calories Consumed Per Generation',
                 },
             },
         },
@@ -328,8 +417,8 @@ const generateFoodStageChart = (data) => {
                 {
                     label: 'Seeds',
                     data: data[0],
-                    backgroundColor: ['Yellow'],
-                    borderColor: ['Yellow'],
+                    backgroundColor: ['rgb(255, 230, 0)'],
+                    borderColor: ['rgb(255, 230, 0)'],
                     borderWidth: 3,
                 },
                 {
@@ -363,7 +452,13 @@ const generateFoodStageChart = (data) => {
             },
             elements: {
                 line: {
-                    tension: 0.2,
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Food Consumed',
                 },
             },
         },
@@ -373,7 +468,7 @@ const generateFoodStageChart = (data) => {
     //     type: 'line',
     //     data: {
     //         datasets: [
-    //             
+    //
     //         ],
     //     },
     //     options: {

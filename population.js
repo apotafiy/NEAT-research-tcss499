@@ -111,8 +111,10 @@ class PopulationManager {
         });
         let sumShared = 0;
         reprodFitMap.forEach((fitness, speciesId) => {
-            reprodFitMap.set(speciesId, fitness + minShared * -1 + 5);
+            const newFit = fitness + minShared * -1 + 5;
+            reprodFitMap.set(speciesId, newFit);
             sumShared += reprodFitMap.get(speciesId);
+            this.agentTracker.addSpeciesFitness({speciesId, fitness: newFit});
         });
         let rouletteOrder = [...reprodFitMap.keys()].sort();
         let ascendingFitSpecies = [...reprodFitMap.keys()].sort((s1, s2) => reprodFitMap.get(s1) - reprodFitMap.get(s2));
@@ -239,6 +241,7 @@ class PopulationManager {
         generateConnectionChart(this.genomeTracker.getConnectionData());
         generateCycleChart(this.genomeTracker.getCycleData());
         generateNodeChart(this.genomeTracker.getNodeData());
+        generateCurrentFitnessChart(this.agentTracker.getFitnessData());
         this.foodTracker.addNewGeneration();
         this.agentTracker.addNewGeneration();
         this.genomeTracker.addNewGeneration();

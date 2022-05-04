@@ -16,6 +16,7 @@ class AgentTracker {
             maxEnergy: 0,
             minEnergy: Number.MAX_VALUE,
             energy: [],
+            speciesFitness: [],
         };
     }
 
@@ -28,9 +29,7 @@ class AgentTracker {
             agent.age,
             this.generations[this.currentGeneration].oldest
         );
-        this.generations[this.currentGeneration].ages.push(
-            agent.age
-        );
+        this.generations[this.currentGeneration].ages.push(agent.age);
     }
 
     /**
@@ -49,6 +48,9 @@ class AgentTracker {
         this.generations[this.currentGeneration].energy;
     }
 
+    addSpeciesFitness(data) {
+        this.generations[this.currentGeneration].speciesFitness.push(data);
+    }
 
     /**
      * Public method
@@ -65,13 +67,15 @@ class AgentTracker {
         // we use only the agents from previous generations and now new agents
         // this is because half of all agents ages will be 0, thus leading to boring data
         // by filtering out agents with age 0 we ignore all new agents
-        const topHalfAges = this.generations.map((obj) => obj.ages.filter((age) => age != 0));
+        const topHalfAges = this.generations.map((obj) =>
+            obj.ages.filter((age) => age != 0)
+        );
         const medianAges = topHalfAges.map((ages) => getMedian(ages));
         const meanAges = topHalfAges.map((ages) => getMean(ages));
         return {
             oldest: maxAges,
             medians: medianAges,
-            means: meanAges
+            means: meanAges,
         };
     }
 
@@ -86,5 +90,9 @@ class AgentTracker {
             maxes: maxEnergies,
             medians: medianEnergies,
         };
+    }
+
+    getFitnessData() {
+        return this.generations.map((obj) => obj.speciesFitness);
     }
 }
