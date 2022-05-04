@@ -4,7 +4,7 @@ class Agent {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
         this.wheelRadius = 1;
-        this.maxVelocity = 3;
+        this.maxVelocity = 5;
         this.strokeColor = "black";
         // this.fillColor = "hsl(240, 100%, 50%)";
         this.leftWheel = 0;
@@ -35,8 +35,6 @@ class Agent {
     };
 
     getHue() {
-        // let commaIndex = this.fillColor.indexOf(",");
-        // return parseFloat(this.fillColor.substring(4, commaIndex));
         return PopulationManager.SPECIES_COLORS.get(this.speciesId);
     };
 
@@ -112,8 +110,8 @@ class Agent {
         }
 
         // uncomment this code to implement agent metabolism
-        // let displacement = distance(oldPos, { x: this.x, y: this.y });
-        // this.energy -= displacement;
+        let displacement = distance(oldPos, { x: this.x, y: this.y });
+        this.energy -= displacement / 2;
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {
