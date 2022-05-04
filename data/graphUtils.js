@@ -22,7 +22,7 @@ const generateNodeChart = (data) => {
                 {
                     label: 'Min Nodes',
                     data: data.mins,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
@@ -30,7 +30,7 @@ const generateNodeChart = (data) => {
                 {
                     label: 'Median Nodes',
                     data: data.medians,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
@@ -38,7 +38,7 @@ const generateNodeChart = (data) => {
                 {
                     label: 'Max Nodes',
                     data: data.maxes,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
@@ -90,7 +90,7 @@ const generateCycleChart = (data) => {
                 {
                     label: 'Min Cycles',
                     data: data.mins,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
@@ -98,7 +98,7 @@ const generateCycleChart = (data) => {
                 {
                     label: 'Median Cycles',
                     data: data.medians,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
@@ -106,7 +106,7 @@ const generateCycleChart = (data) => {
                 {
                     label: 'Max Cycles',
                     data: data.maxes,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
@@ -158,7 +158,7 @@ const generateConnectionChart = (data) => {
                 {
                     label: 'Min Connections',
                     data: data.mins,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
@@ -166,7 +166,7 @@ const generateConnectionChart = (data) => {
                 {
                     label: 'Median Connections',
                     data: data.medians,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
@@ -174,7 +174,7 @@ const generateConnectionChart = (data) => {
                 {
                     label: 'Max Connections',
                     data: data.maxes,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
@@ -233,7 +233,7 @@ const generateAgeChart = (data) => {
                 {
                     label: 'Median Age',
                     data: data.medians,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
                     borderWidth: 3,
@@ -241,7 +241,7 @@ const generateAgeChart = (data) => {
                 {
                     label: 'Mean Age',
                     data: data.means,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
@@ -249,7 +249,7 @@ const generateAgeChart = (data) => {
                 {
                     label: 'Oldest Agent',
                     data: data.oldest,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
                     borderWidth: 3,
@@ -300,7 +300,7 @@ const generateFoodConsumptionChart = (data) => {
                 {
                     label: 'Calories Consumed Per Generation',
                     data: data,
-                    fill: true,
+                    fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
                     borderWidth: 3,
