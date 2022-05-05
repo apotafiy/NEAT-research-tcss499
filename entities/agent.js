@@ -51,8 +51,17 @@ class Agent {
         this.energy = 0;
     };
 
-    update() {
+    getRelativeAngle(vector) {
+        let vectAngle = Math.atan2(vector.y, vector.x);
+        if (vectAngle < 0) {
+            vectAngle = 2 * Math.PI + vectAngle; // convert to a clock wise angle 0 <= a < 2pi
+        }
+        let relLeft = relativeLeft(this.heading, vectAngle);
+        let relRight = relativeRight(this.heading, vectAngle);
+        return Math.abs(relLeft) < Math.abs(relRight) ? relLeft : relRight;
+    };
 
+    update() {
         let oldPos = { x: this.x, y: this.y };
 
         let spottedNeighbors = [];
@@ -69,20 +78,8 @@ class Agent {
         for (let i = 0; i < Math.min(spottedNeighbors.length, 5); i++) {
             let neighbor = spottedNeighbors[i];
             input.push(normalizeHue(neighbor.getHue()));
-            let vector = { x: neighbor.x - this.x, y: neighbor.y - this.y };
-            let vectAngle = Math.atan2(vector.y, vector.x);
-            if (vectAngle < 0) {
-                vectAngle += 2 * Math.PI;
-            }
-            let adjustedHeading = this.heading + Math.PI;
-            if (adjustedHeading >= 2 * Math.PI) {
-                adjustedHeading -= 2 * Math.PI;
-            }
-            input.push(normalizeAngle((adjustedHeading - vectAngle) * 180 / Math.PI));
+            input.push(normalizeAngle(this.getRelativeAngle({ x: neighbor.x - this.x, y: neighbor.y - this.y })));
             input.push(normalizeDistance(distance(neighbor.BC.center, this.BC.center)));
-            // input.push(normalizeAngle(this.heading * 180 / Math.PI));
-            // input.push(normalizeX(neighbor.x - this.x));
-            // input.push(normalizeY(neighbor.y - this.y));
         }
         for (let i = input.length; i < Genome.DEFAULT_INPUTS; i++) {
             input.push(0);
@@ -115,7 +112,7 @@ class Agent {
 
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
-        this.energy -= displacement / 2;
+        // this.energy -= displacement / 2;
 
         this.game.entities.forEach(entity => { // eat food
             if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {

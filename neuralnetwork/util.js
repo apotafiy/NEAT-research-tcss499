@@ -1,12 +1,16 @@
 const normalizeHue = (hue) => Math.min(1, hue / 360);
 
-const normalizeAngle = (a) => a < 0 ? -1 - a / 360 : 1 - a / 360;
+const normalizeAngle = (a) => a / Math.PI;
 
 const normalizeDistance = (distance) => 1 - Math.min(1, distance / params.AGENT_VISION_RADIUS);
 
 const normalizeX = (x) => x < 0 ? -1 - Math.max(-1, x / params.AGENT_VISION_RADIUS) : 1 - Math.min(1, x / params.AGENT_VISION_RADIUS);
 
 const normalizeY = (y) => y < 0 ? -1 - Math.max(-1, y / params.AGENT_VISION_RADIUS) : 1 - Math.min(1, y / params.AGENT_VISION_RADIUS);
+
+const relativeLeft = (heading, vectAngle) => (heading < vectAngle ? heading + (2 * Math.PI - vectAngle) : heading - vectAngle) * -1;
+
+const relativeRight = (heading, vectAngle) => heading < vectAngle ? vectAngle - heading : vectAngle + (2 * Math.PI - heading);
 
 const topoSort = (nodes, edges) => {
     let inMap = new Map();
