@@ -109,7 +109,6 @@ class PopulationManager {
             minShared = Math.min(minShared, sumRaws);
             reprodFitMap.set(speciesId, sumRaws / speciesList.length);
         });
-        console.log(reprodFitMap)
         let sumShared = 0;
         reprodFitMap.forEach((fitness, speciesId) => {
             const newFit = fitness + minShared * -1 + 5;
