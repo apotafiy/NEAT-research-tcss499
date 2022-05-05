@@ -57,7 +57,7 @@ class Agent {
 
         let spottedNeighbors = [];
         this.game.entities.forEach(entity => {
-            if (entity !== this && (params.AGENT_NEIGHBORS || !(entity instanceof Agent)) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
+            if (entity !== this && !(entity instanceof HomeBase) && (params.AGENT_NEIGHBORS || !(entity instanceof Agent)) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
                 spottedNeighbors.push(entity);
             }
         });
@@ -74,7 +74,11 @@ class Agent {
             if (vectAngle < 0) {
                 vectAngle += 2 * Math.PI;
             }
-            input.push(normalizeAngle((this.heading - vectAngle) * 180 / Math.PI));
+            let adjustedHeading = this.heading + Math.PI;
+            if (adjustedHeading >= 2 * Math.PI) {
+                adjustedHeading -= 2 * Math.PI;
+            }
+            input.push(normalizeAngle((adjustedHeading - vectAngle) * 180 / Math.PI));
             input.push(normalizeDistance(distance(neighbor.BC.center, this.BC.center)));
             // input.push(normalizeAngle(this.heading * 180 / Math.PI));
             // input.push(normalizeX(neighbor.x - this.x));
