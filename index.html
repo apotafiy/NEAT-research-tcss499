@@ -37,7 +37,19 @@
         <input type="checkbox" id="enforce_min_food"> Enforce Minimum Food
     </div>
     <div>
-        <input type="checkbox" id="rand_food_phases"> Randomize Food Phases
+        <input type="checkbox" id="rand_food_phases" checked="true"> Randomize Food Phase Time
+    </div>
+    <div>
+        <input type="checkbox" id="rand_food_lifetime"> Randomize Food Lifetime
+    </div>
+    <div>
+        <input type="checkbox" id="periodic_food_repop" checked="true"> Periodically Repopulate Food
+    </div>
+    <div>
+        <input type="checkbox" id="free_range"> FREE RANGE MODE
+    </div>
+    <div>
+        <br> </br><strong>NOTE TO USER:</strong> The following numeric inputs take effect after clicking out of the input field.
     </div>
     <div>
         <input type="text" id="agent_vision_radius" value="500"> Agent Visual Radius (pixels)
@@ -46,10 +58,10 @@
         <input type="text" id="generation_time" value="1000"> Generation Time (ticks)
     </div>
     <div>
-        <input type="text" id="compat_threshold" value="0.1"> Species Compatibility Threshold
+        <input type="text" id="compat_threshold" value="0.075"> Species Compatibility Threshold
     </div>
     <div>
-        <input type="text" id="min_food" value="100"> Minimum Food
+        <input type="text" id="min_food" value="150"> Minimum Food
     </div>
     <div id="charts" style="float: left; width: 50%">
         <div id="currentFitnessChartContainer">

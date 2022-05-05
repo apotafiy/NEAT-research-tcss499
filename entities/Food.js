@@ -6,7 +6,7 @@ class Food {
         this.game = game;
         this.foodTracker = foodTracker;
         this.tickCounter = 0;
-        this.lifetimeTicks = params.GEN_TICKS;
+        this.lifetimeTicks = params.RAND_FOOD_LIFETIME ? randomInt(params.GEN_TICKS / 2 + 1) + params.GEN_TICKS / 2 : params.GEN_TICKS;
         this.states = {
             seed: 0,
             adolescent: 1,
@@ -20,7 +20,7 @@ class Food {
             {
                 lifeSpan: lifespans[0],
                 radius: 3,
-                color: 'hsl(290, 100%, 50%)',
+                color: 'hsl(285, 100%, 50%)',
                 calories: 50,
                 isSet: false,
             },
@@ -34,7 +34,7 @@ class Food {
             {
                 lifeSpan: lifespans[2],
                 radius: 9,
-                color: 'hsl(310, 100%, 50%)',
+                color: 'hsl(315, 100%, 50%)',
                 calories: 150,
                 isSet: false,
             },
@@ -42,7 +42,7 @@ class Food {
                 lifeSpan: lifespans[3],
                 radius: 9,
                 color: 'hsl(60, 100%, 50%)',
-                calories: -200,
+                calories: -100,
                 isSet: false,
             },
         ]; // the properties of the entity at each state

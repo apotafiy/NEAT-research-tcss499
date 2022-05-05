@@ -1,18 +1,19 @@
 class Agent {
 
+    static DEATH_ENERGY_THRESH = 0;
+
     constructor(game, x, y, genome = undefined) {
         Object.assign(this, {game, x, y});
         this.diameter = 20;
         this.wheelRadius = 1;
         this.maxVelocity = 5;
         this.strokeColor = "black";
-        // this.fillColor = "hsl(240, 100%, 50%)";
         this.leftWheel = 0;
         this.rightWheel = 0;
         this.heading = randomInt(361) * Math.PI / 180;
         this.genome = genome === undefined ? new Genome() : genome;
         this.neuralNet = new NeuralNet(this.genome);
-        this.energy = 0;
+        this.resetEnergy();
         this.age = 0;
         this.resetOrigin();
         this.updateBoundingCircle();
@@ -35,6 +36,10 @@ class Agent {
     };
 
     getHue() {
+        return PopulationManager.SPECIES_SENSOR_COLORS.get(this.speciesId);
+    };
+
+    getDisplayHue() {
         return PopulationManager.SPECIES_COLORS.get(this.speciesId);
     };
 
@@ -48,7 +53,11 @@ class Agent {
     };
 
     resetEnergy() {
-        this.energy = 0;
+        this.energy = 50;
+    };
+
+    isInWorld() {
+        return this.x >= 0 && this.x < params.CANVAS_SIZE && this.y >= 0 && this.y < params.CANVAS_SIZE;
     };
 
     getRelativeAngle(vector) {
@@ -66,7 +75,7 @@ class Agent {
 
         let spottedNeighbors = [];
         this.game.entities.forEach(entity => {
-            if (entity !== this && !(entity instanceof HomeBase) && (params.AGENT_NEIGHBORS || !(entity instanceof Agent)) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
+            if (entity !== this && !(entity instanceof HomeBase) && (params.AGENT_NEIGHBORS || !(entity instanceof Agent) || params.FREE_RANGE) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
                 spottedNeighbors.push(entity);
             }
         });
@@ -112,22 +121,34 @@ class Agent {
 
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
-        // this.energy -= displacement / 2;
+        this.energy -= displacement / 10;
 
-        this.game.entities.forEach(entity => { // eat food
-            if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {
-                this.energy += entity.consume();
-            }
-        });
-
-        this.updateBoundingCircle();
+        if (params.FREE_RANGE && (this.energy < Agent.DEATH_ENERGY_THRESH || !(this.isInWorld()))) {
+            this.removeFromWorld = true;
+        } else {
+            spottedNeighbors.forEach(entity => { // eat food
+                if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {
+                    this.energy += entity.consume();
+                } else if (params.FREE_RANGE && entity !== this && entity instanceof Agent && !entity.removeFromWorld && this.speciesId === entity.speciesId && this.BC.collide(entity.BC)) {
+                    if (this.energy >= 25 && entity.energy >= 25) {
+                        let child = new Agent(this.game, this.x, this.y, Genome.crossover(this.genome, entity.genome));
+                        this.energy -= 25;
+                        entity.energy -= 25;
+                        this.removeFromWorld = this.energy >= Agent.DEATH_ENERGY_THRESH;
+                        entity.removeFromWorld = entity.energy >= Agent.DEATH_ENERGY_THRESH;
+                        this.game.population.registerChildAgents([child]);
+                    }
+                }
+            });
+            this.updateBoundingCircle();
+        }
     };
 
     draw(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.diameter / 2, 0, 2 * Math.PI);
         ctx.strokeStyle = this.strokeColor;
-        ctx.fillStyle = `hsl(${this.getHue()}, 100%, 50%)`;
+        ctx.fillStyle = `hsl(${this.getDisplayHue()}, 100%, 50%)`;
         ctx.lineWidth = 2;
         ctx.fill();
         ctx.stroke();

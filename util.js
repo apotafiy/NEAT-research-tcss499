@@ -4,11 +4,14 @@ const params = {
     FOOD_OUTSIDE: false,
     GEN_TICKS: 1000,
     AGENT_NEIGHBORS: false,
-    MIN_FOOD: 100,
-    COMPAT_THRESH: 0.1,
+    MIN_FOOD: 150,
+    COMPAT_THRESH: 0.075,
     ENFORCE_MIN_FOOD: false,
     AGENT_VISION_RADIUS: 500,
-    RAND_FOOD_PHASES: false
+    RAND_FOOD_PHASES: true,
+    RAND_FOOD_LIFETIME: false,
+    FOOD_PERIODIC_REPOP: true,
+    FREE_RANGE: false
  };
 
 /**

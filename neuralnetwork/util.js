@@ -12,6 +12,8 @@ const relativeLeft = (heading, vectAngle) => (heading < vectAngle ? heading + (2
 
 const relativeRight = (heading, vectAngle) => heading < vectAngle ? vectAngle - heading : vectAngle + (2 * Math.PI - heading);
 
+const randomBlueHue = () => randomInt(31) + 225;
+
 const topoSort = (nodes, edges) => {
     let inMap = new Map();
     let nodeQueue = [];
@@ -84,10 +86,10 @@ const getMedian = (arr) => {
     } else {
         return getMean(arr.slice(Math.floor(arr.length/2), Math.floor(arr.length/2) + 2));
     }
-}
+};
 
 const getMean = (arr) => {
     if(arr.length == 0) return 0;
     const total = arr.reduce((curr, acc)=> acc + curr, 0);
     return total / arr.length;
-}
+};

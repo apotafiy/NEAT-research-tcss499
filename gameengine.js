@@ -110,7 +110,7 @@ class GameEngine {
             }
         }
 
-        if (flag) {
+        if (flag && params.FOOD_PERIODIC_REPOP) {
             this.population.checkFoodLevels();
         }
 
