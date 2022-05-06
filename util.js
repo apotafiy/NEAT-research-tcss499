@@ -4,7 +4,7 @@ const params = {
     FOOD_OUTSIDE: false,
     GEN_TICKS: 1000,
     AGENT_NEIGHBORS: false,
-    MIN_FOOD: 150,
+    MIN_FOOD: 200,
     COMPAT_THRESH: 0.075,
     ENFORCE_MIN_FOOD: false,
     AGENT_VISION_RADIUS: 500,

@@ -116,7 +116,7 @@ class PopulationManager {
             repMap.set(speciesId, speciesList[0]);
         });
 
-        let compatOrder = [...PopulationManager.SPECIES_MEMBERS.keys()].sort(); // sort by speciesId such that compatibility is always considered in the same order
+        let compatOrder = [...repMap.keys()].sort(); // sort by speciesId such that compatibility is always considered in the same order
         children.forEach(child => { // fit child into a species
             let matchFound = false;
             compatOrder.forEach(speciesId => {
@@ -145,6 +145,8 @@ class PopulationManager {
                 PopulationManager.SENSOR_COLORS_USED.add(newSensorColor);
                 PopulationManager.SPECIES_SENSOR_COLORS.set(child.speciesId, newSensorColor);
                 PopulationManager.SPECIES_MEMBERS.get(child.speciesId).push(child);
+                repMap.set(child.speciesId, child); // child becomes representative for next children
+                compatOrder = [...repMap.keys()].sort(); // resort the compatibility ordering
             }
 
             this.game.addEntity(child);
