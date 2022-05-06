@@ -1,4 +1,4 @@
-const normalizeHue = (hue) => Math.min(1, hue / 315);
+const normalizeHue = (hue) => (hue - 60) / (315 - 60);
 
 const normalizeAngle = (a) => a / Math.PI;
 

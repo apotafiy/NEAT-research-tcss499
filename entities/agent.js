@@ -121,7 +121,8 @@ class Agent {
 
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
-        this.energy -= displacement / 10;
+        // this.energy -= displacement / 20;
+        this.energy -= 0.2;
 
         if (params.FREE_RANGE && (this.energy < Agent.DEATH_ENERGY_THRESH || !(this.isInWorld()))) {
             this.removeFromWorld = true;
