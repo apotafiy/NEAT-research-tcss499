@@ -1,12 +1,14 @@
-const normalizeHue = (hue) => Math.min(1, hue / 360);
+const normalizeHue = (hue) => (hue - 60) / (315 - 60);
 
-const normalizeAngle = (a) => a < 0 ? -1 - a / 360 : 1 - a / 360;
+const normalizeAngle = (a) => a / Math.PI;
 
 const normalizeDistance = (distance) => 1 - Math.min(1, distance / params.AGENT_VISION_RADIUS);
 
-const normalizeX = (x) => x < 0 ? -1 - Math.max(-1, x / params.AGENT_VISION_RADIUS) : 1 - Math.min(1, x / params.AGENT_VISION_RADIUS);
+const relativeLeft = (heading, vectAngle) => (heading < vectAngle ? heading + (2 * Math.PI - vectAngle) : heading - vectAngle) * -1;
 
-const normalizeY = (y) => y < 0 ? -1 - Math.max(-1, y / params.AGENT_VISION_RADIUS) : 1 - Math.min(1, y / params.AGENT_VISION_RADIUS);
+const relativeRight = (heading, vectAngle) => heading < vectAngle ? vectAngle - heading : vectAngle + (2 * Math.PI - heading);
+
+const randomBlueHue = () => randomInt(31) + 225;
 
 const topoSort = (nodes, edges) => {
     let inMap = new Map();
@@ -80,10 +82,10 @@ const getMedian = (arr) => {
     } else {
         return getMean(arr.slice(Math.floor(arr.length/2), Math.floor(arr.length/2) + 2));
     }
-}
+};
 
 const getMean = (arr) => {
     if(arr.length == 0) return 0;
     const total = arr.reduce((curr, acc)=> acc + curr, 0);
     return total / arr.length;
-}
+};

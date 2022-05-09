@@ -4,7 +4,6 @@ class GameEngine {
     constructor(options) {
         // What you will use to draw
         // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
-        this.ctx = null;
 
         // Everything that will be updated and drawn each frame
         this.entities = [];
@@ -21,9 +20,8 @@ class GameEngine {
         };
     };
 
-    init(ctx) {
-        this.ctx = ctx;
-        this.startInput();
+    init() {
+        // this.startInput();
         this.timer = new Timer();
     };
 
@@ -31,50 +29,50 @@ class GameEngine {
         this.running = true;
         const gameLoop = () => {
             this.loop();
-            requestAnimFrame(gameLoop, this.ctx.canvas);
+            requestAnimFrame(gameLoop, document.body.children[0]);
         };
         gameLoop();
     };
 
-    startInput() {
-        const getXandY = e => ({
-            x: e.clientX - this.ctx.canvas.getBoundingClientRect().left,
-            y: e.clientY - this.ctx.canvas.getBoundingClientRect().top
-        });
+    // startInput() {
+    //     const getXandY = e => ({
+    //         x: e.clientX - this.ctx.canvas.getBoundingClientRect().left,
+    //         y: e.clientY - this.ctx.canvas.getBoundingClientRect().top
+    //     });
         
-        this.ctx.canvas.addEventListener("mousemove", e => {
-            if (this.options.debugging) {
-                console.log("MOUSE_MOVE", getXandY(e));
-            }
-            this.mouse = getXandY(e);
-        });
+    //     this.ctx.canvas.addEventListener("mousemove", e => {
+    //         if (this.options.debugging) {
+    //             console.log("MOUSE_MOVE", getXandY(e));
+    //         }
+    //         this.mouse = getXandY(e);
+    //     });
 
-        this.ctx.canvas.addEventListener("click", e => {
-            if (this.options.debugging) {
-                console.log("CLICK", getXandY(e));
-            }
-            this.click = getXandY(e);
-        });
+    //     this.ctx.canvas.addEventListener("click", e => {
+    //         if (this.options.debugging) {
+    //             console.log("CLICK", getXandY(e));
+    //         }
+    //         this.click = getXandY(e);
+    //     });
 
-        this.ctx.canvas.addEventListener("wheel", e => {
-            if (this.options.debugging) {
-                console.log("WHEEL", getXandY(e), e.wheelDelta);
-            }
-            e.preventDefault(); // Prevent Scrolling
-            this.wheel = e;
-        });
+    //     this.ctx.canvas.addEventListener("wheel", e => {
+    //         if (this.options.debugging) {
+    //             console.log("WHEEL", getXandY(e), e.wheelDelta);
+    //         }
+    //         e.preventDefault(); // Prevent Scrolling
+    //         this.wheel = e;
+    //     });
 
-        this.ctx.canvas.addEventListener("contextmenu", e => {
-            if (this.options.debugging) {
-                console.log("RIGHT_CLICK", getXandY(e));
-            }
-            e.preventDefault(); // Prevent Context Menu
-            this.rightclick = getXandY(e);
-        });
+    //     this.ctx.canvas.addEventListener("contextmenu", e => {
+    //         if (this.options.debugging) {
+    //             console.log("RIGHT_CLICK", getXandY(e));
+    //         }
+    //         e.preventDefault(); // Prevent Context Menu
+    //         this.rightclick = getXandY(e);
+    //     });
 
-        this.ctx.canvas.addEventListener("keydown", event => this.keys[event.key] = true);
-        this.ctx.canvas.addEventListener("keyup", event => this.keys[event.key] = false);
-    };
+    //     this.ctx.canvas.addEventListener("keydown", event => this.keys[event.key] = true);
+    //     this.ctx.canvas.addEventListener("keyup", event => this.keys[event.key] = false);
+    // };
 
     addEntity(entity) {
         if (entity instanceof Agent || entity instanceof HomeBase) {
@@ -87,12 +85,19 @@ class GameEngine {
 
     draw() {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.population.worlds.forEach((members, worldId) => {
+            members.ctx.clearRect(0, 0, params.CANVAS_SIZE, params.CANVAS_SIZE);
+        });
 
         for (let i = 0; i < this.entities.length; i++) {
-            this.entities[i].draw(this.ctx, this);
+            let entity = this.entities[i];
+            let ctx = this.population.worlds.get(entity instanceof Agent ? entity.speciesId : entity.worldId).ctx;
+            entity.draw(ctx, this);
         }
-        this.display.draw(this.ctx, this);
+
+        this.population.worlds.forEach((members, worldId) => {
+            members.display.draw(members.ctx, this);
+        });
     };
 
     update() {
@@ -110,7 +115,7 @@ class GameEngine {
             }
         }
 
-        if (flag) {
+        if (flag && params.FOOD_PERIODIC_REPOP) {
             this.population.checkFoodLevels();
         }
 

@@ -15,5 +15,6 @@ class DataDisplay {
         ctx.strokeText(`Next In: ${params.GEN_TICKS - this.game.population.tickCounter} ticks`, 10, 60);
         ctx.strokeText(`Living Species: ${PopulationManager.SPECIES_MEMBERS.size}`, 10, 90);
         ctx.strokeText(`Total Species: ${PopulationManager.SPECIES_CREATED}`, 10, 120);
+        ctx.strokeText(`Agent Count: ${this.game.population.worlds.get(this.worldId).agents.length}`, 10, 150);
     };
 };

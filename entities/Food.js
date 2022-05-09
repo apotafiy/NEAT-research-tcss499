@@ -6,7 +6,7 @@ class Food {
         this.game = game;
         this.foodTracker = foodTracker;
         this.tickCounter = 0;
-        this.lifetimeTicks = params.GEN_TICKS;
+        this.lifetimeTicks = params.RAND_FOOD_LIFETIME ? randomInt(params.GEN_TICKS / 2 + 1) + params.GEN_TICKS / 2 : params.GEN_TICKS;
         this.states = {
             seed: 0,
             adolescent: 1,
@@ -20,29 +20,29 @@ class Food {
             {
                 lifeSpan: lifespans[0],
                 radius: 3,
-                color: 'hsl(50, 100%, 50%)',
-                calories: 5,
+                color: 'hsl(285, 100%, 50%)',
+                calories: 50,
                 isSet: false,
             },
             {
                 lifeSpan: lifespans[1],
-                radius: 6,
-                color: 'hsl(100, 100%, 50%)',
-                calories: 10,
+                radius: 5,
+                color: 'hsl(300, 100%, 50%)',
+                calories: 100,
                 isSet: false,
             },
             {
                 lifeSpan: lifespans[2],
-                radius: 9,
-                color: 'hsl(200, 100%, 50%)',
-                calories: 15,
+                radius: 7,
+                color: 'hsl(315, 100%, 50%)',
+                calories: 150,
                 isSet: false,
             },
             {
                 lifeSpan: lifespans[3],
-                radius: 9,
-                color: 'hsl(25, 100%, 50%)',
-                calories: -5,
+                radius: 7,
+                color: 'hsl(60, 100%, 50%)',
+                calories: -100,
                 isSet: false,
             },
         ]; // the properties of the entity at each state
@@ -100,7 +100,10 @@ class Food {
 
     reproduce() {
         const maxChildCount = 3;
-        let numChildren = Math.floor(Math.random() * maxChildCount) + 1;
+        let numAgents = this.game.population.worlds.get(this.worldId).agents.length;
+        let numFood = this.game.population.worlds.get(this.worldId).food.length;
+        let numChildren = numFood > numAgents * params.FOOD_AGENT_RATIO ? randomInt(2) : randomInt(maxChildCount) + 1;
+
         // determine a circle around food where it reproduce
         // use the number of children to determine the angle to place the children
         // if number of children is 2 then the angle increments should be 180deg
@@ -119,12 +122,12 @@ class Food {
             children.push(seedling);
             angle += increment;
         }
-        this.game.population.registerSeedlings(children);
+        this.game.population.registerSeedlings(this.worldId, children);
     }
 
     update() {
         if ((this.x < 0 || this.y < 0 || this.x > params.CANVAS_SIZE || this.y > params.CANVAS_SIZE) ||
-            (!(params.FOOD_OUTSIDE) && distance(this.BC.center, this.game.home.BC.center) > params.CANVAS_SIZE / 2)){
+            (!(params.FOOD_OUTSIDE) && distance(this.BC.center, {x: params.CANVAS_SIZE / 2, y: params.CANVAS_SIZE / 2}) > params.CANVAS_SIZE / 2)){
             // I include this in case the food spawns outside the bounds of the canvas
             // that way it does not needlessly render these entities
             this.removeFromWorld = true;
