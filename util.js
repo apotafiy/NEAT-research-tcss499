@@ -1,10 +1,10 @@
 /** Global Parameters Object */
 const params = {
-    CANVAS_SIZE: 1000,
+    CANVAS_SIZE: 800,
     FOOD_OUTSIDE: false,
     GEN_TICKS: 1000,
     AGENT_NEIGHBORS: false,
-    MIN_FOOD: 200,
+    FOOD_AGENT_RATIO: 5,
     COMPAT_THRESH: 0.075,
     ENFORCE_MIN_FOOD: false,
     AGENT_VISION_RADIUS: 500,

@@ -8,12 +8,10 @@ class PopulationManager {
     static SPECIES_MEMBERS = new Map();
     static COLORS_USED = new Set();
     static SENSOR_COLORS_USED = new Set();
-    static MIN_AGENTS = 50;
+    static MIN_AGENTS = 30;
 
     constructor(game) {
         this.game = game;
-        this.agents = [];
-        this.food = [];
         this.foodTracker = new FoodTracker();
         this.agentTracker = new AgentTracker();
         this.tickCounter = 0;
@@ -24,8 +22,11 @@ class PopulationManager {
         let defaultSensorColor = randomBlueHue();
         PopulationManager.SENSOR_COLORS_USED.add(defaultSensorColor);
         PopulationManager.SPECIES_SENSOR_COLORS.set(0, defaultSensorColor);
-        this.spawnAgents();
-        this.spawnFood();
+        
+        this.worlds = new Map();
+        this.initNewWorld(PopulationManager.SPECIES_ID);
+        this.spawnAgents(PopulationManager.SPECIES_ID);
+        this.spawnFood(PopulationManager.SPECIES_ID);
     };
 
     update() {
@@ -37,8 +38,8 @@ class PopulationManager {
         params.RAND_FOOD_LIFETIME = document.getElementById("rand_food_lifetime").checked;
         params.FOOD_PERIODIC_REPOP = document.getElementById("periodic_food_repop").checked;
 
-        if (document.activeElement.id !== "min_food") {
-            params.MIN_FOOD = parseInt(document.getElementById("min_food").value);
+        if (document.activeElement.id !== "food_agent_ratio") {
+            params.FOOD_AGENT_RATIO = parseInt(document.getElementById("food_agent_ratio").value);
         }
         if (document.activeElement.id !== "agent_vision_radius") {
             params.AGENT_VISION_RADIUS = parseFloat(document.getElementById("agent_vision_radius").value);
@@ -47,10 +48,13 @@ class PopulationManager {
             params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
         }
         
-        this.cleanupFood();
-        if (params.ENFORCE_MIN_FOOD && this.food.length < params.MIN_FOOD) {
-            this.spawnFood(params.MIN_FOOD - this.food.length);
-        }
+        this.worlds.forEach((members, worldId) => {
+            this.cleanupFood(worldId);
+            if (params.ENFORCE_MIN_FOOD && members.food.length < params.FOOD_AGENT_RATIO * members.agents.length) { // add agent to food ratio here
+                this.spawnFood(worldId, params.FOOD_AGENT_RATIO * members.agents.length - members.food.length);
+            }
+        });
+        
 
         this.tickCounter++;
         if (this.tickCounter === params.GEN_TICKS) { // we've reached the end of the generation
@@ -64,32 +68,50 @@ class PopulationManager {
         return false;
     };
 
-    cleanupFood() {
-        for (let i = this.food.length - 1; i >= 0; --i) { // remove eaten or dead food
-            if (this.food[i].removeFromWorld) {
-                this.food.splice(i, 1);
+    cleanupFood(worldId) {
+        let foodList = this.worlds.get(worldId).food;
+        for (let i = foodList.length - 1; i >= 0; --i) { // remove eaten or dead food
+            if (foodList[i].removeFromWorld) {
+                foodList.splice(i, 1);
             }
         }
     };
 
-    checkFoodLevels() {
-        this.cleanupFood();
-        this.spawnFood(params.MIN_FOOD - this.food.length);
+    checkFoodLevels() { // periodic food repopulation function
+        this.worlds.forEach((members, worldId) => {
+            this.cleanupFood(worldId);
+            this.spawnFood(worldId, params.FOOD_AGENT_RATIO * members.agents.length - members.food.length);
+        });
     };
 
-    spawnAgents() {
+    getEntitiesInWorld(worldId, foodOnly = false, agentsOnly = false) {
+        let members = this.worlds.get(worldId);
+        // uncomment the following code if you would like to add home to processed entities
+        // if (!foodOnly && !agentsOnly) {
+        //     entities.push(members.home);
+        // }
+        if (foodOnly) {
+            return members.food;
+        } else if (agentsOnly) {
+            return members.agents;
+        } else {
+            return members.food.concat(members.agents);
+        }
+    };
+
+    spawnAgents(worldId) {
         PopulationManager.SPECIES_MEMBERS.set(PopulationManager.SPECIES_ID, []);
         PopulationManager.SPECIES_CREATED++;
         for (let i = 0; i < PopulationManager.MIN_AGENTS; i++) { // add agents
             let agent = new Agent(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2);
             agent.speciesId = PopulationManager.SPECIES_ID;
             PopulationManager.SPECIES_MEMBERS.get(PopulationManager.SPECIES_ID).push(agent);
+            this.worlds.get(worldId).agents.push(agent);
             this.game.addEntity(agent);
-            this.agents.push(agent);
         }
     };
 
-    spawnFood(count = params.MIN_FOOD) {
+    spawnFood(worldId, count = params.FOOD_AGENT_RATIO * this.worlds.get(worldId).agents.length) {
         let seedlings = [];
         for (let i = 0; i < count; i++) { // add food sources
             let randomDist = randomInt(params.CANVAS_SIZE / 2);
@@ -99,12 +121,13 @@ class PopulationManager {
             let food = new Food(this.game, x, y, false, this.foodTracker);
             seedlings.push(food);
         }
-        this.registerSeedlings(seedlings);
+        this.registerSeedlings(worldId, seedlings);
     };
 
-    registerSeedlings(seedlings) {
+    registerSeedlings(worldId, seedlings) {
         seedlings.forEach(seedling => {
-            this.food.push(seedling);
+            seedling.worldId = worldId;
+            this.worlds.get(worldId).food.push(seedling);
             this.game.addEntity(seedling);
         });
     };
@@ -147,16 +170,22 @@ class PopulationManager {
                 PopulationManager.SPECIES_MEMBERS.get(child.speciesId).push(child);
                 repMap.set(child.speciesId, child); // child becomes representative for next children
                 compatOrder = [...repMap.keys()].sort(); // resort the compatibility ordering
+
+                this.initNewWorld(child.speciesId);
             }
 
+
             this.game.addEntity(child);
-            this.agents.push(child);
+            this.worlds.get(child.speciesId).agents.push(child);
+
+            // add food for new child in world
+            // this.spawnFood(child.speciesId, params.FOOD_AGENT_RATIO * this.worlds.get(child.speciesId).agents.length - members.food.length);
         });
     };
 
     countDeads() {
         let count = 0;
-        this.agents.forEach(agent => {
+        this.agentsAsList().forEach(agent => {
             if (agent.removeFromWorld) {
                 count++;
             }
@@ -166,7 +195,7 @@ class PopulationManager {
 
     countAlives() {
         let count = 0;
-        this.agents.forEach(agent => {
+        this.agentsAsList().forEach(agent => {
             if (!(agent.removeFromWorld)) {
                 count++;
             }
@@ -174,8 +203,63 @@ class PopulationManager {
         return count;
     };
 
+    agentsAsList() {
+        let agents = [];
+        this.worlds.forEach((members, worldId) => {
+            members.agents.forEach(agent => {
+                agents.push(agent);
+            });
+        });
+        return agents;
+    };
+
+    cleanupAgents() {
+        this.worlds.forEach((members, worldId) => {
+            for (let i = members.agents.length - 1; i >= 0; --i) {
+                if (members.agents[i].removeFromWorld) {
+                    members.agents.splice(i, 1);
+                }
+            }
+            if (members.agents.length === 0) {
+                this.removeWorld(worldId);
+            }
+        });
+    };
+
+    initNewWorld(worldId) {
+        this.worlds.set(
+            worldId, 
+            {
+                agents: [], 
+                food: [], 
+                home: new HomeBase(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2), 
+                ctx: this.createWorldCanvas(worldId) 
+            }
+        );
+        this.worlds.get(worldId).home.worldId = worldId;
+        this.game.addEntity(this.worlds.get(worldId).home);
+    };
+
+    createWorldCanvas(worldId) {
+        let canvas = document.createElement("canvas");
+        canvas.id = `${worldId}`;
+        canvas.width = params.CANVAS_SIZE;
+        canvas.height = params.CANVAS_SIZE;
+        canvas.style.border = "1px solid black";
+        document.body.prepend(canvas);
+        return canvas.getContext("2d");
+    };
+
+    removeWorld(worldId) {
+        this.worlds.get(worldId).home.removeFromWorld = true;
+        this.worlds.get(worldId).food.forEach(food => food.removeFromWorld = true);
+        let canvas = this.worlds.get(worldId).ctx.canvas;
+        document.body.removeChild(canvas);
+        this.worlds.delete(worldId);
+    };
+
     processGeneration() {
-        this.agents.forEach(agent => {
+       this.agentsAsList().forEach(agent => {
             this.agentTracker.processAgent(agent);
             this.genomeTracker.processGenome(agent.genome);
             agent.age++;
@@ -211,7 +295,8 @@ class PopulationManager {
             }
     
             let deadCount = this.countDeads(); // this call is if we are transitioning from free range -> generational mode
-            for (let i = 0; i < Math.ceil(this.agents.length / 2) - deadCount; i++) { // death roulette -> kill the ceiling to ensure agent list is always even
+            let numAgents = this.agentsAsList().length;
+            for (let i = 0; i < Math.ceil(numAgents / 2) - deadCount; i++) { // death roulette -> kill the ceiling to ensure agent list is always even
                 let killed = false;
                 while (!killed) { // keep rolling the roulette wheel until someone dies
                     let rouletteResult = randomFloat(sumShared);
@@ -266,16 +351,17 @@ class PopulationManager {
             this.registerChildAgents(children);
         }
 
-        for (let i = this.agents.length - 1; i >= 0; --i) { // unregister killed parents
-            if (this.agents[i].removeFromWorld) {
-                this.agents.splice(i, 1);
-            }
-        }
+        // for (let i = this.agents.length - 1; i >= 0; --i) { // unregister killed parents
+        //     if (this.agents[i].removeFromWorld) {
+        //         this.agents.splice(i, 1);
+        //     }
+        // }
+        this.cleanupAgents(); // unregister killed parents
 
         let remainingColors = new Set(); // we need to filter out the colors of species that have died out for reuse
         let remainingSensorColors = new Set(); // same thing with sensor colors
         PopulationManager.SPECIES_MEMBERS = new Map();
-        this.agents.forEach(agent => { // fill species members map with surviving parents and children
+        this.agentsAsList().forEach(agent => { // fill species members map with surviving parents and children
             if (PopulationManager.SPECIES_MEMBERS.get(agent.speciesId) === undefined) {
                 PopulationManager.SPECIES_MEMBERS.set(agent.speciesId, []);
             }
@@ -287,7 +373,7 @@ class PopulationManager {
         PopulationManager.SENSOR_COLORS_USED = new Set([...PopulationManager.SENSOR_COLORS_USED].filter(color => remainingSensorColors.has(color)));
 
         if (!params.FREE_RANGE) {
-            this.agents.forEach(agent => {
+            this.agentsAsList().forEach(agent => {
                 agent.resetPos();
                 agent.resetOrigin();
                 agent.resetEnergy();

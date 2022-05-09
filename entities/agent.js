@@ -4,9 +4,9 @@ class Agent {
 
     constructor(game, x, y, genome = undefined) {
         Object.assign(this, {game, x, y});
-        this.diameter = 20;
+        this.diameter = 15;
         this.wheelRadius = 1;
-        this.maxVelocity = 5;
+        this.maxVelocity = 4;
         this.strokeColor = "black";
         this.leftWheel = 0;
         this.rightWheel = 0;
@@ -74,8 +74,9 @@ class Agent {
         let oldPos = { x: this.x, y: this.y };
 
         let spottedNeighbors = [];
-        this.game.entities.forEach(entity => {
-            if (entity !== this && !(entity instanceof HomeBase) && (params.AGENT_NEIGHBORS || !(entity instanceof Agent) || params.FREE_RANGE) && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
+        let entities = this.game.population.getEntitiesInWorld(this.speciesId, !params.AGENT_NEIGHBORS);
+        entities.forEach(entity => {
+            if (entity !== this && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
                 spottedNeighbors.push(entity);
             }
         });
@@ -128,9 +129,9 @@ class Agent {
             this.removeFromWorld = true;
         } else {
             spottedNeighbors.forEach(entity => { // eat food
-                if (entity instanceof Food && !entity.removeFromWorld && this.BC.collide(entity.BC)) {
+                if (entity instanceof Food && this.BC.collide(entity.BC)) {
                     this.energy += entity.consume();
-                } else if (params.FREE_RANGE && entity !== this && entity instanceof Agent && !entity.removeFromWorld && this.speciesId === entity.speciesId && this.BC.collide(entity.BC)) {
+                } else if (params.FREE_RANGE && entity !== this && entity instanceof Agent && this.speciesId === entity.speciesId && this.BC.collide(entity.BC)) {
                     if (this.energy >= 25 && entity.energy >= 25) {
                         let child = new Agent(this.game, this.x, this.y, Genome.crossover(this.genome, entity.genome));
                         this.energy -= 25;
