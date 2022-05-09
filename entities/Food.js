@@ -100,7 +100,10 @@ class Food {
 
     reproduce() {
         const maxChildCount = 3;
-        let numChildren = Math.floor(Math.random() * maxChildCount) + 1;
+        let numAgents = this.game.population.worlds.get(this.worldId).agents.length;
+        let numFood = this.game.population.worlds.get(this.worldId).food.length;
+        let numChildren = numFood > numAgents * params.FOOD_AGENT_RATIO ? randomInt(2) : randomInt(maxChildCount) + 1;
+
         // determine a circle around food where it reproduce
         // use the number of children to determine the angle to place the children
         // if number of children is 2 then the angle increments should be 180deg
