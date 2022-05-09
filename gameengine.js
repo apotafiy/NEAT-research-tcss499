@@ -85,7 +85,6 @@ class GameEngine {
 
     draw() {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
-
         this.population.worlds.forEach((members, worldId) => {
             members.ctx.clearRect(0, 0, params.CANVAS_SIZE, params.CANVAS_SIZE);
         });
@@ -97,7 +96,7 @@ class GameEngine {
         }
 
         this.population.worlds.forEach((members, worldId) => {
-            this.display.draw(members.ctx, this);
+            members.display.draw(members.ctx, this);
         });
     };
 

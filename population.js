@@ -177,9 +177,6 @@ class PopulationManager {
 
             this.game.addEntity(child);
             this.worlds.get(child.speciesId).agents.push(child);
-
-            // add food for new child in world
-            // this.spawnFood(child.speciesId, params.FOOD_AGENT_RATIO * this.worlds.get(child.speciesId).agents.length - members.food.length);
         });
     };
 
@@ -214,6 +211,7 @@ class PopulationManager {
     };
 
     cleanupAgents() {
+        let extincts = [];
         this.worlds.forEach((members, worldId) => {
             for (let i = members.agents.length - 1; i >= 0; --i) {
                 if (members.agents[i].removeFromWorld) {
@@ -221,8 +219,11 @@ class PopulationManager {
                 }
             }
             if (members.agents.length === 0) {
-                this.removeWorld(worldId);
+                extincts.push(worldId);
             }
+        });
+        extincts.forEach(speciesId => {
+            this.removeWorld(speciesId);
         });
     };
 
@@ -233,10 +234,12 @@ class PopulationManager {
                 agents: [], 
                 food: [], 
                 home: new HomeBase(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2), 
-                ctx: this.createWorldCanvas(worldId) 
+                ctx: this.createWorldCanvas(worldId),
+                display: new DataDisplay(this.game)
             }
         );
         this.worlds.get(worldId).home.worldId = worldId;
+        this.worlds.get(worldId).display.worldId = worldId;
         this.game.addEntity(this.worlds.get(worldId).home);
     };
 
@@ -351,11 +354,6 @@ class PopulationManager {
             this.registerChildAgents(children);
         }
 
-        // for (let i = this.agents.length - 1; i >= 0; --i) { // unregister killed parents
-        //     if (this.agents[i].removeFromWorld) {
-        //         this.agents.splice(i, 1);
-        //     }
-        // }
         this.cleanupAgents(); // unregister killed parents
 
         let remainingColors = new Set(); // we need to filter out the colors of species that have died out for reuse
