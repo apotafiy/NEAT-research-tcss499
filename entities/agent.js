@@ -6,7 +6,7 @@ class Agent {
         Object.assign(this, {game, x, y});
         this.diameter = 15;
         this.wheelRadius = 1;
-        this.maxVelocity = 4;
+        this.maxVelocity = 5;
         this.strokeColor = "black";
         this.leftWheel = 0;
         this.rightWheel = 0;
