@@ -107,7 +107,6 @@ class PopulationManager {
             agent.speciesId = PopulationManager.SPECIES_ID;
             PopulationManager.SPECIES_MEMBERS.get(PopulationManager.SPECIES_ID).push(agent);
             this.worlds.get(worldId).agents.push(agent);
-            this.game.addEntity(agent);
         }
     };
 
@@ -128,7 +127,6 @@ class PopulationManager {
         seedlings.forEach(seedling => {
             seedling.worldId = worldId;
             this.worlds.get(worldId).food.push(seedling);
-            this.game.addEntity(seedling);
         });
     };
 
@@ -173,9 +171,6 @@ class PopulationManager {
 
                 this.initNewWorld(child.speciesId);
             }
-
-
-            this.game.addEntity(child);
             this.worlds.get(child.speciesId).agents.push(child);
         });
     };
@@ -240,7 +235,6 @@ class PopulationManager {
         );
         this.worlds.get(worldId).home.worldId = worldId;
         this.worlds.get(worldId).display.worldId = worldId;
-        this.game.addEntity(this.worlds.get(worldId).home);
     };
 
     createWorldCanvas(worldId) {
