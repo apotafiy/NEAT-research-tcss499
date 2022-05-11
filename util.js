@@ -11,20 +11,20 @@ const params = {
     RAND_FOOD_PHASES: true,
     RAND_FOOD_LIFETIME: false,
     FOOD_PERIODIC_REPOP: true,
-    FREE_RANGE: false
- };
+    FREE_RANGE: false,
+};
 
 /**
  * @param {Number} n
  * @returns Random Integer Between 0 and n-1
  */
-const randomInt = n => Math.floor(Math.random() * n);
+const randomInt = (n) => Math.floor(Math.random() * n);
 
 /**
  * @param {Number} n
  * @returns Random Float Between 0 and n-1
  */
- const randomFloat = n => Math.random() * n;
+const randomFloat = (n) => Math.random() * n;
 
 /**
  * @param {Number} r Red Value
@@ -53,7 +53,8 @@ const hsl = (h, s, l) => `hsl(${h}, ${s}%, ${l}%)`;
 
 /** Creates an alias for requestAnimationFrame for backwards compatibility */
 window.requestAnimFrame = (() => {
-    return window.requestAnimationFrame ||
+    return (
+        window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
@@ -65,7 +66,8 @@ window.requestAnimFrame = (() => {
          */
         ((callback, element) => {
             window.setTimeout(callback, 1000 / 60);
-        });
+        })
+    );
 })();
 
 /**
@@ -82,4 +84,64 @@ const distance = (p1, p2) => {
  * @param {Array} a the array to be shuffled
  * @returns a shuffled copy of the array
  */
-const shuffleArray = a => [...a].sort(() => Math.random() - 0.5);
+const shuffleArray = (a) => [...a].sort(() => Math.random() - 0.5);
+
+/**
+ *
+ * @param {object} array array of html elements you want to put in slideshow
+ * @param {String} id id of slideshow holder
+ */
+const createSlideShow = (array, id) => {
+    const indicatorContainer = document.getElementById(`${id}-indicators`);
+    const carouselContainer = document.getElementById(`${id}-carousel`);
+    let activeSlide = 0;
+    // check which slide was active before
+    if (indicatorContainer.firstChild) {
+        // first remove existing data
+        while (indicatorContainer.firstChild) {
+            indicatorContainer.removeChild(indicatorContainer.lastChild);
+        }
+        let count = 0;
+        while (carouselContainer.firstChild) {
+            if (
+                carouselContainer.firstChild.classList &&
+                carouselContainer.firstChild.classList.contains('active')
+            ) {
+                activeSlide = Math.min(count, array.length - 1);
+            }
+            carouselContainer.removeChild(carouselContainer.firstChild);
+            count++;
+        }
+    }
+    if (array.length < 1) {
+        return;
+    }
+
+    array.forEach((elem, i) => {
+        const indButton = document.createElement('button');
+        indButton.setAttribute('type', 'button');
+        indButton.setAttribute('data-bs-target', '#carouselExampleIndicators');
+        indButton.setAttribute('data-bs-slide-to', `${i}`);
+        if (i == activeSlide) {
+            indButton.setAttribute('class', 'active');
+            indButton.setAttribute('aria-current', 'true');
+        }
+        indButton.setAttribute('style', 'background-color: black');
+        indButton.setAttribute('aria-current', 'true');
+        indButton.setAttribute('aria-label', `Slide ${i + 1}`);
+        indicatorContainer.appendChild(indButton);
+    });
+
+    let count = 0;
+    array.forEach((elem) => {
+        const div = document.createElement('div');
+        div.setAttribute(
+            'class',
+            `carousel-item${count == activeSlide ? ' active' : ''}`
+        );
+        div.setAttribute('data-bs-interval', '999999999');
+        div.appendChild(elem);
+        carouselContainer.appendChild(div);
+        count++;
+    });
+};

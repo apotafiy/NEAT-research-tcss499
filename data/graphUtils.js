@@ -45,7 +45,7 @@ const generateCurrentFitnessChart = (data) => {
         options: {
             scales: {
                 y: {
-                    min: min - 100,
+                    min: Math.max(Math.floor(min - 100), 0),
                 },
             },
             elements: {

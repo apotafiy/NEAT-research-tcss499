@@ -27,6 +27,7 @@ class PopulationManager {
         this.initNewWorld(PopulationManager.SPECIES_ID);
         this.spawnAgents(PopulationManager.SPECIES_ID);
         this.spawnFood(PopulationManager.SPECIES_ID);
+        this.resetCanvases();
     };
 
     update() {
@@ -55,6 +56,7 @@ class PopulationManager {
             }
         });
         
+
 
         this.tickCounter++;
         if (this.tickCounter === params.GEN_TICKS) { // we've reached the end of the generation
@@ -223,13 +225,15 @@ class PopulationManager {
     };
 
     initNewWorld(worldId) {
+        const world = this.createWorldCanvas();
         this.worlds.set(
             worldId, 
             {
                 agents: [], 
                 food: [], 
                 home: new HomeBase(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2), 
-                ctx: this.createWorldCanvas(worldId),
+                ctx: world.getContext("2d"),
+                canvas: world,
                 display: new DataDisplay(this.game)
             }
         );
@@ -243,20 +247,28 @@ class PopulationManager {
         canvas.width = params.CANVAS_SIZE;
         canvas.height = params.CANVAS_SIZE;
         canvas.style.border = "1px solid black";
-        document.body.prepend(canvas);
-        return canvas.getContext("2d");
+        // document.body.prepend(canvas);
+        return canvas;
     };
 
     removeWorld(worldId) {
         this.worlds.get(worldId).home.removeFromWorld = true;
         this.worlds.get(worldId).food.forEach(food => food.removeFromWorld = true);
-        let canvas = this.worlds.get(worldId).ctx.canvas;
-        document.body.removeChild(canvas);
+        // let canvas = this.worlds.get(worldId).ctx.canvas;
+        // document.body.removeChild(canvas);
         this.worlds.delete(worldId);
     };
 
+    resetCanvases() {
+        const tmp = [];
+        this.worlds.forEach((val) => {
+            tmp.push(val.canvas);
+        });
+        createSlideShow(tmp, 'canvas');
+    }
+
     processGeneration() {
-       this.agentsAsList().forEach(agent => {
+        this.agentsAsList().forEach(agent => {
             this.agentTracker.processAgent(agent);
             this.genomeTracker.processGenome(agent.genome);
             agent.age++;
@@ -383,5 +395,6 @@ class PopulationManager {
         this.foodTracker.addNewGeneration();
         this.agentTracker.addNewGeneration();
         this.genomeTracker.addNewGeneration();
+        this.resetCanvases();
     };
 };
