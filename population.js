@@ -56,8 +56,6 @@ class PopulationManager {
             }
         });
         
-
-
         this.tickCounter++;
         if (this.tickCounter === params.GEN_TICKS) { // we've reached the end of the generation
             this.tickCounter = 0;
@@ -247,15 +245,12 @@ class PopulationManager {
         canvas.width = params.CANVAS_SIZE;
         canvas.height = params.CANVAS_SIZE;
         canvas.style.border = "1px solid black";
-        // document.body.prepend(canvas);
         return canvas;
     };
 
     removeWorld(worldId) {
         this.worlds.get(worldId).home.removeFromWorld = true;
         this.worlds.get(worldId).food.forEach(food => food.removeFromWorld = true);
-        // let canvas = this.worlds.get(worldId).ctx.canvas;
-        // document.body.removeChild(canvas);
         this.worlds.delete(worldId);
     };
 
@@ -265,7 +260,7 @@ class PopulationManager {
             tmp.push(val.canvas);
         });
         createSlideShow(tmp, 'canvas');
-    }
+    };
 
     processGeneration() {
         this.agentsAsList().forEach(agent => {
