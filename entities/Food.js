@@ -20,7 +20,7 @@ class Food {
             {
                 lifeSpan: lifespans[0],
                 radius: 3,
-                color: 'hsl(285, 100%, 50%)',
+                color: 'hsl(270, 100%, 50%)',
                 calories: 50,
                 isSet: false,
             },
@@ -34,7 +34,7 @@ class Food {
             {
                 lifeSpan: lifespans[2],
                 radius: 7,
-                color: 'hsl(315, 100%, 50%)',
+                color: 'hsl(330, 100%, 50%)',
                 calories: 150,
                 isSet: false,
             },
