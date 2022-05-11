@@ -85,45 +85,83 @@ class GameEngine {
 
     draw() {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
-        this.population.worlds.forEach((members, worldId) => {
+        // this.population.worlds.forEach((members, worldId) => {
+        //     members.ctx.clearRect(0, 0, params.CANVAS_SIZE, params.CANVAS_SIZE);
+        // });
+
+        // for (let i = 0; i < this.entities.length; i++) {
+        //     let entity = this.entities[i];
+        //     let ctx = this.population.worlds.get(entity instanceof Agent ? entity.speciesId : entity.worldId).ctx;
+        //     entity.draw(ctx, this);
+        // }
+
+        this.population.worlds.forEach(members => {
             members.ctx.clearRect(0, 0, params.CANVAS_SIZE, params.CANVAS_SIZE);
+            members.home.draw(members.ctx);
+            members.food.forEach(food => {
+                if (!food.removeFromWorld) {
+                    food.draw(members.ctx)
+                }
+            });
+            members.agents.forEach(agent => {
+                if (!agent.removeFromWorld) {
+                    agent.draw(members.ctx)
+                }
+            });
+            members.display.draw(members.ctx);
         });
 
-        for (let i = 0; i < this.entities.length; i++) {
-            let entity = this.entities[i];
-            let ctx = this.population.worlds.get(entity instanceof Agent ? entity.speciesId : entity.worldId).ctx;
-            entity.draw(ctx, this);
-        }
 
-        this.population.worlds.forEach((members, worldId) => {
-            members.display.draw(members.ctx, this);
-        });
+        // this.population.worlds.forEach((members, worldId) => {
+        //     members.display.draw(members.ctx, this);
+        // });
     };
 
     update() {
-        this.iShift = 0;
-        let entitiesCount = this.entities.length;
-        let flag = this.population.update();
+        // this.iShift = 0;
+        // let entitiesCount = this.entities.length;
 
-        for (let i = this.iShift; i < this.iShift + entitiesCount; i++) {
-            let entity = this.entities[i];
-            
-            let prevShift = this.iShift;
-            if (!entity.removeFromWorld) {
-                entity.update();
-                i += this.iShift - prevShift;
+        let foodCounts = new Map();
+        let agentCounts = new Map();
+        
+        this.population.worlds.forEach((members, worldId) => {
+            foodCounts.set(worldId, members.food.length);
+            agentCounts.set(worldId, members.agents.length);
+        });
+
+        this.population.worlds.forEach((members, worldId) => {
+            for (let i = 0; i < foodCounts.get(worldId); i++) {
+                if (!members.food[i].removeFromWorld) {
+                    members.food[i].update();
+                }
             }
-        }
+            for (let i = 0; i < agentCounts.get(worldId); i++) {
+                if (!members.agents[i].removeFromWorld) {
+                    members.agents[i].update();
+                }
+            }
+        });
+        
+        // for (let i = this.iShift; i < this.iShift + entitiesCount; i++) {
+        //     let entity = this.entities[i];
+        //     let prevShift = this.iShift;
+        //     if (!entity.removeFromWorld) {
+        //         entity.update();
+        //         i += this.iShift - prevShift;
+        //     }
+        // }
+
+        let flag = this.population.update();
 
         if (flag && params.FOOD_PERIODIC_REPOP) {
             this.population.checkFoodLevels();
         }
 
-        for (let i = entitiesCount + this.iShift - 1; i >= this.iShift; --i) {
-            if (this.entities[i].removeFromWorld) {
-                this.entities.splice(i, 1);
-            }
-        }
+        // for (let i = entitiesCount + this.iShift - 1; i >= this.iShift; --i) {
+        //     if (this.entities[i].removeFromWorld) {
+        //         this.entities.splice(i, 1);
+        //     }
+        // }
     };
 
     loop() {
