@@ -71,7 +71,7 @@ class Genome {
                     let connection = {
                         in: inputNeuron,
                         out: hiddenNeuron,
-                        weight: randomWeights ? Math.random() : 0.1,
+                        weight: randomWeights ? Math.random() * 2 - 1 : 0.1,
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(inputNeuron, hiddenNeuron),
                     };
@@ -82,7 +82,7 @@ class Genome {
                     let connection = {
                         in: inputNeuron,
                         out: outputNeuron,
-                        weight: randomWeights ? Math.random() : 0.1,
+                        weight: randomWeights ? Math.random() * 2 - 1 : 0.1,
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(inputNeuron, outputNeuron),
                     };
@@ -96,7 +96,7 @@ class Genome {
                 let connection = {
                     in: hiddenNeuron,
                     out: outputNeuron,
-                    weight: randomWeights ? Math.random() : 0.1,
+                    weight: randomWeights ? Math.random() * 2 - 1 : 0.1,
                     isEnabled: true,
                     innovation: Genome.assignInnovNum(hiddenNeuron, outputNeuron),
                 };
@@ -235,7 +235,6 @@ class Genome {
 
     static similarity = (genomeA, genomeB) => {
         let N = Math.max(genomeA.numConnections(), genomeB.numConnections());
-        // console.log((1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB)))
         return 1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB); 
     };
 
@@ -260,8 +259,12 @@ class Genome {
         });
 
         if (randomInt(100) < 5) { // new node mutation (5% chance)
-            let connection = this.connectionsAsList()[randomInt(this.numConnections())];
-            if (connection.isEnabled) {
+            let enabledConnections = this.connectionsAsList(false);
+            let connection = undefined;
+            if (enabledConnections.length > 0) {
+                connection = enabledConnections[randomInt(enabledConnections.length)];
+            }
+            if (connection !== undefined) {
                 let nodeId = Genome.assignNodeId(connection.innovation);
                 if (this.nodeGenes.get(nodeId) === undefined) { // check if we already have this node in our genome
                     connection.isEnabled = false; // disable the old connection
@@ -291,18 +294,17 @@ class Genome {
         }
 
         if (randomInt(100) < 5) { // new connection mutation (5% chance)
-            let allNodes = this.nodesAsList();
-            let inNode = allNodes[randomInt(this.numNodes())];
-            let outNode = allNodes[randomInt(this.numNodes())];
+            let possibleConnections = this.getUnusedConnections();
 
-            // cannot create incoming edge to an input node, or a connection that already exists!
-            if (outNode.type !== Genome.NODE_TYPES.input && this.connectionGenes.get([inNode.id, outNode.id]) === undefined) {
+            if (possibleConnections.length > 0) {
+                let randCon = possibleConnections[randomInt(possibleConnections.length)];
+                let inNode = this.nodeGenes.get(randCon[0]);
+                let outNode = this.nodeGenes.get(randCon[1]);
                 let newConnection = {
                     in: inNode.id,
                     out: outNode.id,
-                    weight: Math.random(),
+                    weight: Math.random() * 2 - 1,
                     isEnabled: true,
-                    mutated: true,
                     innovation: Genome.assignInnovNum(inNode.id, outNode.id)
                 };
                 Genome.addParentConnection(this.connectionGenes, this.nodeGenes, newConnection);
@@ -310,6 +312,18 @@ class Genome {
                 newConnection.isCyclic = detectCycle(this.nodeGenes, this.connectionGenes, newConnection);
             }
         }
+    };
+
+    getUnusedConnections() {
+        let unused = [];
+        this.nodeGenes.forEach(inNode => {
+            this.nodeGenes.forEach(outNode => {
+                if (!inNode.outIds.has(outNode.id) && outNode.type !== Genome.NODE_TYPES.input) {
+                    unused.push([inNode.id, outNode.id]);
+                }
+            });
+        });
+        return unused;
     };
 
     innovationSet() {
@@ -324,11 +338,13 @@ class Genome {
         return { innovations: innovations, maxInnovation: maxInnovation };
     };
 
-    connectionsAsList() {
+    connectionsAsList(includeDisabled = true) {
         let connectionList = [];
         this.connectionGenes.forEach(connections => {
             connections.forEach(connection => {
-                connectionList.push(connection);
+                if (connection.isEnabled || includeDisabled) {
+                    connectionList.push(connection);
+                }
             });
         });
         return connectionList;

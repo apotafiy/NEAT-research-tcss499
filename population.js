@@ -8,7 +8,7 @@ class PopulationManager {
     static SPECIES_MEMBERS = new Map();
     static COLORS_USED = new Set();
     static SENSOR_COLORS_USED = new Set();
-    static MIN_AGENTS = 30;
+    static MIN_AGENTS = 50;
 
     constructor(game) {
         this.game = game;
@@ -56,8 +56,6 @@ class PopulationManager {
             }
         });
         
-
-
         this.tickCounter++;
         if (this.tickCounter === params.GEN_TICKS) { // we've reached the end of the generation
             this.tickCounter = 0;
@@ -109,7 +107,6 @@ class PopulationManager {
             agent.speciesId = PopulationManager.SPECIES_ID;
             PopulationManager.SPECIES_MEMBERS.get(PopulationManager.SPECIES_ID).push(agent);
             this.worlds.get(worldId).agents.push(agent);
-            this.game.addEntity(agent);
         }
     };
 
@@ -130,7 +127,6 @@ class PopulationManager {
         seedlings.forEach(seedling => {
             seedling.worldId = worldId;
             this.worlds.get(worldId).food.push(seedling);
-            this.game.addEntity(seedling);
         });
     };
 
@@ -175,9 +171,6 @@ class PopulationManager {
 
                 this.initNewWorld(child.speciesId);
             }
-
-
-            this.game.addEntity(child);
             this.worlds.get(child.speciesId).agents.push(child);
         });
     };
@@ -244,7 +237,6 @@ class PopulationManager {
         );
         this.worlds.get(worldId).home.worldId = worldId;
         this.worlds.get(worldId).display.worldId = worldId;
-        this.game.addEntity(this.worlds.get(worldId).home);
     };
 
     createWorldCanvas(worldId) {
@@ -253,15 +245,12 @@ class PopulationManager {
         canvas.width = params.CANVAS_SIZE;
         canvas.height = params.CANVAS_SIZE;
         canvas.style.border = "1px solid black";
-        // document.body.prepend(canvas);
         return canvas;
     };
 
     removeWorld(worldId) {
         this.worlds.get(worldId).home.removeFromWorld = true;
         this.worlds.get(worldId).food.forEach(food => food.removeFromWorld = true);
-        // let canvas = this.worlds.get(worldId).ctx.canvas;
-        // document.body.removeChild(canvas);
         this.worlds.delete(worldId);
     };
 
@@ -271,7 +260,7 @@ class PopulationManager {
             tmp.push(val.canvas);
         });
         createSlideShow(tmp, 'canvas');
-    }
+    };
 
     processGeneration() {
         this.agentsAsList().forEach(agent => {
