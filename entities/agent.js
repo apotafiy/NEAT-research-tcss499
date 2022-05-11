@@ -136,7 +136,7 @@ class Agent {
             if (params.FREE_RANGE) { // check for reproduction if in free range mode
                 let agents = this.game.population.getEntitiesInWorld(this.speciesId, false, true);
                 agents.forEach(entity => {
-                    if (this.energy >= 25 && entity.energy >= 25 && entity.BC.collide(this.BC)) {
+                    if (entity !== this && this.energy >= 25 && entity.energy >= 25 && entity.BC.collide(this.BC)) {
                         let child = new Agent(this.game, this.x, this.y, Genome.crossover(this.genome, entity.genome));
                         this.energy -= 25;
                         entity.energy -= 25;
