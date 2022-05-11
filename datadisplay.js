@@ -19,6 +19,6 @@ class DataDisplay {
         
         ctx.textAlign = "right";
         ctx.strokeText(`Species: ${this.worldId}`, params.CANVAS_SIZE - 10, 30);
-        ctx.strokeText(`Agent Count: ${this.game.population.worlds.get(this.worldId).agents.length}`, params.CANVAS_SIZE - 10, 60);
+        ctx.strokeText(`Agent Count: ${this.game.population.countAlives(this.worldId)}`, params.CANVAS_SIZE - 10, 60);
     };
 };

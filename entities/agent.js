@@ -125,23 +125,30 @@ class Agent {
         // this.energy -= displacement / 20;
         this.energy -= 0.2;
 
-        if (params.FREE_RANGE && (this.energy < Agent.DEATH_ENERGY_THRESH || !(this.isInWorld()))) {
+        if (params.FREE_RANGE && this.energy < Agent.DEATH_ENERGY_THRESH) {
             this.removeFromWorld = true;
         } else {
             spottedNeighbors.forEach(entity => { // eat food
                 if (entity instanceof Food && this.BC.collide(entity.BC)) {
                     this.energy += entity.consume();
-                } else if (params.FREE_RANGE && entity !== this && entity instanceof Agent && this.speciesId === entity.speciesId && this.BC.collide(entity.BC)) {
-                    if (this.energy >= 25 && entity.energy >= 25) {
+                } 
+            });
+            if (params.FREE_RANGE) { // check for reproduction if in free range mode
+                let agents = this.game.population.getEntitiesInWorld(this.speciesId, false, true);
+                agents.forEach(entity => {
+                    if (this.energy >= 25 && entity.energy >= 25 && entity.BC.collide(this.BC)) {
                         let child = new Agent(this.game, this.x, this.y, Genome.crossover(this.genome, entity.genome));
                         this.energy -= 25;
                         entity.energy -= 25;
-                        this.removeFromWorld = this.energy >= Agent.DEATH_ENERGY_THRESH;
-                        entity.removeFromWorld = entity.energy >= Agent.DEATH_ENERGY_THRESH;
+                        this.removeFromWorld = this.energy < Agent.DEATH_ENERGY_THRESH;
+                        entity.removeFromWorld = entity.energy < Agent.DEATH_ENERGY_THRESH;
                         this.game.population.registerChildAgents([child]);
                     }
-                }
-            });
+                });
+            }
+        }
+
+        if (!this.removeFromWorld) {
             this.updateBoundingCircle();
         }
     };

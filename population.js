@@ -175,9 +175,9 @@ class PopulationManager {
         });
     };
 
-    countDeads() {
+    countDeads(worldId = undefined) {
         let count = 0;
-        this.agentsAsList().forEach(agent => {
+        (worldId === undefined ? this.agentsAsList() : this.worlds.get(worldId).agents).forEach(agent => {
             if (agent.removeFromWorld) {
                 count++;
             }
@@ -185,9 +185,9 @@ class PopulationManager {
         return count;
     };
 
-    countAlives() {
+    countAlives(worldId = undefined) {
         let count = 0;
-        this.agentsAsList().forEach(agent => {
+        (worldId === undefined ? this.agentsAsList() : this.worlds.get(worldId).agents).forEach(agent => {
             if (!(agent.removeFromWorld)) {
                 count++;
             }
@@ -237,6 +237,10 @@ class PopulationManager {
         );
         this.worlds.get(worldId).home.worldId = worldId;
         this.worlds.get(worldId).display.worldId = worldId;
+
+        if (params.FREE_RANGE) {
+            this.resetCanvases();
+        }
     };
 
     createWorldCanvas(worldId) {
