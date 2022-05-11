@@ -71,7 +71,7 @@ class Genome {
                     let connection = {
                         in: inputNeuron,
                         out: hiddenNeuron,
-                        weight: randomWeights ? Math.random() : 0.1,
+                        weight: randomWeights ? Math.random() * 2 - 1 : 0.1,
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(inputNeuron, hiddenNeuron),
                     };
@@ -82,7 +82,7 @@ class Genome {
                     let connection = {
                         in: inputNeuron,
                         out: outputNeuron,
-                        weight: randomWeights ? Math.random() : 0.1,
+                        weight: randomWeights ? Math.random() * 2 - 1 : 0.1,
                         isEnabled: true,
                         innovation: Genome.assignInnovNum(inputNeuron, outputNeuron),
                     };
@@ -96,7 +96,7 @@ class Genome {
                 let connection = {
                     in: hiddenNeuron,
                     out: outputNeuron,
-                    weight: randomWeights ? Math.random() : 0.1,
+                    weight: randomWeights ? Math.random() * 2 - 1 : 0.1,
                     isEnabled: true,
                     innovation: Genome.assignInnovNum(hiddenNeuron, outputNeuron),
                 };
@@ -235,7 +235,6 @@ class Genome {
 
     static similarity = (genomeA, genomeB) => {
         let N = Math.max(genomeA.numConnections(), genomeB.numConnections());
-        // console.log((1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB)))
         return 1 * (Genome.numExcess(genomeA, genomeB) / N) + 1 * (Genome.numDisjoint(genomeA, genomeB) / N) + 1 * Genome.avgWeightDiff(genomeA, genomeB); 
     };
 
@@ -300,9 +299,8 @@ class Genome {
                 let newConnection = {
                     in: inNode.id,
                     out: outNode.id,
-                    weight: Math.random(),
+                    weight: Math.random() * 2 - 1,
                     isEnabled: true,
-                    mutated: true,
                     innovation: Genome.assignInnovNum(inNode.id, outNode.id)
                 };
                 Genome.addParentConnection(this.connectionGenes, this.nodeGenes, newConnection);
