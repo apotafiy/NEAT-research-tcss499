@@ -14,6 +14,7 @@ class Agent {
         this.genome = genome === undefined ? new Genome() : genome;
         this.neuralNet = new NeuralNet(this.genome);
         this.resetEnergy();
+        this.resetPelletCounts();
         this.age = 0;
         this.resetOrigin();
         this.updateBoundingCircle();
@@ -25,7 +26,7 @@ class Agent {
             // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
             // return this.energy - 10 * distance(currentPos, this.game.home.BC.center);
             // return 50 * this.energy - 0.5 * distance(this.game.home.BC.center, currentPos);
-            return this.energy;
+            return this.energy * params.FITNESS_ENERGY + this.foodEaten * params.FITNESS_FOOD + this.poisonEaten * params.FITNESS_POISON;
         };
 
         this.genome.rawFitness = fitnessFunct();
@@ -54,6 +55,11 @@ class Agent {
 
     resetEnergy() {
         this.energy = 50;
+    };
+
+    resetPelletCounts() {
+        this.foodEaten = 0;
+        this.poisonEaten = 0;
     };
 
     isInWorld() {
@@ -124,6 +130,11 @@ class Agent {
 
         spottedNeighbors.forEach(entity => { // eat food
             if (entity instanceof Food && this.BC.collide(entity.BC)) {
+                if (entity.isDecaying()) {
+                    this.poisonEaten++;
+                } else {
+                    this.foodEaten++;
+                }
                 this.energy += entity.consume();
             } 
         });

@@ -69,6 +69,18 @@ class PopulationManager {
         if (document.activeElement.id !== "compat_threshold") {
             params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
         }
+        if (document.activeElement.id !== "agent_neighbor_count") {
+            params.COMPAT_THRESH = parseInt(document.getElementById("agent_neighbor_count").value);
+        }
+        if (document.activeElement.id !== "fitness_energy") {
+            params.FITNESS_ENERGY = parseInt(document.getElementById("fitness_energy").value);
+        }
+        if (document.activeElement.id !== "fitness_food") {
+            params.FITNESS_FOOD = parseInt(document.getElementById("fitness_food").value);
+        }
+        if (document.activeElement.id !== "fitness_poison") {
+            params.FITNESS_POISON = parseInt(document.getElementById("fitness_poison").value);
+        }
         
         this.worlds.forEach((members, worldId) => {
             this.cleanupFood(worldId);
@@ -458,6 +470,7 @@ class PopulationManager {
                 agent.resetPos();
                 agent.resetOrigin();
                 agent.resetEnergy();
+                agent.resetPelletCounts();
             });
         }
 

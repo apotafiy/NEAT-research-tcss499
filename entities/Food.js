@@ -51,6 +51,10 @@ class Food {
         this.updateBoundingCircle();
     }
 
+    isDecaying() {
+        return this.state === this.states.decaying;
+    };
+
     createLifetimes() {
         const minDistribution = 0.1;
         let total = 0;
