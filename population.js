@@ -70,7 +70,7 @@ class PopulationManager {
             params.COMPAT_THRESH = parseFloat(document.getElementById("compat_threshold").value);
         }
         if (document.activeElement.id !== "agent_neighbor_count") {
-            params.COMPAT_THRESH = parseInt(document.getElementById("agent_neighbor_count").value);
+            params.AGENT_NEIGHBOR_COUNT = parseInt(document.getElementById("agent_neighbor_count").value);
         }
         if (document.activeElement.id !== "fitness_energy") {
             params.FITNESS_ENERGY = parseInt(document.getElementById("fitness_energy").value);
