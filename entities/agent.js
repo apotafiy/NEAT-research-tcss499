@@ -95,7 +95,7 @@ class Agent {
             input.push(0);
         }
 
-        if (this.energy < Agent.DEATH_ENERGY_THRESH) {
+        if (this.energy <= Agent.DEATH_ENERGY_THRESH) {
             this.leftWheel = 0;
             this.rightWheel = 0;
         } else {
