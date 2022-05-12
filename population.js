@@ -73,13 +73,13 @@ class PopulationManager {
             params.AGENT_NEIGHBOR_COUNT = parseInt(document.getElementById("agent_neighbor_count").value);
         }
         if (document.activeElement.id !== "fitness_energy") {
-            params.FITNESS_ENERGY = parseInt(document.getElementById("fitness_energy").value);
+            params.FITNESS_ENERGY = parseFloat(document.getElementById("fitness_energy").value);
         }
         if (document.activeElement.id !== "fitness_food") {
-            params.FITNESS_FOOD = parseInt(document.getElementById("fitness_food").value);
+            params.FITNESS_FOOD = parseFloat(document.getElementById("fitness_food").value);
         }
         if (document.activeElement.id !== "fitness_poison") {
-            params.FITNESS_POISON = parseInt(document.getElementById("fitness_poison").value);
+            params.FITNESS_POISON = parseFloat(document.getElementById("fitness_poison").value);
         }
         
         this.worlds.forEach((members, worldId) => {
