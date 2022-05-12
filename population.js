@@ -51,6 +51,7 @@ class PopulationManager {
         params.RAND_FOOD_PHASES = document.getElementById("rand_food_phases").checked;
         params.RAND_FOOD_LIFETIME = document.getElementById("rand_food_lifetime").checked;
         params.FOOD_PERIODIC_REPOP = document.getElementById("periodic_food_repop").checked;
+        params.RAND_DEFAULT_WEIGHTS = document.getElementById("rand_default_weights").checked;
 
         if (params.SPLIT_SPECIES && !document.getElementById("split_species").checked) {
             this.mergeWorlds();

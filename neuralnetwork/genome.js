@@ -53,7 +53,7 @@ class Genome {
         return id;
     };
 
-    static getDefault = (randomWeights = false) => {
+    static getDefault = (randomWeights = params.RAND_DEFAULT_WEIGHTS) => {
 
         let numInputs = Genome.DEFAULT_INPUTS;
         let numHiddens = Genome.DEFAULT_HIDDENS;
