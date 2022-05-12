@@ -261,7 +261,7 @@ class Genome {
         this.connectionGenes.forEach(connections => { // weight mutations
             connections.forEach(connection => {
                 if (randomInt(100) < 5) { // 5% chance of a weight mutation for every connection
-                    connection.weight = randomInt(2) === 1 ? Math.min(1, connection.weight + Math.random() * 0.1) : Math.max(-1, connection.weight - Math.random() * 0.1);
+                    connection.weight = randomInt(2) === 1 ? connection.weight + Math.random() * 0.1 : connection.weight - Math.random() * 0.1;
                 }
             });
         });
