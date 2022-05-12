@@ -30,6 +30,19 @@ class PopulationManager {
         this.resetCanvases();
     };
 
+    resetSim() {
+        PopulationManager.SPECIES_ID = 0;
+        PopulationManager.GEN_NUM = 0;
+        PopulationManager.SPECIES_CREATED = 0;
+        PopulationManager.SPECIES_COLORS = new Map();
+        PopulationManager.SPECIES_SENSOR_COLORS = new Map();
+        PopulationManager.SPECIES_MEMBERS = new Map();
+        PopulationManager.COLORS_USED = new Set();
+        PopulationManager.SENSOR_COLORS_USED = new Set();
+        Genome.resetAll();
+        this.game.population = new PopulationManager(this.game);
+    };
+
     update() {
         params.FREE_RANGE = document.getElementById("free_range").checked;
         params.AGENT_NEIGHBORS = document.getElementById("agent_neighbors").checked;
@@ -38,6 +51,13 @@ class PopulationManager {
         params.RAND_FOOD_PHASES = document.getElementById("rand_food_phases").checked;
         params.RAND_FOOD_LIFETIME = document.getElementById("rand_food_lifetime").checked;
         params.FOOD_PERIODIC_REPOP = document.getElementById("periodic_food_repop").checked;
+
+        if (params.SPLIT_SPECIES && !document.getElementById("split_species").checked) {
+            this.mergeWorlds();
+        } else if (!params.SPLIT_SPECIES && document.getElementById("split_species").checked) {
+            this.splitWorlds();
+        }
+        params.SPLIT_SPECIES = document.getElementById("split_species").checked;
 
         if (document.activeElement.id !== "food_agent_ratio") {
             params.FOOD_AGENT_RATIO = parseInt(document.getElementById("food_agent_ratio").value);
@@ -169,9 +189,12 @@ class PopulationManager {
                 repMap.set(child.speciesId, child); // child becomes representative for next children
                 compatOrder = [...repMap.keys()].sort(); // resort the compatibility ordering
 
-                this.initNewWorld(child.speciesId);
+                if (params.SPLIT_SPECIES) {
+                    this.initNewWorld(child.speciesId);
+                    this.spawnFood(child.speciesId, params.FOOD_AGENT_RATIO);
+                }
             }
-            this.worlds.get(child.speciesId).agents.push(child);
+            this.worlds.get(params.SPLIT_SPECIES ? child.speciesId : 0).agents.push(child);
         });
     };
 
@@ -197,12 +220,22 @@ class PopulationManager {
 
     agentsAsList() {
         let agents = [];
-        this.worlds.forEach((members, worldId) => {
+        this.worlds.forEach(members => {
             members.agents.forEach(agent => {
                 agents.push(agent);
             });
         });
         return agents;
+    };
+
+    foodAsList() {
+        let food = [];
+        this.worlds.forEach(members => {
+            members.food.forEach(f => {
+                food.push(f);
+            });
+        });
+        return food;
     };
 
     cleanupAgents() {
@@ -217,13 +250,15 @@ class PopulationManager {
                 extincts.push(worldId);
             }
         });
-        extincts.forEach(speciesId => {
-            this.removeWorld(speciesId);
-        });
+        if (params.SPLIT_SPECIES) {
+            extincts.forEach(speciesId => {
+                this.removeWorld(speciesId);
+            });
+        }
     };
 
     initNewWorld(worldId) {
-        const world = this.createWorldCanvas();
+        const world = this.createWorldCanvas(worldId);
         this.worlds.set(
             worldId, 
             {
@@ -256,6 +291,48 @@ class PopulationManager {
         this.worlds.get(worldId).home.removeFromWorld = true;
         this.worlds.get(worldId).food.forEach(food => food.removeFromWorld = true);
         this.worlds.delete(worldId);
+    };
+
+    mergeWorlds() {
+        let allAgents = this.agentsAsList();
+        let allFood = this.foodAsList();
+        allFood.forEach(food => food.worldId = 0); // reset the world id of all food
+        this.worlds = new Map();
+        let world = this.createWorldCanvas(0);
+        this.worlds.set(
+            0,
+            {
+                agents: allAgents,
+                food: allFood,
+                home: new HomeBase(this.game, params.CANVAS_SIZE / 2, params.CANVAS_SIZE / 2),
+                ctx: world.getContext("2d"),
+                canvas: world,
+                display: new DataDisplay(this.game)
+            }
+        );
+        this.worlds.get(0).home.worldId = 0;
+        this.worlds.get(0).display.worldId = 0;
+        this.resetCanvases();
+    };
+
+    splitWorlds() {
+       let allAgents = this.agentsAsList();
+       let allFood = this.foodAsList();
+       this.worlds = new Map();
+       allAgents.forEach(agent => {
+            if (this.worlds.get(agent.speciesId) === undefined) {
+                this.initNewWorld(agent.speciesId);
+            }
+            this.worlds.get(agent.speciesId).agents.push(agent);
+        });
+        let worldIds = [...this.worlds.keys()];
+        let index = 0;
+        allFood.forEach(f => {
+            f.worldId = worldIds[index];
+            this.worlds.get(worldIds[index]).food.push(f);
+            index = (index + 1) % worldIds.length;
+        });
+        this.resetCanvases();
     };
 
     resetCanvases() {

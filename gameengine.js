@@ -18,7 +18,12 @@ class GameEngine {
     };
 
     init() {
+        this.startInput();
         this.timer = new Timer();
+    };
+
+    startInput() {
+        document.getElementById("restart_sim").addEventListener("click", () => this.population.resetSim());
     };
 
     start() {

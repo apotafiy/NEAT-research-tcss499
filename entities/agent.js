@@ -74,7 +74,7 @@ class Agent {
         let oldPos = { x: this.x, y: this.y };
 
         let spottedNeighbors = [];
-        let entities = this.game.population.getEntitiesInWorld(this.speciesId, !params.AGENT_NEIGHBORS);
+        let entities = this.game.population.getEntitiesInWorld(params.SPLIT_SPECIES ? this.speciesId : 0, !params.AGENT_NEIGHBORS);
         entities.forEach(entity => {
             if (entity !== this && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
                 spottedNeighbors.push(entity);
@@ -95,9 +95,14 @@ class Agent {
             input.push(0);
         }
 
-        let wheels = this.neuralNet.processInput(input);
-        this.leftWheel = wheels[0];
-        this.rightWheel = wheels[1];
+        if (this.energy < Agent.DEATH_ENERGY_THRESH) {
+            this.leftWheel = 0;
+            this.rightWheel = 0;
+        } else {
+            let wheels = this.neuralNet.processInput(input);
+            this.leftWheel = wheels[0];
+            this.rightWheel = wheels[1];
+        }
 
         let dh = this.wheelRadius / this.diameter * this.maxVelocity * (this.rightWheel - this.leftWheel);   
         let dx = (this.wheelRadius / 2) * this.maxVelocity * (this.rightWheel + this.leftWheel) * Math.cos(this.heading);
@@ -112,40 +117,31 @@ class Agent {
             this.heading -= 2 * Math.PI;
         }
 
-        if (this.heading < 0) {
-            console.log("uh oh!");
-        }
-
-        if (Math.abs(wheels[0]) > 1 || Math.abs(wheels[1]) > 1) {
-            console.log("invalid output for a wheel!");
-        }
-
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
         // this.energy -= displacement / 20;
-        this.energy -= 0.2;
+        this.energy -= 0.1;
 
-        if (params.FREE_RANGE && this.energy < Agent.DEATH_ENERGY_THRESH) {
-            this.removeFromWorld = true;
-        } else {
-            spottedNeighbors.forEach(entity => { // eat food
-                if (entity instanceof Food && this.BC.collide(entity.BC)) {
-                    this.energy += entity.consume();
-                } 
+        spottedNeighbors.forEach(entity => { // eat food
+            if (entity instanceof Food && this.BC.collide(entity.BC)) {
+                this.energy += entity.consume();
+            } 
+        });
+
+        if (params.FREE_RANGE) { // check for reproduction if in free range mode
+            let agents = this.game.population.getEntitiesInWorld(params.SPLIT_SPECIES ? this.speciesId : 0, false, true);
+            agents.forEach(entity => {
+                if (entity !== this && this.energy >= 25 && entity.energy >= 25 && entity.BC.collide(this.BC)) {
+                    let childGenome = Genome.crossover(this.genome, entity.genome);
+                    childGenome.mutate();
+                    let child = new Agent(this.game, this.x, this.y, childGenome);
+                    this.energy -= 25;
+                    entity.energy -= 25;
+                    // this.removeFromWorld = this.energy < Agent.DEATH_ENERGY_THRESH;
+                    // entity.removeFromWorld = entity.energy < Agent.DEATH_ENERGY_THRESH;
+                    this.game.population.registerChildAgents([child]);
+                }
             });
-            if (params.FREE_RANGE) { // check for reproduction if in free range mode
-                let agents = this.game.population.getEntitiesInWorld(this.speciesId, false, true);
-                agents.forEach(entity => {
-                    if (entity !== this && this.energy >= 25 && entity.energy >= 25 && entity.BC.collide(this.BC)) {
-                        let child = new Agent(this.game, this.x, this.y, Genome.crossover(this.genome, entity.genome));
-                        this.energy -= 25;
-                        entity.energy -= 25;
-                        this.removeFromWorld = this.energy < Agent.DEATH_ENERGY_THRESH;
-                        entity.removeFromWorld = entity.energy < Agent.DEATH_ENERGY_THRESH;
-                        this.game.population.registerChildAgents([child]);
-                    }
-                });
-            }
         }
 
         if (!this.removeFromWorld) {

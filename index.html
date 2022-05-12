@@ -51,6 +51,12 @@
         </button>
     </div>
     <div>
+        <strong>DYNAMIC SIMULATION PARAMETERS</strong>
+    </div>
+    <div>
+        <input type="checkbox" id="split_species" checked="true"> Split Species
+    </div>
+    <div>
         <input type="checkbox" id="agent_neighbors"> Agent Neighbors
     </div>
     <div>
@@ -72,7 +78,10 @@
         <input type="checkbox" id="free_range"> FREE RANGE MODE
     </div>
     <div>
-        <br> </br><strong>NOTE TO USER:</strong> The following numeric inputs take effect after clicking out of the input field.
+        <button type="button" id="restart_sim">Restart Simulation</button>
+    </div>
+    <div>
+        <br> </br><strong>NOTE TO USER:</strong> The following parameters take effect after clicking out of the input field.
     </div>
     <div>
         <input type="text" id="agent_vision_radius" value="400"> Agent Visual Radius (pixels)

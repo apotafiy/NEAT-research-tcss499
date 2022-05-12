@@ -24,6 +24,13 @@ class Genome {
         Genome.INNOV_MAP = new ConnectionMap();
     };
 
+    static resetAll = () => {
+        Genome.INNOV_MAP = new ConnectionMap();
+        Genome.NODE_ID_MAP = new Map();
+        Genome.INNOV_NUM = 0;
+        Genome.NODE_ID = Genome.DEFAULT_INPUTS + Genome.DEFAULT_HIDDENS + Genome.DEFAULT_OUTPUTS;
+    };
+
     static assignInnovNum = (inId, outId) => {
         let innovNumber;
         if (Genome.INNOV_MAP.get([inId, outId]) !== undefined) { // check if we have already created a number for this connection
@@ -46,7 +53,7 @@ class Genome {
         return id;
     };
 
-    static getDefault = (randomWeights = true) => {
+    static getDefault = (randomWeights = false) => {
 
         let numInputs = Genome.DEFAULT_INPUTS;
         let numHiddens = Genome.DEFAULT_HIDDENS;
