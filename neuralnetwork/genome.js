@@ -28,6 +28,7 @@ class Genome {
         Genome.INNOV_MAP = new ConnectionMap();
         Genome.NODE_ID_MAP = new Map();
         Genome.INNOV_NUM = 0;
+        Genome.DEFAULT_INPUTS = 3 * params.AGENT_NEIGHBOR_COUNT + 1;
         Genome.NODE_ID = Genome.DEFAULT_INPUTS + Genome.DEFAULT_HIDDENS + Genome.DEFAULT_OUTPUTS;
     };
 
