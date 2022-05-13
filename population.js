@@ -8,7 +8,7 @@ class PopulationManager {
     static SPECIES_MEMBERS = new Map();
     static COLORS_USED = new Set();
     static SENSOR_COLORS_USED = new Set();
-    static MIN_AGENTS = 70;
+    static MIN_AGENTS = 50;
 
     constructor(game) {
         this.game = game;
