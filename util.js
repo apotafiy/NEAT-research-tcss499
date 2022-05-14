@@ -18,7 +18,7 @@ const params = {
     FITNESS_ENERGY: 1,
     FITNESS_FOOD: 10,
     FITNESS_POISON: -10,
-    GEN_STOP: true
+    GEN_STOP: false
 };
 
 /**
