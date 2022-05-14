@@ -126,10 +126,10 @@ class Agent {
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
         // this.energy -= displacement / 20;
-        this.energy -= 0.1;
+        this.energy -= 0.2;
 
         spottedNeighbors.forEach(entity => { // eat food
-            if (entity instanceof Food && this.BC.collide(entity.BC)) {
+            if (entity instanceof Food && this.BC.collide(entity.BC) && this.energy > Agent.DEATH_ENERGY_THRESH) {
                 if (entity.isDecaying()) {
                     this.poisonEaten++;
                 } else {

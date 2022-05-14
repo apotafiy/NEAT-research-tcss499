@@ -17,7 +17,8 @@ const params = {
     AGENT_NEIGHBOR_COUNT: 5,
     FITNESS_ENERGY: 1,
     FITNESS_FOOD: 10,
-    FITNESS_POISON: -10
+    FITNESS_POISON: -10,
+    GEN_STOP: true
 };
 
 /**

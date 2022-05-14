@@ -52,6 +52,7 @@ class PopulationManager {
         params.RAND_FOOD_LIFETIME = document.getElementById("rand_food_lifetime").checked;
         params.FOOD_PERIODIC_REPOP = document.getElementById("periodic_food_repop").checked;
         params.RAND_DEFAULT_WEIGHTS = document.getElementById("rand_default_weights").checked;
+        params.GEN_STOP = document.getElementById("gen_stop").checked;
 
         if (params.SPLIT_SPECIES && !document.getElementById("split_species").checked) {
             this.mergeWorlds();
@@ -90,7 +91,7 @@ class PopulationManager {
         });
         
         this.tickCounter++;
-        if (this.tickCounter === params.GEN_TICKS) { // we've reached the end of the generation
+        if ((this.tickCounter >= params.GEN_TICKS && !params.GEN_STOP) || (params.GEN_STOP && (this.isAgentEnergyGone() || this.isFoodGone()))) { // we've reached the end of the generation
             this.tickCounter = 0;
             this.processGeneration();
             if (document.activeElement.id !== "generation_time") {
@@ -99,6 +100,26 @@ class PopulationManager {
             return true;
         }
         return false;
+    };
+
+    isFoodGone() {
+        let food = this.foodAsList();
+        for (let i = 0; i < food.length; i++) {
+            if (!food[i].removeFromWorld) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    isAgentEnergyGone() {
+        let agents = this.agentsAsList();
+        for (let i = 0; i < agents.length; i++) {
+            if (agents[i].energy > Agent.DEATH_ENERGY_THRESH) {
+                return false;
+            }
+        }
+        return true;
     };
 
     cleanupFood(worldId) {
