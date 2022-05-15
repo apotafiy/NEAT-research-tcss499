@@ -5,7 +5,7 @@ const params = {
     GEN_TICKS: 1000,
     AGENT_NEIGHBORS: false,
     FOOD_AGENT_RATIO: 5,
-    COMPAT_THRESH: 0.075,
+    COMPAT_THRESH: 0.07,
     ENFORCE_MIN_FOOD: false,
     AGENT_VISION_RADIUS: 500,
     RAND_FOOD_PHASES: true,
@@ -15,9 +15,9 @@ const params = {
     SPLIT_SPECIES: true,
     RAND_DEFAULT_WEIGHTS: false,
     AGENT_NEIGHBOR_COUNT: 5,
-    FITNESS_ENERGY: 1,
-    FITNESS_FOOD: 10,
-    FITNESS_POISON: -10,
+    FITNESS_ENERGY: 0.25,
+    FITNESS_FOOD: 30,
+    FITNESS_POISON: -45,
     GEN_STOP: false
 };
 

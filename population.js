@@ -167,7 +167,7 @@ class PopulationManager {
     spawnFood(worldId, count = params.FOOD_AGENT_RATIO * this.worlds.get(worldId).agents.length) {
         let seedlings = [];
         for (let i = 0; i < count; i++) { // add food sources
-            let randomDist = randomInt(params.CANVAS_SIZE / 2);
+            let randomDist = randomInt(params.CANVAS_SIZE / 2 - params.CANVAS_SIZE / 5 + 1) + params.CANVAS_SIZE / 5;
             let randomAngle = randomInt(360) * Math.PI / 180;
             let x = params.CANVAS_SIZE / 2 + randomDist * Math.cos(randomAngle);
             let y = params.CANVAS_SIZE / 2 + randomDist * Math.sin(randomAngle);

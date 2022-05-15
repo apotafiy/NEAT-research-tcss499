@@ -117,6 +117,8 @@ class Agent {
         this.y += dy;
         this.heading += dh;
 
+        this.updateBoundingCircle();
+
         if (this.heading < 0) {
             this.heading += 2 * Math.PI;
         } else if (this.heading >= 2 * Math.PI) {
@@ -125,8 +127,8 @@ class Agent {
 
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
-        // this.energy -= displacement / 20;
-        this.energy -= 0.2;
+        this.energy -= (this.diameter / 20) * (displacement / 10) / 2;
+        this.energy -= 0.1;
 
         spottedNeighbors.forEach(entity => { // eat food
             if (entity instanceof Food && this.BC.collide(entity.BC) && this.energy > Agent.DEATH_ENERGY_THRESH) {
@@ -138,6 +140,14 @@ class Agent {
                 this.energy += entity.consume();
             } 
         });
+
+        // let addOn = 0;
+        // if (this.energy > params.FOOD_AGENT_RATIO * 50) {
+        //     addOn = 10 * Math.min(1, (this.energy - (params.FOOD_AGENT_RATIO * 50)) / (params.FOOD_AGENT_RATIO * (150 - 50)));
+        // }
+        // this.diameter = 10 + addOn;
+
+        // this.updateBoundingCircle();
 
         if (params.FREE_RANGE) { // check for reproduction if in free range mode
             let agents = this.game.population.getEntitiesInWorld(params.SPLIT_SPECIES ? this.speciesId : 0, false, true);
@@ -153,10 +163,6 @@ class Agent {
                     this.game.population.registerChildAgents([child]);
                 }
             });
-        }
-
-        if (!this.removeFromWorld) {
-            this.updateBoundingCircle();
         }
     };
 
