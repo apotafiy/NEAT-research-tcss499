@@ -76,11 +76,11 @@ class PopulationManager {
         if (document.activeElement.id !== "fitness_energy") {
             params.FITNESS_ENERGY = parseFloat(document.getElementById("fitness_energy").value);
         }
-        if (document.activeElement.id !== "fitness_food") {
-            params.FITNESS_FOOD = parseFloat(document.getElementById("fitness_food").value);
+        if (document.activeElement.id !== "fitness_calories") {
+            params.FITNESS_CALORIES = parseFloat(document.getElementById("fitness_calories").value);
         }
-        if (document.activeElement.id !== "fitness_poison") {
-            params.FITNESS_POISON = parseFloat(document.getElementById("fitness_poison").value);
+        if (document.activeElement.id !== "fitness_bad_calories") {
+            params.FITNESS_BAD_CALORIES = parseFloat(document.getElementById("fitness_bad_calories").value);
         }
         
         this.worlds.forEach((members, worldId) => {
@@ -491,7 +491,7 @@ class PopulationManager {
                 agent.resetPos();
                 agent.resetOrigin();
                 agent.resetEnergy();
-                agent.resetPelletCounts();
+                agent.resetCalorieCounts();
             });
         }
 
