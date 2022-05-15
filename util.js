@@ -2,15 +2,19 @@
 const params = {
     CANVAS_SIZE: 800,
     FOOD_OUTSIDE: false,
+    FOOD_INSIDE: false,
     GEN_TICKS: 1000,
     AGENT_NEIGHBORS: false,
-    FOOD_AGENT_RATIO: 5,
+    FOOD_AGENT_RATIO: 3,
+    POISON_AGENT_RATIO: 1,
     COMPAT_THRESH: 0.07,
     ENFORCE_MIN_FOOD: false,
+    ENFORCE_MIN_POISON: false,
     AGENT_VISION_RADIUS: 500,
     RAND_FOOD_PHASES: true,
     RAND_FOOD_LIFETIME: false,
     FOOD_PERIODIC_REPOP: true,
+    POISON_PERIODIC_REPOP: true,
     FREE_RANGE: false,
     SPLIT_SPECIES: true,
     RAND_DEFAULT_WEIGHTS: false,
@@ -18,7 +22,8 @@ const params = {
     FITNESS_ENERGY: 1,
     FITNESS_CALORIES: 1,
     FITNESS_BAD_CALORIES: -1,
-    GEN_STOP: false
+    GEN_STOP: false,
+    NUM_AGENTS: 50
 };
 
 /**

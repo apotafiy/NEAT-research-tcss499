@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>TCSS 499 NEAT Simulation</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="./util.js"></script>
     <script type="text/javascript" src="./data/GenomeTracker.js"></script>
     <script type="text/javascript" src="./data/AgentTracker.js"></script>
     <script type="text/javascript" src="./entities/agent.js"></script>
@@ -21,7 +22,6 @@
     <script type="text/javascript" src="./datadisplay.js"></script>
     <script type="text/javascript" src="./timer.js"></script>
     <script type="text/javascript" src="./gameengine.js"></script>
-    <script type="text/javascript" src="./util.js"></script>
     <script type="text/javascript" src="./main.js"></script>
     <script type="text/javascript" src="./neuralnetwork/genome.js"></script>
 <!-- CSS only -->
@@ -63,19 +63,28 @@
         <input type="checkbox" id="agent_neighbors"> Agent Neighbors
     </div>
     <div>
-        <input type="checkbox" id="food_outside_circle"> Food Outside Circle
+        <input type="checkbox" id="food_outside_circle"> Food Outside Outer Circle
+    </div>
+    <div>
+        <input type="checkbox" id="food_inside_circle"> Food Inside Inner Circle
     </div>
     <div>
         <input type="checkbox" id="enforce_min_food"> Enforce Minimum Food
     </div>
     <div>
-        <input type="checkbox" id="rand_food_phases" checked="true"> Randomize Food Phase Time
+        <input type="checkbox" id="enforce_min_poison"> Enforce Minimum Poison
     </div>
     <div>
-        <input type="checkbox" id="rand_food_lifetime"> Randomize Food Lifetime
+        <input type="checkbox" id="rand_food_phases" checked="true"> Randomize Food and Poison Phase Times
+    </div>
+    <div>
+        <input type="checkbox" id="rand_food_lifetime"> Randomize Food and Poison Lifetimes
     </div>
     <div>
         <input type="checkbox" id="periodic_food_repop" checked="true"> Periodically Repopulate Food
+    </div>
+    <div>
+        <input type="checkbox" id="periodic_poison_repop" checked="true"> Periodically Repopulate Poison
     </div>
     <div>
         <input type="checkbox" id="free_range"> FREE RANGE MODE
@@ -88,6 +97,9 @@
     </div>
     <div>
         <br> </br><strong>NOTE TO USER:</strong> The following parameters take effect after clicking out of the input field.
+    </div>
+    <div>
+        <input type="text" id="num_agents" value="50"> Number of Agents in Simulation (restart to take effect)
     </div>
     <div>
         <input type="text" id="agent_neighbor_count" value="5"> Neighbors Detected by Agents (restart to take effect)
@@ -103,6 +115,9 @@
     </div>
     <div>
         <input type="text" id="food_agent_ratio" value="5"> Food to Agent Ratio
+    </div>
+    <div>
+        <input type="text" id="poison_agent_ratio" value="1"> Poison to Agent Ratio
     </div>
     <div>
         <br> </br><strong>Agent Fitness Function:</strong><br> </br> <input type="text" id="fitness_energy" value="1"> (Raw Energy) + <input type="text" id="fitness_calories" value="1"> (Calories Eaten) + <input type="text" id="fitness_bad_calories" value="-1"> (Poison Calories Eaten)
