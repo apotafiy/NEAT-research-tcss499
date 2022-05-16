@@ -1,6 +1,7 @@
 class Agent {
 
     static DEATH_ENERGY_THRESH = 0;
+    static START_ENERGY = 100;
 
     constructor(game, x, y, genome = undefined) {
         Object.assign(this, {game, x, y});
@@ -54,7 +55,7 @@ class Agent {
     };
 
     resetEnergy() {
-        this.energy = 50;
+        this.energy = Agent.START_ENERGY;
     };
 
     resetCalorieCounts() {
@@ -91,7 +92,7 @@ class Agent {
         let input = [];
 
         input.push(1); // bias node always = 1
-        for (let i = 0; i < Math.min(spottedNeighbors.length, 5); i++) {
+        for (let i = 0; i < Math.min(spottedNeighbors.length, params.AGENT_NEIGHBOR_COUNT); i++) {
             let neighbor = spottedNeighbors[i];
             input.push(normalizeHue(neighbor.getHue()));
             input.push(normalizeAngle(this.getRelativeAngle({ x: neighbor.x - this.x, y: neighbor.y - this.y })));
@@ -153,12 +154,12 @@ class Agent {
         if (params.FREE_RANGE) { // check for reproduction if in free range mode
             let agents = this.game.population.getEntitiesInWorld(params.SPLIT_SPECIES ? this.speciesId : 0, false, true);
             agents.forEach(entity => {
-                if (entity !== this && this.energy >= 25 && entity.energy >= 25 && entity.BC.collide(this.BC)) {
+                if (entity !== this && this.energy >= Agent.START_ENERGY / 2 && entity.energy >= Agent.START_ENERGY / 2 && entity.BC.collide(this.BC)) {
                     let childGenome = Genome.crossover(this.genome, entity.genome);
                     childGenome.mutate();
                     let child = new Agent(this.game, this.x, this.y, childGenome);
-                    this.energy -= 25;
-                    entity.energy -= 25;
+                    this.energy -= Agent.START_ENERGY / 2;
+                    entity.energy -= Agent.START_ENERGY / 2;
                     // this.removeFromWorld = this.energy < Agent.DEATH_ENERGY_THRESH;
                     // entity.removeFromWorld = entity.energy < Agent.DEATH_ENERGY_THRESH;
                     this.game.population.registerChildAgents([child]);

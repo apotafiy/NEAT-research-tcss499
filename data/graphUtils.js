@@ -45,7 +45,8 @@ const generateCurrentFitnessChart = (data) => {
         options: {
             scales: {
                 y: {
-                    min: Math.max(Math.floor(min - 100), 0),
+                    // min: Math.max(Math.floor(min - 100), 0),
+                    beginAtZero: true
                 },
             },
             elements: {
@@ -113,7 +114,7 @@ const generateNodeChart = (data) => {
         options: {
             scales: {
                 y: {
-                    min: 10,
+                    beginAtZero: true
                 },
             },
             elements: {
@@ -181,6 +182,7 @@ const generateCycleChart = (data) => {
         options: {
             scales: {
                 y: {
+                    // min: 10
                     beginAtZero: true,
                 },
             },
@@ -249,8 +251,8 @@ const generateConnectionChart = (data) => {
         options: {
             scales: {
                 y: {
-                    min: 25,
-                    // beginAtZero: true,
+                    // min: 25,
+                    beginAtZero: true,
                 },
             },
             elements: {

@@ -12,12 +12,6 @@ class NeuralNet {
         let wheels = [];
         let inputIndex = 0;
 
-        if (this.sortedNodes === false) {
-            console.log("we have a problem")
-            console.log(this.nodes)
-            console.log(this.edges)
-        }
-
         this.sortedNodes.forEach(nodeId => {
             let currNode = this.nodes.get(nodeId);
             if (currNode.type === Genome.NODE_TYPES.input) { // assign values to input neurons
