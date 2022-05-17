@@ -31,7 +31,7 @@
 </head>
 <body>
     <!-- <canvas id="gameWorld" width="800" height="800" style="background: white; border: 1px solid black" tabindex="0"></canvas> -->
-    <div style="float: left; width: 850px" id="carouselExampleIndicators" class="carousel carousel-dark" data-bs-ride="carousel">
+    <div style="float: left; width: 850px" id="carouselCanvasIndicators" class="carousel carousel-dark" data-bs-ride="carousel">
         <div id="canvas-indicators" class="carousel-indicators">
         </div>
         <div style="padding-left: 0;
@@ -41,11 +41,11 @@
         display: block;
         width: 805px;" id="canvas-carousel" class="carousel-inner">
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselCanvasIndicators" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselCanvasIndicators" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
         </button>
@@ -122,7 +122,28 @@
     <div>
         <br> </br><strong>Agent Fitness Function:</strong><br> </br> <input type="text" id="fitness_energy" value="1"> (Raw Energy) + <input type="text" id="fitness_calories" value="1"> (Calories Eaten) + <input type="text" id="fitness_bad_calories" value="-1"> (Poison Calories Eaten)
     </div>
-    <div id="charts" style="float: left; width: 50%">
+    <div id="charts" style="float: left; width: 50%; margin-top: 100px;">
+        <div id="carouselExampleIndicators" class="carousel carousel-dark" data-bs-ride="carousel">
+            <div id="fitness-indicators" class="carousel-indicators">
+            </div>
+            <div id="fitness-carousel" class="carousel-inner">
+            </div>
+            <!--<div style="padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            width: 805px;" id="fitness-carousel" class="carousel-inner">
+            </div> -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
         <div id="currentFitnessChartContainer">
             <div id="currentFitnessChart"></div>
         </div>
