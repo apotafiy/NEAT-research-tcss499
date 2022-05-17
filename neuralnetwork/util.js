@@ -1,4 +1,4 @@
-const normalizeHue = (hue) => (hue - 60) / (315 - 60);
+const normalizeHue = (hue) => 2 * (hue - 30) / (330 - 30) - 1;
 
 const normalizeAngle = (a) => a / Math.PI;
 
@@ -8,7 +8,7 @@ const relativeLeft = (heading, vectAngle) => (heading < vectAngle ? heading + (2
 
 const relativeRight = (heading, vectAngle) => heading < vectAngle ? vectAngle - heading : vectAngle + (2 * Math.PI - heading);
 
-const randomBlueHue = () => randomInt(31) + 225;
+const randomBlueHue = () => randomFloat(31) + 225;
 
 const topoSort = (nodes, edges) => {
     let inMap = new Map();

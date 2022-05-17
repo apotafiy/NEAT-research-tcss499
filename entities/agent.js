@@ -1,6 +1,7 @@
 class Agent {
 
     static DEATH_ENERGY_THRESH = 0;
+    static START_ENERGY = 100;
 
     constructor(game, x, y, genome = undefined) {
         Object.assign(this, {game, x, y});
@@ -14,6 +15,7 @@ class Agent {
         this.genome = genome === undefined ? new Genome() : genome;
         this.neuralNet = new NeuralNet(this.genome);
         this.resetEnergy();
+        this.resetCalorieCounts();
         this.age = 0;
         this.resetOrigin();
         this.updateBoundingCircle();
@@ -25,7 +27,7 @@ class Agent {
             // return distance(this.origin, currentPos) - 10 * distance(this.game.home.BC.center, currentPos);
             // return this.energy - 10 * distance(currentPos, this.game.home.BC.center);
             // return 50 * this.energy - 0.5 * distance(this.game.home.BC.center, currentPos);
-            return this.energy;
+            return this.energy * params.FITNESS_ENERGY + this.caloriesEaten * params.FITNESS_CALORIES + this.badCaloriesEaten * params.FITNESS_BAD_CALORIES;
         };
 
         this.genome.rawFitness = fitnessFunct();
@@ -53,7 +55,12 @@ class Agent {
     };
 
     resetEnergy() {
-        this.energy = 50;
+        this.energy = Agent.START_ENERGY;
+    };
+
+    resetCalorieCounts() {
+        this.caloriesEaten = 0;
+        this.badCaloriesEaten = 0;
     };
 
     isInWorld() {
@@ -74,7 +81,7 @@ class Agent {
         let oldPos = { x: this.x, y: this.y };
 
         let spottedNeighbors = [];
-        let entities = this.game.population.getEntitiesInWorld(this.speciesId, !params.AGENT_NEIGHBORS);
+        let entities = this.game.population.getEntitiesInWorld(params.SPLIT_SPECIES ? this.speciesId : 0, !params.AGENT_NEIGHBORS);
         entities.forEach(entity => {
             if (entity !== this && !entity.removeFromWorld && distance(entity.BC.center, this.BC.center) <= params.AGENT_VISION_RADIUS) {
                 spottedNeighbors.push(entity);
@@ -85,7 +92,7 @@ class Agent {
         let input = [];
 
         input.push(1); // bias node always = 1
-        for (let i = 0; i < Math.min(spottedNeighbors.length, 5); i++) {
+        for (let i = 0; i < Math.min(spottedNeighbors.length, params.AGENT_NEIGHBOR_COUNT); i++) {
             let neighbor = spottedNeighbors[i];
             input.push(normalizeHue(neighbor.getHue()));
             input.push(normalizeAngle(this.getRelativeAngle({ x: neighbor.x - this.x, y: neighbor.y - this.y })));
@@ -95,9 +102,14 @@ class Agent {
             input.push(0);
         }
 
-        let wheels = this.neuralNet.processInput(input);
-        this.leftWheel = wheels[0];
-        this.rightWheel = wheels[1];
+        if (this.energy <= Agent.DEATH_ENERGY_THRESH) {
+            this.leftWheel = 0;
+            this.rightWheel = 0;
+        } else {
+            let wheels = this.neuralNet.processInput(input);
+            this.leftWheel = wheels[0];
+            this.rightWheel = wheels[1];
+        }
 
         let dh = this.wheelRadius / this.diameter * this.maxVelocity * (this.rightWheel - this.leftWheel);   
         let dx = (this.wheelRadius / 2) * this.maxVelocity * (this.rightWheel + this.leftWheel) * Math.cos(this.heading);
@@ -106,43 +118,53 @@ class Agent {
         this.y += dy;
         this.heading += dh;
 
+        this.updateBoundingCircle();
+
         if (this.heading < 0) {
             this.heading += 2 * Math.PI;
         } else if (this.heading >= 2 * Math.PI) {
             this.heading -= 2 * Math.PI;
         }
 
-        if (this.heading < 0) {
-            console.log("uh oh!");
-        }
-
-        if (Math.abs(wheels[0]) > 1 || Math.abs(wheels[1]) > 1) {
-            console.log("invalid output for a wheel!");
-        }
-
         // uncomment this code to implement agent metabolism
         let displacement = distance(oldPos, { x: this.x, y: this.y });
-        // this.energy -= displacement / 20;
-        this.energy -= 0.2;
+        this.energy -= (this.diameter / 20) * (displacement / 10) / 2;
+        this.energy -= 0.1;
 
-        if (params.FREE_RANGE && (this.energy < Agent.DEATH_ENERGY_THRESH || !(this.isInWorld()))) {
-            this.removeFromWorld = true;
-        } else {
-            spottedNeighbors.forEach(entity => { // eat food
-                if (entity instanceof Food && this.BC.collide(entity.BC)) {
-                    this.energy += entity.consume();
-                } else if (params.FREE_RANGE && entity !== this && entity instanceof Agent && this.speciesId === entity.speciesId && this.BC.collide(entity.BC)) {
-                    if (this.energy >= 25 && entity.energy >= 25) {
-                        let child = new Agent(this.game, this.x, this.y, Genome.crossover(this.genome, entity.genome));
-                        this.energy -= 25;
-                        entity.energy -= 25;
-                        this.removeFromWorld = this.energy >= Agent.DEATH_ENERGY_THRESH;
-                        entity.removeFromWorld = entity.energy >= Agent.DEATH_ENERGY_THRESH;
-                        this.game.population.registerChildAgents([child]);
-                    }
+        spottedNeighbors.forEach(entity => { // eat food
+            if (entity instanceof Food && this.BC.collide(entity.BC) && this.energy > Agent.DEATH_ENERGY_THRESH) {
+                let cals = entity.consume();
+                if (cals < 0) {
+                    this.badCaloriesEaten += Math.abs(cals);
+                } else {
+                    this.caloriesEaten += cals;
+                }
+                this.energy += cals;
+            } 
+        });
+
+        // let addOn = 0;
+        // if (this.energy > params.FOOD_AGENT_RATIO * 50) {
+        //     addOn = 10 * Math.min(1, (this.energy - (params.FOOD_AGENT_RATIO * 50)) / (params.FOOD_AGENT_RATIO * (150 - 50)));
+        // }
+        // this.diameter = 10 + addOn;
+
+        // this.updateBoundingCircle();
+
+        if (params.FREE_RANGE) { // check for reproduction if in free range mode
+            let agents = this.game.population.getEntitiesInWorld(params.SPLIT_SPECIES ? this.speciesId : 0, false, true);
+            agents.forEach(entity => {
+                if (entity !== this && this.energy >= Agent.START_ENERGY / 2 && entity.energy >= Agent.START_ENERGY / 2 && entity.BC.collide(this.BC)) {
+                    let childGenome = Genome.crossover(this.genome, entity.genome);
+                    childGenome.mutate();
+                    let child = new Agent(this.game, this.x, this.y, childGenome);
+                    this.energy -= Agent.START_ENERGY / 2;
+                    entity.energy -= Agent.START_ENERGY / 2;
+                    // this.removeFromWorld = this.energy < Agent.DEATH_ENERGY_THRESH;
+                    // entity.removeFromWorld = entity.energy < Agent.DEATH_ENERGY_THRESH;
+                    this.game.population.registerChildAgents([child]);
                 }
             });
-            this.updateBoundingCircle();
         }
     };
 

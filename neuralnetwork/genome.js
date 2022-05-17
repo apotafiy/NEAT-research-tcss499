@@ -1,6 +1,6 @@
 class Genome {
 
-    static DEFAULT_INPUTS = 16;
+    static DEFAULT_INPUTS = 3 * params.AGENT_NEIGHBOR_COUNT + 1;
 
     static DEFAULT_HIDDENS = 0;
 
@@ -22,6 +22,14 @@ class Genome {
 
     static resetInnovations = () => { // this function must be called whenever a new set of agents is created
         Genome.INNOV_MAP = new ConnectionMap();
+    };
+
+    static resetAll = () => {
+        Genome.INNOV_MAP = new ConnectionMap();
+        Genome.NODE_ID_MAP = new Map();
+        Genome.INNOV_NUM = 0;
+        Genome.DEFAULT_INPUTS = 3 * params.AGENT_NEIGHBOR_COUNT + 1;
+        Genome.NODE_ID = Genome.DEFAULT_INPUTS + Genome.DEFAULT_HIDDENS + Genome.DEFAULT_OUTPUTS;
     };
 
     static assignInnovNum = (inId, outId) => {
@@ -46,7 +54,7 @@ class Genome {
         return id;
     };
 
-    static getDefault = (randomWeights = false) => {
+    static getDefault = (randomWeights = params.RAND_DEFAULT_WEIGHTS) => {
 
         let numInputs = Genome.DEFAULT_INPUTS;
         let numHiddens = Genome.DEFAULT_HIDDENS;
@@ -253,7 +261,7 @@ class Genome {
         this.connectionGenes.forEach(connections => { // weight mutations
             connections.forEach(connection => {
                 if (randomInt(100) < 5) { // 5% chance of a weight mutation for every connection
-                    connection.weight = randomInt(2) === 1 ? Math.min(1, connection.weight + Math.random() * 0.1) : Math.max(-1, connection.weight - Math.random() * 0.1);
+                    connection.weight = randomInt(2) === 1 ? connection.weight + Math.random() * 0.1 : connection.weight - Math.random() * 0.1;
                 }
             });
         });

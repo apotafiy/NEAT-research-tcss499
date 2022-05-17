@@ -20,29 +20,29 @@ class Food {
             {
                 lifeSpan: lifespans[0],
                 radius: 3,
-                color: 'hsl(285, 100%, 50%)',
+                color: this.isPoison? 120 : 270,
                 calories: 50,
                 isSet: false,
             },
             {
                 lifeSpan: lifespans[1],
                 radius: 5,
-                color: 'hsl(300, 100%, 50%)',
+                color: this.isPoison? 90 : 300,
                 calories: 100,
                 isSet: false,
             },
             {
                 lifeSpan: lifespans[2],
                 radius: 7,
-                color: 'hsl(315, 100%, 50%)',
+                color: this.isPoison? 60 : 330,
                 calories: 150,
                 isSet: false,
             },
             {
                 lifeSpan: lifespans[3],
                 radius: 7,
-                color: 'hsl(60, 100%, 50%)',
-                calories: -100,
+                color: 30,
+                calories: -200,
                 isSet: false,
             },
         ]; // the properties of the entity at each state
@@ -50,6 +50,10 @@ class Food {
         this.ticksToNext = this.properties[this.states.seed].lifeSpan;
         this.updateBoundingCircle();
     }
+
+    isDecaying() {
+        return this.state === this.states.decaying;
+    };
 
     createLifetimes() {
         const minDistribution = 0.1;
@@ -74,8 +78,7 @@ class Food {
     };
 
     getHue() {
-        let commaIndex = this.properties[this.state].color.indexOf(",");
-        return parseFloat(this.properties[this.state].color.substring(4, commaIndex));
+        return this.properties[this.state].color;
     };
 
     updateBoundingCircle() {
@@ -101,8 +104,8 @@ class Food {
     reproduce() {
         const maxChildCount = 3;
         let numAgents = this.game.population.worlds.get(this.worldId).agents.length;
-        let numFood = this.game.population.worlds.get(this.worldId).food.length;
-        let numChildren = numFood > numAgents * params.FOOD_AGENT_RATIO ? randomInt(2) : randomInt(maxChildCount) + 1;
+        let numFood = this.isPoison ? this.game.population.worlds.get(this.worldId).poison.length : this.game.population.worlds.get(this.worldId).food.length;
+        let numChildren = numFood > numAgents * (this.isPoison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) ? randomInt(2) : randomInt(maxChildCount) + 1;
 
         // determine a circle around food where it reproduce
         // use the number of children to determine the angle to place the children
@@ -118,7 +121,7 @@ class Food {
             const distance = Math.random() * maxDist;
             const x = Math.cos(angle) * distance;
             const y = Math.sin(angle) * distance;
-            let seedling = new Food(this.game, this.x + x, this.y + y, false, this.foodTracker);
+            let seedling = new Food(this.game, this.x + x, this.y + y, this.isPoison, this.foodTracker);
             children.push(seedling);
             angle += increment;
         }
@@ -127,7 +130,8 @@ class Food {
 
     update() {
         if ((this.x < 0 || this.y < 0 || this.x > params.CANVAS_SIZE || this.y > params.CANVAS_SIZE) ||
-            (!(params.FOOD_OUTSIDE) && distance(this.BC.center, {x: params.CANVAS_SIZE / 2, y: params.CANVAS_SIZE / 2}) > params.CANVAS_SIZE / 2)){
+            (!(params.FOOD_OUTSIDE) && distance(this.BC.center, {x: params.CANVAS_SIZE / 2, y: params.CANVAS_SIZE / 2}) > params.CANVAS_SIZE / 2) ||
+            (!(params.FOOD_INSIDE) && distance(this.BC.center, this.game.population.worlds.get(this.worldId).home.BC.center) < params.CANVAS_SIZE / 5)){
             // I include this in case the food spawns outside the bounds of the canvas
             // that way it does not needlessly render these entities
             this.removeFromWorld = true;
@@ -168,7 +172,7 @@ class Food {
             2 * Math.PI,
             false
         );
-        ctx.fillStyle = this.properties[this.state].color;
+        ctx.fillStyle = `hsl(${this.properties[this.state].color}, 100%, 50%)`;
         ctx.fill();
         ctx.lineWidth = 2;
         ctx.strokeStyle = 'Black';

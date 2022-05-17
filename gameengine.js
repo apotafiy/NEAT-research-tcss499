@@ -18,7 +18,12 @@ class GameEngine {
     };
 
     init() {
+        this.startInput();
         this.timer = new Timer();
+    };
+
+    startInput() {
+        document.getElementById("restart_sim").addEventListener("click", () => this.population.resetSim());
     };
 
     start() {
@@ -39,6 +44,11 @@ class GameEngine {
                     food.draw(members.ctx)
                 }
             });
+            members.poison.forEach(poison => {
+                if (!poison.removeFromWorld) {
+                    poison.draw(members.ctx)
+                }
+            });
             members.agents.forEach(agent => {
                 if (!agent.removeFromWorld) {
                     agent.draw(members.ctx)
@@ -50,10 +60,12 @@ class GameEngine {
 
     update() {
         let foodCounts = new Map();
+        let poisonCounts = new Map();
         let agentCounts = new Map();
         
         this.population.worlds.forEach((members, worldId) => {
             foodCounts.set(worldId, members.food.length);
+            poisonCounts.set(worldId, members.poison.length);
             agentCounts.set(worldId, members.agents.length);
         });
 
@@ -61,6 +73,11 @@ class GameEngine {
             for (let i = 0; i < foodCounts.get(worldId); i++) {
                 if (!members.food[i].removeFromWorld) {
                     members.food[i].update();
+                }
+            }
+            for (let i = 0; i < poisonCounts.get(worldId); i++) {
+                if (!members.poison[i].removeFromWorld) {
+                    members.poison[i].update();
                 }
             }
             for (let i = 0; i < agentCounts.get(worldId); i++) {
@@ -73,7 +90,10 @@ class GameEngine {
         let flag = this.population.update();
 
         if (flag && params.FOOD_PERIODIC_REPOP) {
-            this.population.checkFoodLevels();
+            this.population.checkFoodLevels(false);
+        }
+        if (flag && params.POISON_PERIODIC_REPOP) {
+            this.population.checkFoodLevels(true);
         }
     };
 
