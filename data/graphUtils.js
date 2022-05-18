@@ -1,5 +1,98 @@
 /**
  *
+ * @param {array} fitnessData all fitness data from agent tracker
+ */
+const generateFitnessChart = (fitnessData) => {
+    const currSpecies = new Set();
+    PopulationManager.SPECIES_MEMBERS.forEach((val, key) =>
+        currSpecies.add(key)
+    );
+    const generations = [];
+    fitnessData.forEach((gen) =>
+        generations.push(gen.filter((obj) => currSpecies.has(obj.speciesId)))
+    );
+    const speciesFit = [];
+    currSpecies.forEach((id) => {
+        const fitnesses = [];
+        let firstGen = Number.MAX_VALUE;
+        generations.forEach((array, currentGeneration) => {
+            for (let i = 0; i < array.length; i++) {
+                if (array[i].speciesId == id) {
+                    firstGen = Math.min(firstGen, currentGeneration);
+                    fitnesses.push(array[i].fitness);
+                    break;
+                }
+            }
+        });
+        speciesFit.push({ speciesId: id, firstGen, fitnesses });
+    });
+    const canvases = [];
+    speciesFit.forEach((obj, i) => {
+        canvases.push(
+            getFitnessChart(obj.speciesId, obj.fitnesses, obj.firstGen)
+        );
+    });
+    createSlideShow(canvases, "fitness");
+};
+
+/**
+ * Create canvas chart for species fitness over time.
+ * @param {int} id species id
+ * @param {array} data array of species fitness for one species
+ * @returns {html} canvas
+ */
+const getFitnessChart = (id, data, firstGen) => {
+    const labels = [];
+    for (let i = firstGen; i < data.length + firstGen; i++) {
+        labels.push(i);
+    }
+    const ctx = document.createElement('canvas');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: `Species ${id}`,
+                    data: data,
+                    fill: false,
+                    backgroundColor: [
+                        hsl(PopulationManager.SPECIES_COLORS.get(id), 100, 50),
+                    ],
+                    borderColor: [
+                        hsl(PopulationManager.SPECIES_COLORS.get(id), 100, 50),
+                    ],
+                    borderWidth: 3,
+                },
+            ],
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+                x: {
+                    min: firstGen,
+                },
+            },
+            elements: {
+                line: {
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Species ${id} Fitness Over Time`,
+                },
+            },
+        },
+    });
+    return ctx;
+};
+
+/**
+ *
  * @param {2d array} data array of arrays of life stage counts per generation
  */
 const generateCurrentFitnessChart = (data) => {
@@ -46,7 +139,7 @@ const generateCurrentFitnessChart = (data) => {
             scales: {
                 y: {
                     // min: Math.max(Math.floor(min - 100), 0),
-                    beginAtZero: true
+                    beginAtZero: true,
                 },
             },
             elements: {
@@ -70,7 +163,6 @@ const generateCurrentFitnessChart = (data) => {
  */
 const generateNodeChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });
@@ -114,7 +206,7 @@ const generateNodeChart = (data) => {
         options: {
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
                 },
             },
             elements: {
@@ -138,7 +230,6 @@ const generateNodeChart = (data) => {
  */
 const generateCycleChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });
@@ -207,7 +298,6 @@ const generateCycleChart = (data) => {
  */
 const generateConnectionChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });
@@ -282,7 +372,6 @@ const generateEnergyChart = (data) => {};
  */
 const generateAgeChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });

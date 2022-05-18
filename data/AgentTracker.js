@@ -48,6 +48,10 @@ class AgentTracker {
         this.generations[this.currentGeneration].energy;
     }
 
+    /**
+     *
+     * @param {obj} data object containing species id and fitness {speciedId, fitness}
+     */
     addSpeciesFitness(data) {
         this.generations[this.currentGeneration].speciesFitness.push(data);
     }
