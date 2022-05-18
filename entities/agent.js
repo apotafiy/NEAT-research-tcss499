@@ -105,10 +105,12 @@ class Agent {
         if (this.energy <= Agent.DEATH_ENERGY_THRESH) {
             this.leftWheel = 0;
             this.rightWheel = 0;
+            this.eating = false;
         } else {
             let wheels = this.neuralNet.processInput(input);
             this.leftWheel = wheels[0];
             this.rightWheel = wheels[1];
+            this.eating = randomFloat(2) - 1 <= wheels[2];
         }
 
         let dh = this.wheelRadius / this.diameter * this.maxVelocity * (this.rightWheel - this.leftWheel);   
@@ -132,7 +134,7 @@ class Agent {
         this.energy -= 0.1;
 
         spottedNeighbors.forEach(entity => { // eat food
-            if (entity instanceof Food && this.BC.collide(entity.BC) && this.energy > Agent.DEATH_ENERGY_THRESH) {
+            if (entity instanceof Food && this.BC.collide(entity.BC) && this.energy > Agent.DEATH_ENERGY_THRESH && this.eating) {
                 let cals = entity.consume();
                 if (cals < 0) {
                     this.badCaloriesEaten += Math.abs(cals);
