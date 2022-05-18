@@ -122,43 +122,44 @@
     <div>
         <br> </br><strong>Agent Fitness Function:</strong><br> </br> <input type="text" id="fitness_energy" value="1"> (Raw Energy) + <input type="text" id="fitness_calories" value="1"> (Calories Eaten) + <input type="text" id="fitness_bad_calories" value="-1"> (Poison Calories Eaten)
     </div>
-    <div id="charts" style="float: left; width: 50%; margin-top: 100px;">
+    <div id="charts" style="float: left; width: 50%; margin-top: 75px;">
+        <div id="currentFitnessChartContainer">
+            <div id="currentFitnessChart"></div>
+        </div>
+        <div id="carouselExampleIndicators" class="carousel carousel-dark" data-bs-ride="carousel">
         <div id="carouselExampleIndicators" class="carousel carousel-dark" data-bs-ride="carousel">
             <div id="fitness-indicators" class="carousel-indicators">
             </div>
             <div id="fitness-carousel" class="carousel-inner">
             </div>
-            </div> -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
         </div>
-        <div id="currentFitnessChartContainer">
-            <div id="currentFitnessChart"></div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
         </div>
-        <div id="connectionChartContainer">
-            <canvas id="connectionChart"></canvas>
-        </div>
-        <div id="nodeChartContainer">
-            <canvas id="nodeChart"></canvas>
-        </div>
-        <div id="foodConsumptionChartContainer">
-            <canvas id="foodConsumptionChart"></canvas>
-        </div>
-        <div id="ageChartContainer">
-            <canvas id="ageChart"></canvas>
-        </div>
-        <div id="cycleChartContainer">
-            <canvas id="cycleChart"></canvas>
-        </div>
-        <div id="foodLifeStageChartContainer">
-            <canvas id="foodLifeStageChart"></canvas>
-        </div>
+    <div id="connectionChartContainer">
+        <canvas id="connectionChart"></canvas>
+    </div>
+    <div id="nodeChartContainer">
+        <canvas id="nodeChart"></canvas>
+    </div>
+    <div id="foodConsumptionChartContainer">
+        <canvas id="foodConsumptionChart"></canvas>
+    </div>
+    <div id="ageChartContainer">
+        <canvas id="ageChart"></canvas>
+    </div>
+    <div id="cycleChartContainer">
+        <canvas id="cycleChart"></canvas>
+    </div>
+    <div id="foodLifeStageChartContainer">
+        <canvas id="foodLifeStageChart"></canvas>
+    </div>
     </div>
 
 </body>
