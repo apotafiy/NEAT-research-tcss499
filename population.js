@@ -437,6 +437,7 @@ class PopulationManager {
             sumShared += reprodFitMap.get(speciesId);
             this.agentTracker.addSpeciesFitness({speciesId, fitness: newFit});
         });
+        generateFitnessChart(this.agentTracker.getFitnessData());
 
         if (!params.FREE_RANGE) {
             let rouletteOrder = [...reprodFitMap.keys()].sort();

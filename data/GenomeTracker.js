@@ -47,7 +47,6 @@ class GenomeTracker {
         );
         const numCycles = connections.reduce((acc, curr) => {
             if (curr.isCyclic) {
-                console.log('cycle');
                 return 1 + acc;
             } else {
                 return acc;

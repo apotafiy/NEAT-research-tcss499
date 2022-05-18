@@ -23,7 +23,7 @@ const params = {
     FITNESS_CALORIES: 1,
     FITNESS_BAD_CALORIES: -1,
     GEN_STOP: false,
-    NUM_AGENTS: 50
+    NUM_AGENTS: 50,
 };
 
 /**
@@ -132,7 +132,10 @@ const createSlideShow = (array, id) => {
     array.forEach((elem, i) => {
         const indButton = document.createElement('button');
         indButton.setAttribute('type', 'button');
-        indButton.setAttribute('data-bs-target', '#carouselExampleIndicators');
+        indButton.setAttribute(
+            'data-bs-target',
+            `#carousel${id.charAt(0).toUpperCase() + id.slice(1)}Indicators`
+        );
         indButton.setAttribute('data-bs-slide-to', `${i}`);
         if (i == activeSlide) {
             indButton.setAttribute('class', 'active');
