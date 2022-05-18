@@ -46,7 +46,6 @@ const getFitnessChart = (id, data, firstGen) => {
     for (let i = firstGen; i < data.length + firstGen; i++) {
         labels.push(i);
     }
-    console.log(`id: ${id}`, labels);
     const ctx = document.createElement('canvas');
     new Chart(ctx, {
         type: 'line',
@@ -164,7 +163,6 @@ const generateCurrentFitnessChart = (data) => {
  */
 const generateNodeChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });
@@ -232,7 +230,6 @@ const generateNodeChart = (data) => {
  */
 const generateCycleChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });
@@ -301,7 +298,6 @@ const generateCycleChart = (data) => {
  */
 const generateConnectionChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });
@@ -376,7 +372,6 @@ const generateEnergyChart = (data) => {};
  */
 const generateAgeChart = (data) => {
     const labels = [];
-    // console.log(data.means);
     data.medians.forEach((elem, i) => {
         labels.push(i);
     });
