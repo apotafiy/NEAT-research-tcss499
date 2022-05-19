@@ -3,6 +3,9 @@
  * @param {array} fitnessData all fitness data from agent tracker
  */
 const generateFitnessChart = (fitnessData) => {
+    if (document.getElementById('fitnessChart') != undefined) {
+        document.getElementById('fitnessChart').remove();
+    }
     const currSpecies = new Set();
     PopulationManager.SPECIES_MEMBERS.forEach((val, key) =>
         currSpecies.add(key)
@@ -13,58 +16,77 @@ const generateFitnessChart = (fitnessData) => {
     );
     const speciesFit = [];
     currSpecies.forEach((id) => {
-        const fitnesses = [];
-        let firstGen = Number.MAX_VALUE;
-        generations.forEach((array, currentGeneration) => {
-            for (let i = 0; i < array.length; i++) {
-                if (array[i].speciesId == id) {
-                    firstGen = Math.min(firstGen, currentGeneration);
-                    fitnesses.push(array[i].fitness);
-                    break;
-                }
-            }
-        });
+        const { fitnesses, firstGen } = getFitnessDataSet(id, fitnessData);
         speciesFit.push({ speciesId: id, firstGen, fitnesses });
     });
-    const canvases = [];
-    speciesFit.forEach((obj, i) => {
-        canvases.push(
-            getFitnessChart(obj.speciesId, obj.fitnesses, obj.firstGen)
-        );
+    speciesFit.sort((a, b) => a.speciesId - b.speciesId);
+    const canvas = getFitnessChart(speciesFit);
+    canvas.setAttribute('id', 'fitnessChart');
+    document.getElementById('fitnessChartContainer').appendChild(canvas);
+};
+
+const getFitnessDataSet = (id, fitnessData) => {
+    const fitnesses = [];
+    let firstGen = Number.MAX_VALUE;
+    fitnessData.forEach((array, currentGeneration) => {
+        for (let i = 0; i < array.length; i++) {
+            if (array[i].speciesId == id) {
+                firstGen = Math.min(firstGen, currentGeneration);
+                fitnesses.push(array[i].fitness);
+                break;
+            }
+        }
     });
-    createSlideShow(canvases, "fitness");
+    return { id, firstGen, fitnesses };
 };
 
 /**
  * Create canvas chart for species fitness over time.
- * @param {int} id species id
- * @param {array} data array of species fitness for one species
+ * @param {array} speciesFitnesses array of fitness data
  * @returns {html} canvas
  */
-const getFitnessChart = (id, data, firstGen) => {
+const getFitnessChart = (speciesFitnesses) => {
+    const firstGen = speciesFitnesses.reduce(
+        (acc, curr) => Math.min(curr.firstGen, acc),
+        Number.MAX_VALUE
+    );
+    const longestGen = speciesFitnesses.reduce((acc, curr) => Math.max(acc, curr.fitnesses.length), 0);
     const labels = [];
-    for (let i = firstGen; i < data.length + firstGen; i++) {
+    for (let i = firstGen; i < longestGen + firstGen; i++) {
         labels.push(i);
     }
+    const datasets = [];
+    speciesFitnesses.forEach((obj) => {
+        while(obj.fitnesses.length < longestGen){
+            obj.fitnesses.unshift(undefined);
+        }
+        datasets.push({
+            label: `Species ${obj.speciesId}`,
+            data: obj.fitnesses,
+            fill: false,
+            backgroundColor: [
+                hsl(
+                    PopulationManager.SPECIES_COLORS.get(obj.speciesId),
+                    100,
+                    50
+                ),
+            ],
+            borderColor: [
+                hsl(
+                    PopulationManager.SPECIES_COLORS.get(obj.speciesId),
+                    100,
+                    50
+                ),
+            ],
+            borderWidth: 2,
+        });
+    });
     const ctx = document.createElement('canvas');
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: `Species ${id}`,
-                    data: data,
-                    fill: false,
-                    backgroundColor: [
-                        hsl(PopulationManager.SPECIES_COLORS.get(id), 100, 50),
-                    ],
-                    borderColor: [
-                        hsl(PopulationManager.SPECIES_COLORS.get(id), 100, 50),
-                    ],
-                    borderWidth: 3,
-                },
-            ],
+            labels,
+            datasets,
         },
         options: {
             scales: {
@@ -83,7 +105,7 @@ const getFitnessChart = (id, data, firstGen) => {
             plugins: {
                 title: {
                     display: true,
-                    text: `Species ${id} Fitness Over Time`,
+                    text: `Species Fitness Over Time`,
                 },
             },
         },
@@ -124,7 +146,7 @@ const generateCurrentFitnessChart = (data) => {
                     obj.speciesId
                 )}, 100%, 50%, 0.7)`,
             ],
-            borderWidth: 3,
+            borderWidth: 1.5,
         };
         datasets.push(temp);
     });
@@ -183,7 +205,7 @@ const generateNodeChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Median Nodes',
@@ -191,7 +213,7 @@ const generateNodeChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Max Nodes',
@@ -199,7 +221,7 @@ const generateNodeChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
             ],
         },
@@ -250,7 +272,7 @@ const generateCycleChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Median Cycles',
@@ -258,7 +280,7 @@ const generateCycleChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Max Cycles',
@@ -266,7 +288,7 @@ const generateCycleChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
             ],
         },
@@ -318,7 +340,7 @@ const generateConnectionChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Median Connections',
@@ -326,7 +348,7 @@ const generateConnectionChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Max Connections',
@@ -334,7 +356,7 @@ const generateConnectionChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
             ],
         },
@@ -392,7 +414,7 @@ const generateAgeChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(255,0,0,0.1)'],
                     borderColor: ['rgba(255,0,0,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Mean Age',
@@ -400,7 +422,7 @@ const generateAgeChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Oldest Agent',
@@ -408,7 +430,7 @@ const generateAgeChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(0,0,255,0.1)'],
                     borderColor: ['rgba(0,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
             ],
         },
@@ -459,7 +481,7 @@ const generateFoodConsumptionChart = (data) => {
                     fill: false,
                     backgroundColor: ['rgba(150,0,255,0.1)'],
                     borderColor: ['rgba(150,0,255,1)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
             ],
         },
@@ -510,28 +532,28 @@ const generateFoodStageChart = (data) => {
                     data: data[0],
                     backgroundColor: ['rgb(255, 230, 0)'],
                     borderColor: ['rgb(255, 230, 0)'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Adolescents',
                     data: data[1],
                     backgroundColor: ['Green'],
                     borderColor: ['Green'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Adults',
                     data: data[2],
                     backgroundColor: ['Blue'],
                     borderColor: ['Blue'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
                 {
                     label: 'Decaying',
                     data: data[3],
                     backgroundColor: ['Orange'],
                     borderColor: ['Orange'],
-                    borderWidth: 3,
+                    borderWidth: 1.5,
                 },
             ],
         },
