@@ -13,6 +13,7 @@ class FoodTracker {
         this.generations[this.currentGeneration] = {
             lifeStageCounts: [0, 0, 0, 0],
             caloriesConsumed: 0,
+            consumptionTick: []
         };
     }
 
@@ -26,11 +27,12 @@ class FoodTracker {
     }
 
     /**
-     * Records how many calories consumed each generation
+     * Records how many calories consumed each generation and at what time
      * @param {int} num number of calories consumed
      */
     addCalories(num) {
         this.generations[this.currentGeneration].caloriesConsumed += num;
+        this.generations[this.currentGeneration].consumptionTick.push(PopulationManager.tickCounter);
     }
 
     /**
