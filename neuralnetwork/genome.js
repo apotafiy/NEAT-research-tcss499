@@ -4,7 +4,7 @@ class Genome {
 
     static DEFAULT_HIDDENS = 0;
 
-    static DEFAULT_OUTPUTS = 3;
+    static DEFAULT_OUTPUTS = 2;
 
     static INNOV_NUM = 0;
 

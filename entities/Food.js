@@ -105,7 +105,7 @@ class Food {
         const maxChildCount = 3;
         let numAgents = this.game.population.worlds.get(this.worldId).agents.length;
         let numFood = this.isPoison ? this.game.population.worlds.get(this.worldId).poison.length : this.game.population.worlds.get(this.worldId).food.length;
-        let numChildren = numFood > numAgents * (this.isPoison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) ? randomInt(2) : randomInt(maxChildCount) + 1;
+        let numChildren = numFood > numAgents * (this.isPoison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) ? randomInt(2) : randomInt(maxChildCount) + 2;
 
         // determine a circle around food where it reproduce
         // use the number of children to determine the angle to place the children
