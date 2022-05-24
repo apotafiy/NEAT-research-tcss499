@@ -198,10 +198,12 @@ class PopulationManager {
 
     spawnFood(worldId, poison = false, count = (poison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) * this.worlds.get(worldId).agents.length) {
         let seedlings = [];
+        let index = 0;
         for (let i = 0; i < count; i++) { // add food sources
-            let pod = poison ? this.poisonPodLayout[randomInt(this.poisonPodLayout.length)] : this.foodPodLayout[randomInt(this.foodPodLayout.length)];
+            let pod = poison ? this.poisonPodLayout[index] : this.foodPodLayout[index];
             let loc = pod.placeSeedling();
             seedlings.push(new Food(this.game, loc.x, loc.y, poison, this.foodTracker));
+            index = (index + 1) % (poison ? this.poisonPodLayout.length : this.foodPodLayout.length);
         }
         this.registerSeedlings(worldId, seedlings);
     };
