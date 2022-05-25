@@ -5,6 +5,7 @@ class Food {
         this.isPoison = isPoison;
         this.game = game;
         this.foodTracker = foodTracker;
+        // this.foodTracker.addFood(); // count how many foods per generation
         this.tickCounter = 0;
         this.lifetimeTicks = params.RAND_FOOD_LIFETIME ? randomInt(params.GEN_TICKS / 2 + 1) + params.GEN_TICKS / 2 : params.GEN_TICKS;
         this.states = {

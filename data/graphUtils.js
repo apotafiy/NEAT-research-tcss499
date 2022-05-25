@@ -1,4 +1,16 @@
 /**
+ * 
+ * @param {array} timeData food consumption time for each generation
+ */
+const generateFoodTimeChart = (timeData)=>{
+    // timeData.forEach((arr) => arr.sort((a, b) => a - b));
+    // probably don't need to sort because they should be inserted in order already
+    const getPercentile = (ticks, fraction) => {
+        
+    };
+};
+
+/**
  *
  * @param {array} fitnessData all fitness data from agent tracker
  */
