@@ -49,20 +49,20 @@ class Food {
         // would access as such: this.stateProps[this.state].lifeSpan
         this.ticksToNext = this.properties[this.states.seed].lifeSpan;
         this.updateBoundingCircle();
-    }
+    };
 
     isDecaying() {
         return this.state === this.states.decaying;
     };
 
     createLifetimes() {
-        const minDistribution = 0.1;
+        const minDistribution = 0.2;
         let total = 0;
         let lifetimes = [];
         if (!params.RAND_FOOD_PHASES) { // not randomized
             for (let i = 0; i < 3; i++) {
-                lifetimes.push(Math.floor(0.25 * this.lifetimeTicks));
-                total += Math.floor(0.25 * this.lifetimeTicks);
+                lifetimes.push(Math.floor(this.lifetimeTicks / 4));
+                total += Math.floor(this.lifetimeTicks / 4);
             }
         } else { // randomized
             for (let i = 0; i < 3; i++) {
@@ -87,7 +87,7 @@ class Food {
             this.y,
             this.properties[this.state].radius
         );
-    }
+    };
 
     consume() {
         // if isPoison then energy is depleted
@@ -99,13 +99,13 @@ class Food {
         this.state = this.states.dead;
         this.removeFromWorld = true;
         return cals;
-    }
+    };
 
     reproduce() {
         const maxChildCount = 3;
         let numAgents = this.game.population.worlds.get(this.worldId).agents.length;
         let numFood = this.isPoison ? this.game.population.worlds.get(this.worldId).poison.length : this.game.population.worlds.get(this.worldId).food.length;
-        let numChildren = numFood > numAgents * (this.isPoison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) ? randomInt(2) : randomInt(maxChildCount) + 1;
+        let numChildren = numFood > numAgents * (this.isPoison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) ? randomInt(2) : randomInt(maxChildCount) + 2;
 
         // determine a circle around food where it reproduce
         // use the number of children to determine the angle to place the children
@@ -114,7 +114,7 @@ class Food {
         // once we know the angle we can choose a random distance from center to place the food
         const increment = (2 * Math.PI) / numChildren;
         let angle = Math.random() * Math.PI; // choose random starting angle to provide some variation in placements
-        const maxDist = 250;
+        const maxDist = 50;
         let children = [];
         for (let i = 0; i < numChildren; i++) {
             // if i know angle and distance then i know coordinates
@@ -126,7 +126,7 @@ class Food {
             angle += increment;
         }
         this.game.population.registerSeedlings(this.worldId, children);
-    }
+    };
 
     update() {
         if ((this.x < 0 || this.y < 0 || this.x > params.CANVAS_SIZE || this.y > params.CANVAS_SIZE) ||
@@ -157,7 +157,7 @@ class Food {
         if (!this.removeFromWorld) {
             this.updateBoundingCircle();
         }
-    }
+    };
 
     draw(ctx) {
         if(this.state == this.states.dead){
@@ -177,5 +177,20 @@ class Food {
         ctx.lineWidth = 2;
         ctx.strokeStyle = 'Black';
         ctx.stroke();
-    }
-}
+    };
+};
+
+class FoodPod {
+
+    constructor(game, centerX, centerY, radius, isPoison) {
+        Object.assign(this, {game, centerX, centerY, radius, isPoison});
+    };
+
+    genFoodPos() {
+        let randomDist = randomInt(this.radius);
+        let randomAngle = randomInt(360) * Math.PI / 180;
+        let x = this.centerX + randomDist * Math.cos(randomAngle);
+        let y = this.centerY + randomDist * Math.sin(randomAngle);
+        return { x, y };
+    };
+};

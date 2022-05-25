@@ -26,9 +26,47 @@ class PopulationManager {
         this.worlds = new Map();
         this.initNewWorld(PopulationManager.SPECIES_ID);
         this.spawnAgents(PopulationManager.SPECIES_ID);
+        this.createFoodPodLayout();
         this.spawnFood(PopulationManager.SPECIES_ID, false);
         this.spawnFood(PopulationManager.SPECIES_ID, true);
         this.resetCanvases();
+    };
+
+    createFoodPodLayout() { // all worlds will share the same food / poison pod layout. this will ensure clean merging and splitting
+        let foodPods = [];
+        let poisonPods = [];
+        let flag = false;
+        for (let theta = 0; theta < 2 * Math.PI; theta += Math.PI / 4) {
+            let randomDist = params.CANVAS_SIZE / 2.5;
+            let centerX = params.CANVAS_SIZE / 2 + randomDist * Math.cos(theta);
+            let centerY = params.CANVAS_SIZE / 2 + randomDist * Math.sin(theta);
+            let currList = flag ? poisonPods : foodPods;
+            currList.push(new FoodPod(this.game, centerX, centerY, 100, flag));
+            flag = !flag;
+        }
+        this.foodPodLayout = foodPods;
+        this.poisonPodLayout = poisonPods;
+    };
+
+    redistributeFoodAndPoison() {
+        let foodIndex = 0;
+        let poisonIndex = 0;
+        this.worlds.forEach(members => {
+            members.food.forEach(f => {
+                let pos = this.foodPodLayout[foodIndex].genFoodPos();
+                f.x = pos.x;
+                f.y = pos.y;
+                f.updateBoundingCircle();
+                foodIndex = (foodIndex + 1) % this.foodPodLayout.length;
+            });
+            members.poison.forEach(p => {
+                let pos = this.poisonPodLayout[poisonIndex].genFoodPos();
+                p.x = pos.x;
+                p.y = pos.y;
+                p.updateBoundingCircle();
+                poisonIndex = (poisonIndex + 1) % this.poisonPodLayout.length;
+            });
+        });
     };
 
     resetSim() {
@@ -181,13 +219,12 @@ class PopulationManager {
 
     spawnFood(worldId, poison = false, count = (poison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) * this.worlds.get(worldId).agents.length) {
         let seedlings = [];
+        let index = 0;
         for (let i = 0; i < count; i++) { // add food sources
-            let randomDist = randomInt(params.CANVAS_SIZE / 2 - params.CANVAS_SIZE / 5 + 1) + params.CANVAS_SIZE / 5;
-            let randomAngle = randomInt(360) * Math.PI / 180;
-            let x = params.CANVAS_SIZE / 2 + randomDist * Math.cos(randomAngle);
-            let y = params.CANVAS_SIZE / 2 + randomDist * Math.sin(randomAngle);
-            let food = new Food(this.game, x, y, poison, this.foodTracker);
-            seedlings.push(food);
+            let pod = poison ? this.poisonPodLayout[index] : this.foodPodLayout[index];
+            let loc = pod.genFoodPos();
+            seedlings.push(new Food(this.game, loc.x, loc.y, poison, this.foodTracker));
+            index = (index + 1) % (poison ? this.poisonPodLayout.length : this.foodPodLayout.length);
         }
         this.registerSeedlings(worldId, seedlings);
     };

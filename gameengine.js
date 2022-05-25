@@ -89,11 +89,16 @@ class GameEngine {
 
         let flag = this.population.update();
 
-        if (flag && params.FOOD_PERIODIC_REPOP) {
-            this.population.checkFoodLevels(false);
-        }
-        if (flag && params.POISON_PERIODIC_REPOP) {
-            this.population.checkFoodLevels(true);
+        if (flag) {
+            this.population.redistributeFoodAndPoison();
+
+            if (params.FOOD_PERIODIC_REPOP) {
+                this.population.checkFoodLevels(false);
+            }
+
+            if (params.POISON_PERIODIC_REPOP) {
+                this.population.checkFoodLevels(true);
+            }
         }
     };
 
