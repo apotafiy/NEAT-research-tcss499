@@ -48,6 +48,27 @@ class PopulationManager {
         this.poisonPodLayout = poisonPods;
     };
 
+    redistributeFoodAndPoison() {
+        let foodIndex = 0;
+        let poisonIndex = 0;
+        this.worlds.forEach(members => {
+            members.food.forEach(f => {
+                let pos = this.foodPodLayout[foodIndex].genFoodPos();
+                f.x = pos.x;
+                f.y = pos.y;
+                f.updateBoundingCircle();
+                foodIndex = (foodIndex + 1) % this.foodPodLayout.length;
+            });
+            members.poison.forEach(p => {
+                let pos = this.poisonPodLayout[poisonIndex].genFoodPos();
+                p.x = pos.x;
+                p.y = pos.y;
+                p.updateBoundingCircle();
+                poisonIndex = (poisonIndex + 1) % this.poisonPodLayout.length;
+            });
+        });
+    };
+
     resetSim() {
         PopulationManager.SPECIES_ID = 0;
         PopulationManager.GEN_NUM = 0;
@@ -201,7 +222,7 @@ class PopulationManager {
         let index = 0;
         for (let i = 0; i < count; i++) { // add food sources
             let pod = poison ? this.poisonPodLayout[index] : this.foodPodLayout[index];
-            let loc = pod.placeSeedling();
+            let loc = pod.genFoodPos();
             seedlings.push(new Food(this.game, loc.x, loc.y, poison, this.foodTracker));
             index = (index + 1) % (poison ? this.poisonPodLayout.length : this.foodPodLayout.length);
         }

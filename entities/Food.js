@@ -56,13 +56,13 @@ class Food {
     };
 
     createLifetimes() {
-        const minDistribution = 0.1;
+        const minDistribution = 0.2;
         let total = 0;
         let lifetimes = [];
         if (!params.RAND_FOOD_PHASES) { // not randomized
             for (let i = 0; i < 3; i++) {
-                lifetimes.push(Math.floor(0.25 * this.lifetimeTicks));
-                total += Math.floor(0.25 * this.lifetimeTicks);
+                lifetimes.push(Math.floor(this.lifetimeTicks / 4));
+                total += Math.floor(this.lifetimeTicks / 4);
             }
         } else { // randomized
             for (let i = 0; i < 3; i++) {
@@ -105,7 +105,7 @@ class Food {
         const maxChildCount = 3;
         let numAgents = this.game.population.worlds.get(this.worldId).agents.length;
         let numFood = this.isPoison ? this.game.population.worlds.get(this.worldId).poison.length : this.game.population.worlds.get(this.worldId).food.length;
-        let numChildren = numFood > numAgents * (this.isPoison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) * 2 ? randomInt(2) : randomInt(maxChildCount) + 2;
+        let numChildren = numFood > numAgents * (this.isPoison ? params.POISON_AGENT_RATIO : params.FOOD_AGENT_RATIO) ? randomInt(2) : randomInt(maxChildCount) + 2;
 
         // determine a circle around food where it reproduce
         // use the number of children to determine the angle to place the children
@@ -186,7 +186,7 @@ class FoodPod {
         Object.assign(this, {game, centerX, centerY, radius, isPoison});
     };
 
-    placeSeedling() {
+    genFoodPos() {
         let randomDist = randomInt(this.radius);
         let randomAngle = randomInt(360) * Math.PI / 180;
         let x = this.centerX + randomDist * Math.cos(randomAngle);
