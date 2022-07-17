@@ -13,9 +13,9 @@ class FoodTracker {
         this.generations[this.currentGeneration] = {
             lifeStageCounts: [0, 0, 0, 0],
             caloriesConsumed: 0,
-            consumptionTick: [],
+            consumptionTicks: [],
             tickPercentile: {
-                foodCount: params.NUM_AGENTS * params.FOOD_AGENT_RATIO,
+                foodCount: 0 // params.NUM_AGENTS * params.FOOD_AGENT_RATIO,
             },
         };
     }
@@ -35,9 +35,22 @@ class FoodTracker {
      */
     addCalories(num) {
         this.generations[this.currentGeneration].caloriesConsumed += num;
-        this.generations[this.currentGeneration].consumptionTick.push(
+    }
+
+    /**
+     * Records time when food was eaten
+     */
+    addTick(){
+        this.generations[this.currentGeneration].consumptionTicks.push(
             PopulationManager.tickCounter
-        );
+        );       
+    }
+
+    /**
+     * Records when a new food is created in a generation.
+     */
+    addFood() {
+        this.generations[this.currentGeneration].tickPercentile.foodCount++;
     }
 
     /**
@@ -48,8 +61,12 @@ class FoodTracker {
         return this.generations.map((obj) => obj.caloriesConsumed);
     }
 
+    getPercentileData(){
+        
+    }
+
     computePercentiles() {
-        const ticks = this.generations[this.currentGeneration].consumptionTick;
+        const ticks = this.generations[this.currentGeneration].consumptionTicks;
         ticks.sort((a, b) => a - b);
         const getPercentile = (ticks, fraction, foodCount) => {
             const index = Math.floor((foodCount - 1) * fraction);
