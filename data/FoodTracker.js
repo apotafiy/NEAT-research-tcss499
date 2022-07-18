@@ -1,4 +1,22 @@
 class FoodTracker {
+    static percentileMapping = [
+            {
+                key: '50',
+                val: 0.5
+            },
+            {
+                key: '75', 
+                val: 0.75
+            },
+            {
+                key: '90',
+                val: 0.9
+            },
+            {
+                key: '100',
+                val: 1
+            }
+        ];
     constructor() {
         this.currentGeneration = -1;
         this.generations = [];
@@ -10,13 +28,20 @@ class FoodTracker {
      */
     addNewGeneration() {
         this.currentGeneration++;
+        const tickPercentile = {
+            foodCount: 0,
+        };
+        // pretty sure array notation required for number variable names
+        // downside is I have to remember to use array notation
+        tickPercentile['50'] = undefined;
+        tickPercentile['75'] = undefined;
+        tickPercentile['90'] = undefined;
+        tickPercentile['100'] = undefined;
         this.generations[this.currentGeneration] = {
             lifeStageCounts: [0, 0, 0, 0],
             caloriesConsumed: 0,
-            consumptionTicks: [],
-            tickPercentile: {
-                foodCount: 0 // params.NUM_AGENTS * params.FOOD_AGENT_RATIO,
-            },
+            consumptionTicks: [], // records the time when a food was consumed
+            tickPercentile, // tracks what time a certain percent of food was consumed
         };
     }
 
@@ -42,7 +67,7 @@ class FoodTracker {
      */
     addTick(){
         this.generations[this.currentGeneration].consumptionTicks.push(
-            PopulationManager.tickCounter
+            gameEngine.population.tickCounter
         );       
     }
 
@@ -62,46 +87,51 @@ class FoodTracker {
     }
 
     getPercentileData(){
-        
+        const dataSets = [];
+        FoodTracker.percentileMapping.forEach((obj) => {
+            const data = this.generations.map((gen) => gen.tickPercentile[obj.key]);
+            dataSets.push(data);
+        });
+        return dataSets;
     }
 
     computePercentiles() {
-        const ticks = this.generations[this.currentGeneration].consumptionTicks;
-        ticks.sort((a, b) => a - b);
+        // ticks.sort((a, b) => a - b); // sorted shouldn't be needed due to insertion order
         const getPercentile = (ticks, fraction, foodCount) => {
             const index = Math.floor((foodCount - 1) * fraction);
-            let ret = undefined;
+            let ret = null;
             if (index < ticks.length) {
                 ret = ticks[index];
             }
             return ret;
         };
-        const foodCount =
-            this.generations[this.currentGeneration].tickPercentile.foodCount;
-        this.generations[this.currentGeneration].tickPercentile['50'] =
+        FoodTracker.percentileMapping.forEach((obj)=> {
+            this.generations[this.currentGeneration].tickPercentile[obj.key] =
             getPercentile(
-                this.generations[this.currentGeneration],
-                0.5,
-                foodCount
+                this.generations[this.currentGeneration].consumptionTicks,
+                obj.val,
+                this.generations[this.currentGeneration].tickPercentile.foodCount
             );
-        this.generations[this.currentGeneration].tickPercentile['75'] =
-            getPercentile(
-                this.generations[this.currentGeneration],
-                0.75,
-                foodCount
-            );
-        this.generations[this.currentGeneration].tickPercentile['90'] =
-            getPercentile(
-                this.generations[this.currentGeneration],
-                0.9,
-                foodCount
-            );
-        this.generations[this.currentGeneration].tickPercentile['100'] =
-            getPercentile(
-                this.generations[this.currentGeneration],
-                1,
-                foodCount
-            );
+        });
+        console.log(this.generations[this.currentGeneration].tickPercentile);
+        // this.generations[this.currentGeneration].tickPercentile['75'] =
+        //     getPercentile(
+        //         this.generations[this.currentGeneration],
+        //         0.75,
+        //         foodCount
+        //     );
+        // this.generations[this.currentGeneration].tickPercentile['90'] =
+        //     getPercentile(
+        //         this.generations[this.currentGeneration],
+        //         0.9,
+        //         foodCount
+        //     );
+        // this.generations[this.currentGeneration].tickPercentile['100'] =
+        //     getPercentile(
+        //         this.generations[this.currentGeneration],
+        //         1,
+        //         foodCount
+        //     );
     }
 
     /**
