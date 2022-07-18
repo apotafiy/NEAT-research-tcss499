@@ -1,13 +1,70 @@
+/*
+ * Sorry for spaghetti IDK how to do front end lol
+ */
+
 /**
- * 
+ * If "Enforce Minimum Food" is on then the graph must be interpreted a little different since food is alway regenerated and the agents can never actually eat all the food.
+ * That being said, the graph should still fundamentally show the same thing.
  * @param {array} timeData food consumption time for each generation
  */
 const generateFoodTimeChart = (timeData)=>{
-    // timeData.forEach((arr) => arr.sort((a, b) => a - b));
-    // probably don't need to sort because they should be inserted in order already
-    const getPercentile = (ticks, fraction) => {
-        
-    };
+    const datasets = [];
+    FoodTracker.percentileMapping.forEach((obj, i) => {
+        let hue = 0;
+        if(i == 1){
+            hue = 50;
+        } else if(i == 2) {
+            hue = 100;
+        } else if(i == 3) {
+            hue = 230;
+        }
+        datasets.push({
+            label: `${obj.key}%`,
+            data: timeData[i],
+            fill: false,
+            borderColor: [hsl(hue, 100, 50)],
+            backgroundColor: [hsl(hue, 100, 50)],
+            borderWidth: 2,
+        });
+    });
+    if (document.getElementById('foodTimeChart') != undefined) {
+        document.getElementById('foodTimeChart').remove();
+    }
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('id', 'foodTimeChart');
+    document.getElementById('foodTimeChartContainer').appendChild(canvas);
+    const labels = [];
+    for(let i = 0 ; i < timeData[0].length; i++) {
+        labels.push(i);
+    }
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets,
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+                // x: {
+                //     min: 0,
+                // },
+            },
+            elements: {
+                line: {
+                    tension: 0.1,
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Time to Consumption`,
+                },
+            },
+        },
+    });
 };
 
 /**

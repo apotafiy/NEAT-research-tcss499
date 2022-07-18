@@ -574,6 +574,8 @@ class PopulationManager {
         generateCycleChart(this.genomeTracker.getCycleData());
         generateNodeChart(this.genomeTracker.getNodeData());
         generateCurrentFitnessChart(this.agentTracker.getFitnessData());
+        this.foodTracker.computePercentiles();
+        generateFoodTimeChart(this.foodTracker.getPercentileData());
         this.foodTracker.addNewGeneration();
         this.agentTracker.addNewGeneration();
         this.genomeTracker.addNewGeneration();
