@@ -113,7 +113,7 @@ class FoodTracker {
                 this.generations[this.currentGeneration].tickPercentile.foodCount
             );
         });
-        console.log(this.generations[this.currentGeneration].tickPercentile);
+        // console.log(this.generations[this.currentGeneration].tickPercentile);
         // this.generations[this.currentGeneration].tickPercentile['75'] =
         //     getPercentile(
         //         this.generations[this.currentGeneration],

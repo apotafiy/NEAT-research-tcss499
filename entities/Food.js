@@ -96,8 +96,10 @@ class Food {
             ? Math.abs(this.properties[this.state].calories) * -1
             : this.properties[this.state].calories;
         this.foodTracker.addCalories(cals);
-        this.foodTracker.addTick();
-        this.foodTracker.addLifeStage(this.state);
+        if(!this.isPoison) {
+            this.foodTracker.addTick();
+            this.foodTracker.addLifeStage(this.state);
+        }
         this.state = this.states.dead;
         this.removeFromWorld = true;
         return cals;
