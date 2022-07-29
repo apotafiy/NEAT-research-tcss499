@@ -102,7 +102,7 @@ class FoodTracker {
             let ret = null;
             if (index < ticks.length) {
                 ret = ticks[index];
-            }
+            }            
             return ret;
         };
         FoodTracker.percentileMapping.forEach((obj)=> {
