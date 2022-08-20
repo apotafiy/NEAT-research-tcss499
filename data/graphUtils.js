@@ -1,5 +1,5 @@
 /*
- * Sorry for spaghetti IDK how to do front end lol
+ * Sorry for spaghetti IDK how to do front end lol (Parker doesn't either)
  */
 
 /**

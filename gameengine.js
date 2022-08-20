@@ -87,9 +87,9 @@ class GameEngine {
             }
         });
 
-        let flag = this.population.update();
+        let isNewGeneration = this.population.update();
 
-        if (flag) {
+        if (isNewGeneration) {
             this.population.redistributeFoodAndPoison();
 
             if (params.FOOD_PERIODIC_REPOP) {

@@ -24,6 +24,22 @@ const params = {
     FITNESS_BAD_CALORIES: -1,
     GEN_STOP: false,
     NUM_AGENTS: 50,
+    DYNAMIC_AGENT_SIZING: false
+};
+
+const getMedian = (arr) => {
+    arr.sort((a, b) => a - b);
+    if(arr.length % 2 != 0) {
+        return arr[Math.floor(arr.length / 2)];
+    } else {
+        return getMean(arr.slice(Math.floor(arr.length/2), Math.floor(arr.length/2) + 2));
+    }
+};
+
+const getMean = (arr) => {
+    if(arr.length == 0) return 0;
+    const total = arr.reduce((curr, acc)=> acc + curr, 0);
+    return total / arr.length;
 };
 
 /**

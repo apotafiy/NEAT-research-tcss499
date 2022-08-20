@@ -4,7 +4,7 @@ class NeuralNet {
         this.genome = genome;
         this.nodes = this.genome.nodeGenes;
         this.edges = this.genome.connectionGenes;
-        this.sortedNodes = topoSort(this.nodes, this.edges);
+        this.sortedNodes = NeuralNetUtil.topoSort(this.nodes, this.edges);
     };
 
     processInput(input) {
