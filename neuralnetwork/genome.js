@@ -185,7 +185,7 @@ class Genome {
 
                 // detect if this newly added edge creates a cycle in existing child genome
                 newConnection.isCyclic = false;
-                newConnection.isCyclic = detectCycle(copiedNodes, copiedConnections, newConnection);
+                newConnection.isCyclic = NeuralNetUtil.detectCycle(copiedNodes, copiedConnections, newConnection);
             }
         });
 
@@ -317,7 +317,7 @@ class Genome {
                 };
                 Genome.addParentConnection(this.connectionGenes, this.nodeGenes, newConnection);
 
-                newConnection.isCyclic = detectCycle(this.nodeGenes, this.connectionGenes, newConnection);
+                newConnection.isCyclic = NeuralNetUtil.detectCycle(this.nodeGenes, this.connectionGenes, newConnection);
             }
         }
     };

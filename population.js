@@ -19,7 +19,7 @@ class PopulationManager {
         let defaultColor = randomInt(361);
         PopulationManager.COLORS_USED.add(defaultColor);
         PopulationManager.SPECIES_COLORS.set(0, defaultColor);
-        let defaultSensorColor = randomBlueHue();
+        let defaultSensorColor = AgentInputUtil.randomBlueHue();
         PopulationManager.SENSOR_COLORS_USED.add(defaultSensorColor);
         PopulationManager.SPECIES_SENSOR_COLORS.set(0, defaultSensorColor);
         
@@ -96,6 +96,7 @@ class PopulationManager {
         params.POISON_PERIODIC_REPOP = document.getElementById("periodic_poison_repop").checked;
         params.RAND_DEFAULT_WEIGHTS = document.getElementById("rand_default_weights").checked;
         params.GEN_STOP = document.getElementById("gen_stop").checked;
+        params.DYNAMIC_AGENT_SIZING = document.getElementById("dynamic_agent_sizing").checked;
 
         if (params.SPLIT_SPECIES && !document.getElementById("split_species").checked) {
             this.mergeWorlds();
@@ -193,10 +194,10 @@ class PopulationManager {
 
     getEntitiesInWorld(worldId, foodOnly = false, agentsOnly = false) {
         let members = this.worlds.get(worldId);
-        // uncomment the following code if you would like to add home to processed entities
-        // if (!foodOnly && !agentsOnly) {
-        //     entities.push(members.home);
-        // }
+
+        if (!foodOnly && !agentsOnly) {
+            entities.push(members.home);
+        }
         if (foodOnly) {
             return members.food.concat(members.poison);
         } else if (agentsOnly) {
@@ -269,9 +270,9 @@ class PopulationManager {
                 }
                 PopulationManager.COLORS_USED.add(newColor);
                 PopulationManager.SPECIES_COLORS.set(child.speciesId, newColor);
-                let newSensorColor = randomBlueHue();
+                let newSensorColor = AgentInputUtil.randomBlueHue();
                 while (PopulationManager.SENSOR_COLORS_USED.has(newSensorColor)) {
-                    newSensorColor = randomBlueHue();
+                    newSensorColor = AgentInputUtil.randomBlueHue();
                 }
                 PopulationManager.SENSOR_COLORS_USED.add(newSensorColor);
                 PopulationManager.SPECIES_SENSOR_COLORS.set(child.speciesId, newSensorColor);
@@ -559,7 +560,7 @@ class PopulationManager {
 
         if (!params.FREE_RANGE) {
             this.agentsAsList().forEach(agent => {
-                agent.resetPos();
+                agent.moveToWorldCenter();
                 agent.resetOrigin();
                 agent.resetEnergy();
                 agent.resetCalorieCounts();

@@ -1,3 +1,6 @@
+/**
+ * A class for tracking food data for each generation
+ */
 class FoodTracker {
     static percentileMapping = [
             {

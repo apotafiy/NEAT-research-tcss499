@@ -78,7 +78,7 @@ class Food {
         return lifetimes;
     };
 
-    getHue() {
+    getDataHue() {
         return this.properties[this.state].color;
     };
 

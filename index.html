@@ -6,16 +6,17 @@
     <title>TCSS 499 NEAT Simulation</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="text/javascript" src="./util.js"></script>
-    <script type="text/javascript" src="./data/GenomeTracker.js"></script>
-    <script type="text/javascript" src="./data/AgentTracker.js"></script>
+    <script type="text/javascript" src="./data/genometracker.js"></script>
+    <script type="text/javascript" src="./data/agenttracker.js"></script>
+    <script type="text/javascript" src="./entities/agentutil.js"></script>
     <script type="text/javascript" src="./entities/agent.js"></script>
-    <script type="text/javascript" src="./data/FoodTracker.js"></script>
-    <script type="text/javascript" src="./data/graphUtils.js"></script>
-    <script type="text/javascript" src="./entities/Food.js"></script>
+    <script type="text/javascript" src="./data/foodtracker.js"></script>
+    <script type="text/javascript" src="./data/graphutils.js"></script>
+    <script type="text/javascript" src="./entities/food.js"></script>
     <script type="text/javascript" src="./entities/home.js"></script>
-    <script type="text/javascript" src="./neuralnetwork/mapping.js"></script>
+    <script type="text/javascript" src="./neuralnetwork/custommaptypes.js"></script>
+    <script type="text/javascript" src="./neuralnetwork/neuralnetutil.js"></script>
     <script type="text/javascript" src="./neuralnetwork/neuralnet.js"></script>
-    <script type="text/javascript" src="./neuralnetwork/util.js"></script>
     <script type="text/javascript" src="./population.js"></script>
     <script type="text/javascript" src="./boundingcircle.js"></script>
     <script type="text/javascript" src="./assetmanager.js"></script>
@@ -61,6 +62,9 @@
     </div>
     <div>
         <input type="checkbox" id="agent_neighbors"> Agent Neighbors
+    </div>
+    <div>
+        <input type="checkbox" id="dynamic_agent_sizing"> Agent Size Changes With Energy
     </div>
     <div>
         <input type="checkbox" id="food_outside_circle"> Food and Poison Outside Outer Circle

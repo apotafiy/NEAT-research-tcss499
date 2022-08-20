@@ -1,7 +1,7 @@
 class HomeBase {
     constructor(game, x, y) {
         Object.assign(this, {game, x, y});
-        this.diameter = 30;
+        this.diameter = 20;
         this.strokeColor = "black";    
         this.fillColor = "hsl(0, 0%, 0%)";
         this.updateBoundingCircle();
@@ -9,11 +9,6 @@ class HomeBase {
 
     updateBoundingCircle() {
         this.BC = new BoundingCircle(this.x, this.y, this.diameter / 2);
-    };
-
-    getHue() {
-        let commaIndex = this.fillColor.indexOf(",");
-        return parseFloat(this.fillColor.substring(4, commaIndex));
     };
 
     update() {};
