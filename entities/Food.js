@@ -3,7 +3,7 @@
  * 
  * @author Parker Rosengreen and Artem Potafiy
  */
-class Food {
+ class Food {
 
     /**
      * Creates a new Food

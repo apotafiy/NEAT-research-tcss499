@@ -1,7 +1,7 @@
 /**
  * A class for tracking genome structural data for each generation
  */
-class GenomeTracker {
+ class GenomeTracker {
     constructor() {
         this.currentGeneration = -1;
         this.generations = [];

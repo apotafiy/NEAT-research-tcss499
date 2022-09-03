@@ -1,7 +1,7 @@
 /**
  * A class for tracking food data for each generation
  */
-class FoodTracker {
+ class FoodTracker {
     static percentileMapping = [
             {
                 key: '50',
