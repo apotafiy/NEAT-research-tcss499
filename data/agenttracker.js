@@ -1,7 +1,7 @@
 /**
  * A class for tracking agent data for each generation
  */
-class AgentTracker {
+ class AgentTracker {
     constructor() {
         this.currentGeneration = -1;
         this.generations = [];
