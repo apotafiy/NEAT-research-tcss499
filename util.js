@@ -15,6 +15,7 @@ const params = {
     RAND_FOOD_LIFETIME: false,
     FOOD_PERIODIC_REPOP: true,
     POISON_PERIODIC_REPOP: true,
+    FOOD_PODS: true,
     FREE_RANGE: false,
     SPLIT_SPECIES: true,
     RAND_DEFAULT_WEIGHTS: false,

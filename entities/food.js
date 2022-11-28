@@ -179,16 +179,6 @@
         }
     };
 
-    /** Indicates whether this food lies outside of the main food circle in the sim */
-    isOutsideOuterCircle() {
-        return distance(this.BC.center, {x: params.CANVAS_SIZE / 2, y: params.CANVAS_SIZE / 2}) > params.CANVAS_SIZE / 2;
-    };
-
-    /** Indicates whether this food lies inside of the innermost center food circle in the sim */
-    isInsideInnerCircle() {
-        return distance(this.BC.center, this.game.population.worlds.get(this.worldId).home.BC.center) < params.CANVAS_SIZE / 5;
-    };
-
     /** Updates this Food for the current tick */
     update() {
 
@@ -268,11 +258,30 @@ class FoodPod {
      * 
      * @returns the randomly generated position
      */
-    genFoodPos() {
+    generatePosition() {
         let randomDist = randomInt(this.radius);
         let randomAngle = randomInt(360) * Math.PI / 180;
         let x = this.centerX + randomDist * Math.cos(randomAngle);
         let y = this.centerY + randomDist * Math.sin(randomAngle);
         return { x, y };
+    };
+};
+
+/**
+ * A utility class for determining and validating food positioning in the sim.
+ */
+class FoodPositioningUtil {
+
+    static isPositionValid = entity => {
+               /** Indicates whether this food lies outside of the main food circle in the sim */
+        return (params.FOOD_OUTSIDE || distance(entity.BC.center, {x: params.CANVAS_SIZE / 2, y: params.CANVAS_SIZE / 2}) <= params.CANVAS_SIZE / 2) &&
+               /** Indicates whether this food lies inside of the innermost center food circle in the sim */
+               (params.FOOD_INSIDE || distance(entity.BC.center, entity.game.population.worlds.get(entity.worldId).home.BC.center) >= params.CANVAS_SIZE / 5) &&
+               /** Indicates whether this food lies outside of the entire sim */
+               !(entity.BC.x < 0 || entity.BC.y < 0 || entity.BC.x > params.CANVAS_SIZE || entity.BC.y > params.CANVAS_SIZE);
+    };
+      
+    static generatePosition = () => {
+        return {x: 0, y: 0};
     };
 };

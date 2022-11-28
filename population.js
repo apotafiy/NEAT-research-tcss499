@@ -53,14 +53,14 @@ class PopulationManager {
         let poisonIndex = 0;
         this.worlds.forEach(members => {
             members.food.forEach(f => {
-                let pos = this.foodPodLayout[foodIndex].genFoodPos();
+                let pos = params.FOOD_PODS ? this.foodPodLayout[foodIndex].genFoodPos() : FoodPositioningUtil.genFoodPos();
                 f.x = pos.x;
                 f.y = pos.y;
                 f.updateBoundingCircle();
                 foodIndex = (foodIndex + 1) % this.foodPodLayout.length;
             });
             members.poison.forEach(p => {
-                let pos = this.poisonPodLayout[poisonIndex].genFoodPos();
+                let pos = params.FOOD_PODS ? this.poisonPodLayout[poisonIndex].genFoodPos() : FoodPositioningUtil.genFoodPos();
                 p.x = pos.x;
                 p.y = pos.y;
                 p.updateBoundingCircle();
@@ -195,9 +195,6 @@ class PopulationManager {
     getEntitiesInWorld(worldId, foodOnly = false, agentsOnly = false) {
         let members = this.worlds.get(worldId);
 
-        if (!foodOnly && !agentsOnly) {
-            entities.push(members.home);
-        }
         if (foodOnly) {
             return members.food.concat(members.poison);
         } else if (agentsOnly) {

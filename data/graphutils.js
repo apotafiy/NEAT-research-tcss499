@@ -7,7 +7,7 @@
  * That being said, the graph should still fundamentally show the same thing.
  * @param {array} timeData food consumption time for each generation
  */
- const generateFoodTimeChart = (timeData)=>{
+ const generateFoodTimeChart = (timeData) => {
     const datasets = [];
     FoodTracker.percentileMapping.forEach((obj, i) => {
         let hue = 0;
